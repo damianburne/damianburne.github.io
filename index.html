@@ -421,15 +421,9 @@
             justify-content: center;
         }
 
-        /* Services section with reduced top padding */
-        #services {
+        /* All sections with optimized padding for consistent title positioning */
+        #services, #about, #projects, #thought-hub, #contact {
             padding: 50px 24px 80px;
-        }
-
-        /* About section optimized for better title positioning */
-        #about {
-            padding: 90px 24px 80px;
-            align-items: flex-start;
         }
 
         .section:nth-child(even) {
@@ -843,13 +837,9 @@
                 align-items: flex-start;
             }
 
-            #services {
+            /* All sections with consistent mobile padding */
+            #services, #about, #projects, #thought-hub, #contact {
                 padding: 30px 16px 60px;
-            }
-
-            #about {
-                padding: 70px 16px 60px;
-                align-items: flex-start;
             }
 
             .projects-grid {
@@ -875,14 +865,19 @@
             scroll-margin-top: 70px;
         }
 
-        /* Optimized scroll positioning for About section */
-        #about {
-            scroll-margin-top: 60px;
+        /* Optimized scroll positioning for all sections */
+        #about, #services, #projects, #thought-hub, #contact {
+            scroll-margin-top: 40px;
         }
 
         @media (max-width: 768px) {
             .section {
-                scroll-margin-top: 70px;
+                scroll-margin-top: 50px;
+            }
+            
+            /* Mobile scroll positioning for all sections */
+            #about, #services, #projects, #thought-hub, #contact {
+                scroll-margin-top: 40px;
             }
         }
     </style>
