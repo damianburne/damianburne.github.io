@@ -12,6 +12,9 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://damianburne.com">
     <link rel="canonical" href="https://damianburne.com">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.svg">
     
     <style>
         :root {
@@ -186,6 +189,16 @@
             text-align: center;
         }
 
+        .country-flag {
+            width: 24px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            border-radius: 2px;
+        }
+
         /* Mobile Menu */
         .mobile-menu {
             display: none;
@@ -194,6 +207,10 @@
             padding: 8px;
             border-radius: 4px;
             transition: all 0.3s ease;
+            position: relative;
+            width: 30px;
+            height: 30px;
+            justify-content: center;
         }
 
         .mobile-menu span {
@@ -201,20 +218,92 @@
             height: 2px;
             background: var(--text-primary);
             margin: 2px 0;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             transform-origin: center;
+            position: absolute;
+        }
+
+        .mobile-menu span:nth-child(1) {
+            top: 8px;
+        }
+
+        .mobile-menu span:nth-child(2) {
+            top: 14px;
+        }
+
+        .mobile-menu span:nth-child(3) {
+            top: 20px;
         }
 
         .mobile-menu.active span:nth-child(1) {
-            transform: rotate(45deg) translate(3px, 3px);
+            transform: rotate(45deg);
+            top: 14px;
         }
 
         .mobile-menu.active span:nth-child(2) {
             opacity: 0;
+            transform: translateX(20px);
         }
 
         .mobile-menu.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(3px, -3px);
+            transform: rotate(-45deg);
+            top: 14px;
+        }
+
+        /* Mobile Navigation Overlay */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .mobile-nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-nav-content {
+            background: white;
+            margin: 0;
+            padding: 40px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mobile-nav-links li {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mobile-nav-links li:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-nav-links a {
+            display: block;
+            padding: 20px 24px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-links a:hover {
+            background: var(--surface);
+            color: var(--primary-color);
         }
 
         /* Hero Section */
@@ -710,6 +799,25 @@
                 display: flex;
             }
 
+            .mobile-nav-overlay {
+                display: block;
+            }
+
+            .language-switcher {
+                order: -1;
+                margin-right: auto;
+                margin-left: 0;
+            }
+
+            .nav {
+                justify-content: space-between;
+            }
+
+            .logo {
+                order: 0;
+                margin: 0 auto;
+            }
+
             .hero-regions {
                 flex-direction: column;
                 gap: 12px;
@@ -752,6 +860,30 @@
     <!-- Header -->
     <header class="header">
         <nav class="nav">
+            <div class="language-switcher">
+                <button class="language-btn" id="languageBtn">
+                    <span class="flag">EN</span>
+                    <span>▼</span>
+                </button>
+                <div class="language-dropdown" id="languageDropdown">
+                    <div class="language-option" data-lang="en">
+                        <span class="country-flag us-flag">🇺🇸</span>
+                        <span>English</span>
+                    </div>
+                    <div class="language-option" data-lang="es">
+                        <span class="country-flag ar-flag">🇦🇷</span>
+                        <span>Español</span>
+                    </div>
+                    <div class="language-option" data-lang="pt">
+                        <span class="country-flag br-flag">🇧🇷</span>
+                        <span>Português</span>
+                    </div>
+                    <div class="language-option" data-lang="it">
+                        <span class="country-flag it-flag">🇮🇹</span>
+                        <span>Italiano</span>
+                    </div>
+                </div>
+            </div>
             <a href="#home" class="logo">Damian Burne</a>
             <ul class="nav-links">
                 <li><a href="#about" data-i18n="nav.about">About</a></li>
@@ -760,30 +892,6 @@
                 <li><a href="#thought-hub" data-i18n="nav.thoughtHub">Thought Hub</a></li>
                 <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
             </ul>
-            <div class="language-switcher">
-                <button class="language-btn" id="languageBtn">
-                    <span class="flag">EN</span>
-                    <span>▼</span>
-                </button>
-                <div class="language-dropdown" id="languageDropdown">
-                    <div class="language-option" data-lang="en">
-                        <span class="flag">EN</span>
-                        <span>English</span>
-                    </div>
-                    <div class="language-option" data-lang="es">
-                        <span class="flag">ES</span>
-                        <span>Español</span>
-                    </div>
-                    <div class="language-option" data-lang="pt">
-                        <span class="flag">PT</span>
-                        <span>Português</span>
-                    </div>
-                    <div class="language-option" data-lang="it">
-                        <span class="flag">IT</span>
-                        <span>Italiano</span>
-                    </div>
-                </div>
-            </div>
             <div class="mobile-menu" id="mobileMenu">
                 <span></span>
                 <span></span>
@@ -791,6 +899,19 @@
             </div>
         </nav>
     </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay">
+        <div class="mobile-nav-content">
+            <ul class="mobile-nav-links">
+                <li><a href="#about" data-i18n="nav.about" class="mobile-nav-link">About</a></li>
+                <li><a href="#services" data-i18n="nav.services" class="mobile-nav-link">Services</a></li>
+                <li><a href="#projects" data-i18n="nav.projects" class="mobile-nav-link">Projects</a></li>
+                <li><a href="#thought-hub" data-i18n="nav.thoughtHub" class="mobile-nav-link">Thought Hub</a></li>
+                <li><a href="#contact" data-i18n="nav.contact" class="mobile-nav-link">Contact</a></li>
+            </ul>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -1154,8 +1275,18 @@
                 });
             });
 
-            document.addEventListener('click', () => {
-                languageDropdown.classList.remove('active');
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
+                    languageDropdown.classList.remove('active');
+                }
+            });
+
+            // Close dropdown on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && languageDropdown.classList.contains('active')) {
+                    languageDropdown.classList.remove('active');
+                }
             });
         }
 
@@ -1280,11 +1411,40 @@
         // Mobile menu functionality
         function initMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
-            const navLinks = document.querySelector('.nav-links');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
             
             mobileMenu.addEventListener('click', () => {
                 mobileMenu.classList.toggle('active');
-                navLinks.classList.toggle('mobile-active');
+                mobileNavOverlay.classList.toggle('active');
+                document.body.style.overflow = mobileNavOverlay.classList.contains('active') ? 'hidden' : '';
+            });
+
+            // Close mobile menu when clicking on a link
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            // Close mobile menu when clicking outside
+            mobileNavOverlay.addEventListener('click', (e) => {
+                if (e.target === mobileNavOverlay) {
+                    mobileMenu.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && mobileNavOverlay.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             });
         }
 
@@ -1301,53 +1461,6 @@
             initHeaderEffects();
             initMobileMenu();
         });
-
-        // Performance optimization: Debounce scroll events
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        // Add mobile styles for navigation
-        const mobileStyles = `
-            @media (max-width: 768px) {
-                .nav-links.mobile-active {
-                    display: flex;
-                    position: fixed;
-                    top: 60px;
-                    left: 0;
-                    right: 0;
-                    background: rgba(255, 255, 255, 0.95);
-                    backdrop-filter: saturate(180%) blur(20px);
-                    flex-direction: column;
-                    padding: 20px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                    z-index: 9998;
-                }
-                
-                .nav-links.mobile-active a {
-                    padding: 15px 0;
-                    border-bottom: 1px solid var(--border);
-                }
-                
-                .language-switcher {
-                    order: -1;
-                    margin-bottom: 20px;
-                }
-            }
-        `;
-
-        // Inject mobile styles
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = mobileStyles;
-        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff9500"/>
+      <stop offset="100%" style="stop-color:#ff6b00"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="6" fill="url(#gradient)"/>
+  <!-- DB text perfectly centered in the icon -->
+  <text x="16" y="19" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">DB</text>
+  <!-- Three bigger blue dots forming equilateral triangle around centered DB -->
+  <!-- Top dot - positioned between top of DB letters and top edge of icon -->
+  <circle cx="16" cy="5" r="2.2" fill="#007AFF"/>
+  <!-- Bottom left dot - positioned for perfect equilateral triangle -->
+  <circle cx="4.6" cy="24.75" r="2.2" fill="#007AFF"/>
+  <!-- Bottom right dot - positioned for perfect equilateral triangle -->
+  <circle cx="27.4" cy="24.75" r="2.2" fill="#007AFF"/>
+</svg>
