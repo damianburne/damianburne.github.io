@@ -3,9 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Damian Burne - IT Consultant & Process Improvement Specialist</title>
-    <meta name="description" content="IT Consultant specializing in Jira process improvement, automation, delivery coaching, and AI agent solutions for business scaling.">
+    <title>Damian Burne - Technical Air Support for Your Team | Agile Transformation Consultant</title>
+    <meta name="description" content="Providing technical air support for teams through enterprise-scale agile transformations, business process improvement, and delivery leadership across LATAM, Europe, and Oceania.">
+    <meta name="keywords" content="Technical support, Agile transformation, Scrum master, delivery leadership, business process improvement, enterprise Atlassian, workflow design">
+    <meta name="author" content="Damian Burne">
+    <meta property="og:title" content="Damian Burne - Technical Air Support for Your Team">
+    <meta property="og:description" content="Providing technical air support for teams through enterprise-scale agile transformations and delivery leadership.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://damianburne.com">
+    <link rel="canonical" href="https://damianburne.com">
+    
     <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --background: #ffffff;
+            --surface: #f5f5f7;
+            --border: rgba(0, 0, 0, 0.08);
+            --accent: #FF3B30;
+            --success: #34C759;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,75 +36,154 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', Helvetica, Arial, sans-serif;
             line-height: 1.47059;
-            color: #1d1d1f;
+            color: var(--text-primary);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
         }
 
-        /* Header */
+        /* Header & Navigation */
         .header {
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(251, 251, 253, 0.8);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: saturate(180%) blur(20px);
             z-index: 9999;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid var(--border);
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .nav {
-            max-width: 1024px;
+            max-width: 1200px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 22px;
-            height: 44px;
+            padding: 0 24px;
+            height: 60px;
         }
 
         .logo {
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 600;
-            color: #1d1d1f;
+            color: var(--text-primary);
             letter-spacing: -0.022em;
+            text-decoration: none;
         }
 
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 40px;
+            gap: 32px;
+            align-items: center;
         }
 
         .nav-links a {
             text-decoration: none;
-            color: #1d1d1f;
-            font-size: 17px;
+            color: var(--text-primary);
+            font-size: 16px;
             font-weight: 400;
             letter-spacing: -0.022em;
-            transition: color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
+            padding: 8px 0;
         }
 
-        .nav-links a:hover {
-            color: #0071e3;
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
         }
 
         .nav-links a::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: 0;
             left: 50%;
             width: 0;
             height: 2px;
-            background: #0071e3;
+            background: var(--primary-color);
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             transform: translateX(-50%);
         }
 
-        .nav-links a:hover::after {
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
             width: 100%;
+        }
+
+        /* Language Switcher */
+        .language-switcher {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .language-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .language-btn:hover {
+            background: #e8e8ed;
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--shadow);
+            padding: 8px 0;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .language-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .language-option:hover {
+            background: var(--surface);
+        }
+
+        .flag {
+            width: 24px;
+            height: 16px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
         }
 
         /* Mobile Menu */
@@ -93,24 +193,20 @@
             cursor: pointer;
             padding: 8px;
             border-radius: 4px;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .mobile-menu:hover {
-            background: rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
         }
 
         .mobile-menu span {
-            width: 18px;
-            height: 1px;
-            background: #1d1d1f;
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
             margin: 2px 0;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.3s ease;
             transform-origin: center;
         }
 
         .mobile-menu.active span:nth-child(1) {
-            transform: rotate(45deg) translate(2px, 2px);
+            transform: rotate(45deg) translate(3px, 3px);
         }
 
         .mobile-menu.active span:nth-child(2) {
@@ -118,51 +214,7 @@
         }
 
         .mobile-menu.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(2px, -2px);
-        }
-
-        /* Mobile Navigation */
-        .mobile-nav {
-            position: fixed;
-            top: 44px;
-            left: 0;
-            width: 100%;
-            height: calc(100vh - 44px);
-            background: rgba(251, 251, 253, 0.95);
-            backdrop-filter: saturate(180%) blur(20px);
-            transform: translateY(-100%);
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            z-index: 9998;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .mobile-nav.active {
-            transform: translateY(0);
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .mobile-nav-links {
-            padding: 40px 22px;
-            list-style: none;
-        }
-
-        .mobile-nav-links li {
-            margin-bottom: 24px;
-        }
-
-        .mobile-nav-links a {
-            color: #1d1d1f;
-            text-decoration: none;
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: -0.003em;
-            transition: color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .mobile-nav-links a:hover {
-            color: #0071e3;
+            transform: rotate(-45deg) translate(3px, -3px);
         }
 
         /* Hero Section */
@@ -170,8 +222,10 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            justify-content: center;
             text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff9500;stop-opacity:1" /><stop offset="50%" style="stop-color:%23ff7b00;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff6b00;stop-opacity:1" /></linearGradient></defs><rect width="1200" height="800" fill="url(%23g1)"/><polygon points="0,400 300,200 600,350 900,150 1200,300 1200,800 0,800" fill="rgba(255,255,255,0.1)"/><polygon points="0,600 200,400 500,550 800,350 1200,500 1200,800 0,800" fill="rgba(255,255,255,0.05)"/></svg>') center/cover;
             position: relative;
             overflow: hidden;
         }
@@ -183,334 +237,461 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+            background: radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
         }
 
         .hero-content {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 0 22px;
+            max-width: 900px;
+            padding: 0 24px;
             position: relative;
             z-index: 1;
         }
 
         .hero h1 {
-            font-size: clamp(48px, 7vw, 80px);
+            font-size: clamp(40px, 6vw, 72px);
             font-weight: 700;
             letter-spacing: -0.003em;
             margin-bottom: 24px;
-            color: #1d1d1f;
+            color: white;
             line-height: 1.05;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .hero-subtitle {
-            font-size: clamp(21px, 3vw, 28px);
+            font-size: clamp(18px, 2.5vw, 24px);
             font-weight: 400;
             letter-spacing: -0.003em;
             margin-bottom: 40px;
-            color: #86868b;
-            line-height: 1.25;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-regions {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out 0.9s forwards;
+        }
+
+        .region-badge {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .cta-button {
             display: inline-block;
-            background: #0071e3;
+            background: var(--primary-color);
             color: white;
-            padding: 12px 24px;
-            border-radius: 980px;
+            padding: 16px 32px;
+            border-radius: 50px;
             text-decoration: none;
-            font-weight: 400;
-            font-size: 17px;
+            font-weight: 500;
+            font-size: 16px;
             letter-spacing: -0.022em;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            border: 1px solid #0071e3;
+            border: 2px solid var(--primary-color);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out 1.2s forwards;
         }
 
         .cta-button:hover {
-            background: #0077ed;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 113, 227, 0.25);
+            background: #0056D6;
+            border-color: #0056D6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
         }
 
-        /* Services Section */
-        .services {
-            padding: 100px 22px;
-            background: #f5f5f7;
-        }
-
-        .container {
-            max-width: 980px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: clamp(40px, 5vw, 56px);
-            font-weight: 700;
-            letter-spacing: -0.003em;
-            margin-bottom: 80px;
-            color: #1d1d1f;
-            line-height: 1.07;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 40px;
-        }
-
-        .service-card {
-            background: white;
-            padding: 40px 32px;
-            border-radius: 18px;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        .service-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        }
-
-        .service-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #0071e3, #00a8ff);
-            border-radius: 16px;
+        /* Sections */
+        .section {
+            min-height: 100vh;
+            padding: 120px 24px 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 24px;
-            font-size: 24px;
-            color: white;
         }
 
-        .service-card h3 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #1d1d1f;
+        .section:nth-child(even) {
+            background: var(--surface);
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 700;
             letter-spacing: -0.003em;
-            line-height: 1.17;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            line-height: 1.07;
+            text-align: center;
         }
 
-        .service-card p {
-            color: #86868b;
-            line-height: 1.47;
-            font-size: 17px;
-            letter-spacing: -0.022em;
+        .section-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* About Section */
-        .about {
-            padding: 100px 22px;
-            background: white;
-        }
-
-        .about-content {
+        .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 80px;
             align-items: center;
         }
 
-        .about-text h2 {
-            font-size: clamp(40px, 5vw, 56px);
-            font-weight: 700;
-            margin-bottom: 32px;
-            color: #1d1d1f;
-            letter-spacing: -0.003em;
-            line-height: 1.07;
+        .about-text h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
         }
 
         .about-text p {
-            font-size: 19px;
-            color: #86868b;
-            margin-bottom: 24px;
-            line-height: 1.42;
-            letter-spacing: -0.022em;
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
         }
 
-        .skills {
+        .expertise-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             margin-top: 32px;
         }
 
-        .skill-tag {
-            background: #f5f5f7;
-            color: #1d1d1f;
+        .tag {
+            background: var(--primary-color);
+            color: white;
             padding: 8px 16px;
             border-radius: 20px;
-            font-size: 15px;
-            font-weight: 400;
-            letter-spacing: -0.016em;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .about-visual {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 24px;
+            padding: 60px;
+            color: white;
+            text-align: center;
         }
 
-        .about-visual-inner {
-            width: 320px;
-            height: 320px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80px;
+        .about-visual h4 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .stat {
+            margin: 20px 0;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
         }
 
-        .about-visual-inner::before {
+        .service-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 30%, rgba(0, 113, 227, 0.1) 0%, transparent 70%);
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 24px;
+        }
+
+        .service-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .service-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .service-features {
+            list-style: none;
+        }
+
+        .service-features li {
+            padding: 4px 0;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px var(--shadow);
+        }
+
+        .project-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .project-content {
+            padding: 32px;
+        }
+
+        .project-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .project-card .client {
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .project-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .project-tag {
+            background: var(--surface);
+            color: var(--text-primary);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Thought Hub Section */
+        .thought-hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .article-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px var(--shadow);
+        }
+
+        .article-category {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .article-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .article-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .read-more {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
         }
 
         /* Contact Section */
-        .contact {
-            padding: 100px 22px;
-            background: #1d1d1f;
-            color: white;
+        .contact-content {
             text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .contact h2 {
-            font-size: clamp(40px, 5vw, 56px);
-            font-weight: 700;
-            margin-bottom: 24px;
-            letter-spacing: -0.003em;
-            line-height: 1.07;
-        }
-
-        .contact p {
-            font-size: 19px;
-            margin-bottom: 40px;
-            color: #a1a1a6;
-            line-height: 1.42;
-            letter-spacing: -0.022em;
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
 
-        .contact-button {
-            display: inline-block;
-            background: #0071e3;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 980px;
-            text-decoration: none;
-            font-weight: 400;
-            font-size: 17px;
-            letter-spacing: -0.022em;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            border: 1px solid #0071e3;
+        .contact-method {
+            background: white;
+            padding: 32px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
         }
 
-        .contact-button:hover {
-            background: #0077ed;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 113, 227, 0.25);
+        .contact-method:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px var(--shadow);
+        }
+
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: white;
+            font-size: 20px;
         }
 
         /* Footer */
         .footer {
-            background: #1d1d1f;
-            color: #86868b;
+            background: var(--text-primary);
+            color: white;
             text-align: center;
-            padding: 40px 22px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px 24px;
         }
 
         .footer p {
-            font-size: 12px;
-            letter-spacing: -0.01em;
+            opacity: 0.7;
         }
 
-        /* Responsive Design */
-        @media (max-width: 834px) {
-            .nav-links {
-                display: none;
-            }
-
-            .mobile-menu {
-                display: flex;
-            }
-
-            .about-content {
-                grid-template-columns: 1fr;
-                gap: 60px;
-                text-align: center;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-
-            .services {
-                padding: 80px 22px;
-            }
-
-            .about {
-                padding: 80px 22px;
-            }
-
-            .contact {
-                padding: 80px 22px;
-            }
-
-            .about-visual-inner {
-                width: 280px;
-                height: 280px;
-                font-size: 60px;
+        /* Animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        @media (max-width: 430px) {
-            .nav {
-                padding: 0 16px;
-            }
-
-            .hero-content,
-            .services,
-            .about,
-            .contact {
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-
-            .service-card {
-                padding: 32px 24px;
-            }
-        }
-
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Loading animations */
         .fade-in {
             opacity: 0;
-            transform: translateY(24px);
+            transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
@@ -519,13 +700,51 @@
             transform: translateY(0);
         }
 
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
             }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .hero-regions {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .section {
+                padding: 80px 16px 60px;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Smooth scrolling behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Section visibility for navigation */
+        .section {
+            scroll-margin-top: 80px;
         }
     </style>
 </head>
@@ -533,199 +752,602 @@
     <!-- Header -->
     <header class="header">
         <nav class="nav">
-            <div class="logo">Damian Burne</div>
+            <a href="#home" class="logo">Damian Burne</a>
             <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#about" data-i18n="nav.about">About</a></li>
+                <li><a href="#services" data-i18n="nav.services">Services</a></li>
+                <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
+                <li><a href="#thought-hub" data-i18n="nav.thoughtHub">Thought Hub</a></li>
+                <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
             </ul>
+            <div class="language-switcher">
+                <button class="language-btn" id="languageBtn">
+                    <span class="flag">EN</span>
+                    <span>▼</span>
+                </button>
+                <div class="language-dropdown" id="languageDropdown">
+                    <div class="language-option" data-lang="en">
+                        <span class="flag">EN</span>
+                        <span>English</span>
+                    </div>
+                    <div class="language-option" data-lang="es">
+                        <span class="flag">ES</span>
+                        <span>Español</span>
+                    </div>
+                    <div class="language-option" data-lang="pt">
+                        <span class="flag">PT</span>
+                        <span>Português</span>
+                    </div>
+                    <div class="language-option" data-lang="it">
+                        <span class="flag">IT</span>
+                        <span>Italiano</span>
+                    </div>
+                </div>
+            </div>
             <div class="mobile-menu" id="mobileMenu">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
         </nav>
-        <div class="mobile-nav" id="mobileNav">
-            <ul class="mobile-nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </div>
     </header>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>IT Consultant & Process Innovation Specialist</h1>
-            <p class="hero-subtitle">Transforming businesses through Jira optimization, automation, and cutting-edge AI agent solutions</p>
-            <a href="#contact" class="cta-button">Let's Transform Your Business</a>
+            <h1 data-i18n="hero.title">Give your team technical air support</h1>
+            <p class="hero-subtitle" data-i18n="hero.subtitle">Expert Jira SME with strong scripting capabilities and deep expertise in Agile rollouts, Business Process Improvements & Team Coordination - ready to accelerate your delivery success</p>
+            <div class="hero-regions">
+                <span class="region-badge" data-i18n="regions.latam">LATAM</span>
+                <span class="region-badge" data-i18n="regions.europe">Europe</span>
+                <span class="region-badge" data-i18n="regions.oceania">Oceania</span>
+            </div>
+            <a href="mailto:hello@damianburne.com" class="cta-button" data-i18n="hero.cta">Get In Touch</a>
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section id="services" class="services">
+    <!-- About Section -->
+    <section id="about" class="section">
         <div class="container">
-            <h2 class="section-title">My Expertise</h2>
-            <div class="services-grid">
-                <div class="service-card fade-in">
-                    <div class="service-icon">⚙️</div>
-                    <h3>Jira Process Improvement</h3>
-                    <p>Streamline your workflows, optimize configurations, and enhance team productivity through expert Jira consulting and customization.</p>
+            <h2 class="section-title" data-i18n="about.title">About</h2>
+            <p class="section-subtitle" data-i18n="about.subtitle">Delivering enterprise-scale agile transformations with precision and expertise</p>
+            <div class="about-grid">
+                <div class="about-text fade-in">
+                    <h3 data-i18n="about.heading">Technical Excellence Meets Delivery Leadership</h3>
+                    <p data-i18n="about.p1">With deep expertise in Jira ecosystem design and enterprise-scale implementations, I help organizations transform their delivery capabilities through strategic process improvement and agile methodologies.</p>
+                    <p data-i18n="about.p2">My approach combines technical precision with practical delivery experience, ensuring that complex transformations are executed smoothly and deliver measurable business value.</p>
+                    <p data-i18n="about.p3">Specialized in scaling agile practices across large organizations while maintaining focus on team coordination, workflow optimization, and sustainable delivery practices.</p>
+                    <div class="expertise-tags">
+                        <span class="tag">Jira Administration</span>
+                        <span class="tag">Agile Transformation</span>
+                        <span class="tag">Scrum Leadership</span>
+                        <span class="tag">Process Design</span>
+                        <span class="tag">Team Coordination</span>
+                        <span class="tag">Confluence</span>
+                    </div>
                 </div>
-                <div class="service-card fade-in">
-                    <div class="service-icon">🤖</div>
-                    <h3>Automation Solutions</h3>
-                    <p>Implement intelligent automation to reduce manual tasks, eliminate bottlenecks, and accelerate your delivery pipeline.</p>
-                </div>
-                <div class="service-card fade-in">
-                    <div class="service-icon">🚀</div>
-                    <h3>Delivery Coaching</h3>
-                    <p>Guide your teams to achieve consistent, high-quality deliveries through proven methodologies and hands-on coaching.</p>
-                </div>
-                <div class="service-card fade-in">
-                    <div class="service-icon">🧠</div>
-                    <h3>AI Agent Development</h3>
-                    <p>Future-ready AI solutions that help small companies scale efficiently, offering enterprise-level capabilities at a fraction of the cost.</p>
+                <div class="about-visual fade-in">
+                    <h4 data-i18n="about.experience">Experience</h4>
+                    <div class="stat">
+                        <span class="stat-number">20+</span>
+                        <span class="stat-label" data-i18n="about.years">Years in IT</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">3.5</span>
+                        <span class="stat-label" data-i18n="about.languages">Languages Available</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">Global</span>
+                        <span class="stat-label" data-i18n="about.deployment">LATAM, EU & OZ Ready</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
+    <!-- Services Section -->
+    <section id="services" class="section">
         <div class="container">
-            <div class="about-content">
-                <div class="about-text fade-in">
-                    <h2>Driving Digital Transformation</h2>
-                    <p>With extensive experience in IT consulting and process improvement, I specialize in helping organizations unlock their full potential through strategic technology implementations and streamlined workflows.</p>
-                    <p>My expertise in Jira, combined with a strong automation background and delivery-oriented approach, enables me to deliver measurable results that drive business growth and operational excellence.</p>
-                    <p>Looking ahead, I'm passionate about democratizing AI technology, making sophisticated agent solutions accessible to small businesses that want to compete with larger enterprises.</p>
-                    <div class="skills">
-                        <span class="skill-tag">Jira Administration</span>
-                        <span class="skill-tag">Process Automation</span>
-                        <span class="skill-tag">Agile Coaching</span>
-                        <span class="skill-tag">DevOps</span>
-                        <span class="skill-tag">AI Integration</span>
-                        <span class="skill-tag">Workflow Optimization</span>
+            <h2 class="section-title" data-i18n="services.title">Services</h2>
+            <p class="section-subtitle" data-i18n="services.subtitle">Comprehensive solutions for agile transformation and delivery excellence</p>
+            <div class="services-grid">
+                <div class="service-card fade-in">
+                    <div class="service-icon">⚙</div>
+                    <h3 data-i18n="services.jira.title">Jira Workflow Design</h3>
+                    <p data-i18n="services.jira.description">Expert design and implementation of enterprise-scale Jira workflows, custom fields, and automation rules tailored to your organizational needs.</p>
+                    <ul class="service-features">
+                        <li data-i18n="services.jira.feature1">Custom workflow optimization</li>
+                        <li data-i18n="services.jira.feature2">Automation & scripting</li>
+                        <li data-i18n="services.jira.feature3">Performance tuning</li>
+                        <li data-i18n="services.jira.feature4">Integration architecture</li>
+                    </ul>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">🚀</div>
+                    <h3 data-i18n="services.agile.title">Agile Rollout Support</h3>
+                    <p data-i18n="services.agile.description">End-to-end agile transformation support, from initial assessment through implementation and continuous improvement.</p>
+                    <ul class="service-features">
+                        <li data-i18n="services.agile.feature1">Agile maturity assessment</li>
+                        <li data-i18n="services.agile.feature2">Framework selection & customization</li>
+                        <li data-i18n="services.agile.feature3">Change management</li>
+                        <li data-i18n="services.agile.feature4">Training & coaching</li>
+                    </ul>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">👥</div>
+                    <h3 data-i18n="services.scrum.title">Scrum & Delivery Leadership</h3>
+                    <p data-i18n="services.scrum.description">Strategic leadership for high-performing teams, focusing on delivery excellence and sustainable practices.</p>
+                    <ul class="service-features">
+                        <li data-i18n="services.scrum.feature1">Scrum Master coaching</li>
+                        <li data-i18n="services.scrum.feature2">Team performance optimization</li>
+                        <li data-i18n="services.scrum.feature3">Delivery metrics & reporting</li>
+                        <li data-i18n="services.scrum.feature4">Scaling frameworks (SAFe, LeSS)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="container">
+            <h2 class="section-title" data-i18n="projects.title">Featured Projects</h2>
+            <p class="section-subtitle" data-i18n="projects.subtitle">Real-world implementations delivering measurable business impact</p>
+            <div class="projects-grid">
+                <div class="project-card fade-in">
+                    <div class="project-image">VH</div>
+                    <div class="project-content">
+                        <div class="client">Virtus Health</div>
+                        <h3 data-i18n="projects.virtus.title">Jira/Confluence Ecosystem Design</h3>
+                        <p data-i18n="projects.virtus.description">Complete redesign of project management infrastructure for Australia's leading fertility healthcare provider, implementing standardized workflows across multiple business units and improving delivery visibility by 300%.</p>
+                        <div class="project-tags">
+                            <span class="project-tag">Jira Administration</span>
+                            <span class="project-tag">Confluence</span>
+                            <span class="project-tag">Workflow Design</span>
+                            <span class="project-tag">Healthcare</span>
+                        </div>
                     </div>
                 </div>
-                <div class="about-visual fade-in">
-                    <div class="about-visual-inner">
-                        💼
+                <div class="project-card fade-in">
+                    <div class="project-image">TLS</div>
+                    <div class="project-content">
+                        <div class="client">Telstra</div>
+                        <h3 data-i18n="projects.telstra.title">Enterprise Jira Standards</h3>
+                        <p data-i18n="projects.telstra.description">Developed and implemented company-wide Jira standards for 26,000+ users across Australia's largest telecommunications provider, establishing governance frameworks and training programs for sustainable adoption.</p>
+                        <div class="project-tags">
+                            <span class="project-tag">Enterprise Scale</span>
+                            <span class="project-tag">Governance</span>
+                            <span class="project-tag">Training</span>
+                            <span class="project-tag">Telecommunications</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Thought Hub Section -->
+    <section id="thought-hub" class="section">
+        <div class="container">
+            <h2 class="section-title" data-i18n="thoughtHub.title">Thought Hub</h2>
+            <p class="section-subtitle" data-i18n="thoughtHub.subtitle">Insights on agile transformation, Jira strategy, and delivery excellence</p>
+            <div class="thought-hub-grid">
+                <article class="article-card fade-in">
+                    <span class="article-category" data-i18n="thoughtHub.categories.jira">Jira Strategy</span>
+                    <h3 data-i18n="thoughtHub.article1.title">Enterprise Jira Architecture: Beyond Basic Workflows</h3>
+                    <p data-i18n="thoughtHub.article1.excerpt">Exploring advanced patterns for scaling Jira across large organizations while maintaining performance and user experience.</p>
+                    <a href="#" class="read-more" data-i18n="thoughtHub.readMore">Read More →</a>
+                </article>
+                <article class="article-card fade-in">
+                    <span class="article-category" data-i18n="thoughtHub.categories.agile">Agile Coaching</span>
+                    <h3 data-i18n="thoughtHub.article2.title">The Psychology of Agile Transformation</h3>
+                    <p data-i18n="thoughtHub.article2.excerpt">Understanding the human elements that make or break large-scale agile implementations in enterprise environments.</p>
+                    <a href="#" class="read-more" data-i18n="thoughtHub.readMore">Read More →</a>
+                </article>
+                <article class="article-card fade-in">
+                    <span class="article-category" data-i18n="thoughtHub.categories.operations">Operations</span>
+                    <h3 data-i18n="thoughtHub.article3.title">Delivery Metrics That Actually Matter</h3>
+                    <p data-i18n="thoughtHub.article3.excerpt">Moving beyond velocity and burn-downs to metrics that drive real business outcomes and team improvement.</p>
+                    <a href="#" class="read-more" data-i18n="thoughtHub.readMore">Read More →</a>
+                </article>
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="contact">
+    <section id="contact" class="section">
         <div class="container">
-            <h2>Ready to Scale Your Business?</h2>
-            <p>Let's discuss how I can help optimize your processes and prepare your organization for the future of work.</p>
-            <a href="mailto:hello@damianburne.com" class="contact-button">Get In Touch</a>
+            <div class="contact-content">
+                <h2 class="section-title" data-i18n="contact.title">Let's Work Together</h2>
+                <p class="section-subtitle" data-i18n="contact.subtitle">Ready to transform your delivery capabilities? Let's discuss how we can achieve your organizational goals.</p>
+                <div class="contact-methods">
+                    <div class="contact-method fade-in">
+                        <div class="contact-icon">@</div>
+                        <h3 data-i18n="contact.email.title">Email</h3>
+                        <a href="mailto:hello@damianburne.com" data-i18n="contact.email.address">hello@damianburne.com</a>
+                    </div>
+                    <div class="contact-method fade-in">
+                        <div class="contact-icon">★</div>
+                        <h3 data-i18n="contact.regions.title">Regions</h3>
+                        <p data-i18n="contact.regions.list">LATAM • Europe • Oceania</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Damian Burne. All rights reserved.</p>
+            <p data-i18n="footer.copyright">&copy; 2025 Damian Burne. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
-        // Mobile menu functionality
-        const mobileMenu = document.getElementById('mobileMenu');
-        const mobileNav = document.getElementById('mobileNav');
-        
-        mobileMenu.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            mobileNav.classList.toggle('active');
-            document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
-        });
-
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.mobile-nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                mobileNav.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!mobileMenu.contains(e.target) && !mobileNav.contains(e.target)) {
-                mobileMenu.classList.remove('active');
-                mobileNav.classList.remove('active');
-                document.body.style.overflow = '';
+        // Internationalization
+        const translations = {
+            en: {
+                'nav.about': 'About',
+                'nav.services': 'Services',
+                'nav.projects': 'Projects',
+                'nav.thoughtHub': 'Thought Hub',
+                'nav.contact': 'Contact',
+                'lang.english': 'EN',
+                'hero.title': 'Give your team technical air support',
+                'hero.subtitle': 'Expert Jira SME with strong scripting capabilities and deep expertise in Agile rollouts, Business Process Improvements & Team Coordination - ready to accelerate your delivery success',
+                'hero.cta': 'Get In Touch',
+                'regions.latam': 'LATAM',
+                'regions.europe': 'Europe',
+                'regions.oceania': 'Oceania',
+                'about.title': 'About',
+                'about.subtitle': 'Delivering enterprise-scale agile transformations with precision and expertise',
+                'about.heading': 'Technical Excellence Meets Delivery Leadership',
+                'about.p1': 'With deep expertise in Jira ecosystem design and enterprise-scale implementations, I help organizations transform their delivery capabilities through strategic process improvement and agile methodologies.',
+                'about.p2': 'My approach combines technical precision with practical delivery experience, ensuring that complex transformations are executed smoothly and deliver measurable business value.',
+                'about.p3': 'Specialized in scaling agile practices across large organizations while maintaining focus on team coordination, workflow optimization, and sustainable delivery practices.',
+                'about.experience': 'Experience',
+                'about.years': 'Years in IT',
+                'about.languages': 'Languages Available',
+                'about.deployment': 'LATAM, EU & OZ Ready',
+                'services.title': 'Services',
+                'services.subtitle': 'Comprehensive solutions for agile transformation and delivery excellence',
+                'services.jira.title': 'Jira Workflow Design',
+                'services.jira.description': 'Expert design and implementation of enterprise-scale Jira workflows, custom fields, and automation rules tailored to your organizational needs.',
+                'services.jira.feature1': 'Custom workflow optimization',
+                'services.jira.feature2': 'Automation & scripting',
+                'services.jira.feature3': 'Performance tuning',
+                'services.jira.feature4': 'Integration architecture',
+                'services.agile.title': 'Agile Rollout Support',
+                'services.agile.description': 'End-to-end agile transformation support, from initial assessment through implementation and continuous improvement.',
+                'services.agile.feature1': 'Agile maturity assessment',
+                'services.agile.feature2': 'Framework selection & customization',
+                'services.agile.feature3': 'Change management',
+                'services.agile.feature4': 'Training & coaching',
+                'services.scrum.title': 'Scrum & Delivery Leadership',
+                'services.scrum.description': 'Strategic leadership for high-performing teams, focusing on delivery excellence and sustainable practices.',
+                'services.scrum.feature1': 'Scrum Master coaching',
+                'services.scrum.feature2': 'Team performance optimization',
+                'services.scrum.feature3': 'Delivery metrics & reporting',
+                'services.scrum.feature4': 'Scaling frameworks (SAFe, LeSS)',
+                'projects.title': 'Featured Projects',
+                'projects.subtitle': 'Real-world implementations delivering measurable business impact',
+                'projects.virtus.title': 'Jira/Confluence Ecosystem Design',
+                'projects.virtus.description': 'Complete redesign of project management infrastructure for Australia\'s leading fertility healthcare provider, implementing standardized workflows across multiple business units and improving delivery visibility by 300%.',
+                'projects.telstra.title': 'Enterprise Jira Standards',
+                'projects.telstra.description': 'Developed and implemented company-wide Jira standards for 26,000+ users across Australia\'s largest telecommunications provider, establishing governance frameworks and training programs for sustainable adoption.',
+                'thoughtHub.title': 'Thought Hub',
+                'thoughtHub.subtitle': 'Insights on agile transformation, Jira strategy, and delivery excellence',
+                'thoughtHub.categories.jira': 'Jira Strategy',
+                'thoughtHub.categories.agile': 'Agile Coaching',
+                'thoughtHub.categories.operations': 'Operations',
+                'thoughtHub.article1.title': 'Enterprise Jira Architecture: Beyond Basic Workflows',
+                'thoughtHub.article1.excerpt': 'Exploring advanced patterns for scaling Jira across large organizations while maintaining performance and user experience.',
+                'thoughtHub.article2.title': 'The Psychology of Agile Transformation',
+                'thoughtHub.article2.excerpt': 'Understanding the human elements that make or break large-scale agile implementations in enterprise environments.',
+                'thoughtHub.article3.title': 'Delivery Metrics That Actually Matter',
+                'thoughtHub.article3.excerpt': 'Moving beyond velocity and burn-downs to metrics that drive real business outcomes and team improvement.',
+                'thoughtHub.readMore': 'Read More →',
+                'contact.title': 'Let\'s Work Together',
+                'contact.subtitle': 'Ready to transform your delivery capabilities? Let\'s discuss how we can achieve your organizational goals.',
+                'contact.email.title': 'Email',
+                'contact.email.address': 'hello@damianburne.com',
+                'contact.regions.title': 'Regions',
+                'contact.regions.list': 'LATAM • Europe • Oceania',
+                'footer.copyright': '© 2025 Damian Burne. All rights reserved.'
+            },
+            es: {
+                'nav.about': 'Acerca de',
+                'nav.services': 'Servicios',
+                'nav.projects': 'Proyectos',
+                'nav.thoughtHub': 'Centro de Ideas',
+                'nav.contact': 'Contacto',
+                'lang.english': 'ES',
+                'hero.title': 'Brinda soporte técnico aéreo a tu equipo',
+                'hero.subtitle': 'Experto SME en Jira con sólidas capacidades de scripting y profunda experiencia en implementaciones Ágiles, Mejoras de Procesos Empresariales y Coordinación de Equipos - listo para acelerar tu éxito en entrega',
+                'hero.cta': 'Contáctame',
+                'regions.latam': 'LATAM',
+                'regions.europe': 'Europa',
+                'regions.oceania': 'Oceanía',
+                'about.title': 'Acerca de',
+                'about.subtitle': 'Entregando transformaciones ágiles a escala empresarial con precisión y experiencia',
+                'about.heading': 'La Excelencia Técnica se Encuentra con el Liderazgo de Entrega',
+                'about.p1': 'Con profunda experiencia en diseño de ecosistemas Jira e implementaciones a escala empresarial, ayudo a las organizaciones a transformar sus capacidades de entrega a través de mejoras estratégicas de procesos y metodologías ágiles.',
+                'about.p2': 'Mi enfoque combina precisión técnica con experiencia práctica de entrega, asegurando que las transformaciones complejas se ejecuten sin problemas y entreguen valor empresarial medible.',
+                'about.p3': 'Especializado en escalar prácticas ágiles a través de grandes organizaciones mientras mantengo el foco en la coordinación de equipos, optimización de flujos de trabajo y prácticas de entrega sostenibles.',
+                'services.title': 'Servicios',
+                'services.subtitle': 'Soluciones integrales para transformación ágil y excelencia en entrega',
+                'contact.title': 'Trabajemos Juntos',
+                'contact.subtitle': '¿Listo para transformar tus capacidades de entrega? Hablemos sobre cómo podemos lograr tus objetivos organizacionales.',
+                'footer.copyright': '© 2025 Damian Burne. Todos los derechos reservados.'
+            },
+            pt: {
+                'nav.about': 'Sobre',
+                'nav.services': 'Serviços',
+                'nav.projects': 'Projetos',
+                'nav.thoughtHub': 'Centro de Ideias',
+                'nav.contact': 'Contato',
+                'lang.english': 'PT',
+                'hero.title': 'Fornece suporte técnico aéreo para sua equipe',
+                'hero.subtitle': 'SME especialista em Jira com fortes capacidades de scripting e profunda experiência em implementações Ágeis, Melhorias de Processos Empresariais e Coordenação de Equipes - pronto para acelerar seu sucesso de entrega',
+                'hero.cta': 'Entre em Contato',
+                'regions.latam': 'LATAM',
+                'regions.europe': 'Europa',
+                'regions.oceania': 'Oceania',
+                'about.title': 'Sobre',
+                'about.subtitle': 'Entregando transformações ágeis em escala empresarial com precisão e expertise',
+                'about.heading': 'Excelência Técnica Encontra Liderança de Entrega',
+                'about.p1': 'Com profunda expertise em design de ecossistemas Jira e implementações em escala empresarial, ajudo organizações a transformar suas capacidades de entrega através de melhorias estratégicas de processos e metodologias ágeis.',
+                'about.p2': 'Minha abordagem combina precisão técnica com experiência prática de entrega, garantindo que transformações complexas sejam executadas suavemente e entreguem valor empresarial mensurável.',
+                'about.p3': 'Especializado em escalar práticas ágeis através de grandes organizações mantendo foco na coordenação de equipes, otimização de fluxos de trabalho e práticas de entrega sustentáveis.',
+                'services.title': 'Serviços',
+                'services.subtitle': 'Soluções abrangentes para transformação ágil e excelência em entrega',
+                'contact.title': 'Vamos Trabalhar Juntos',
+                'contact.subtitle': 'Pronto para transformar suas capacidades de entrega? Vamos discutir como podemos alcançar seus objetivos organizacionais.',
+                'footer.copyright': '© 2025 Damian Burne. Todos os direitos reservados.'
+            },
+            it: {
+                'nav.about': 'Chi Sono',
+                'nav.services': 'Servizi',
+                'nav.projects': 'Progetti',
+                'nav.thoughtHub': 'Centro Idee',
+                'nav.contact': 'Contatto',
+                'lang.english': 'IT',
+                'hero.title': 'Fornisci supporto tecnico aereo al tuo team',
+                'hero.subtitle': 'SME esperto di Jira con forti capacità di scripting e profonda esperienza in implementazioni Agili, Miglioramenti dei Processi Aziendali e Coordinamento del Team - pronto ad accelerare il tuo successo di consegna',
+                'hero.cta': 'Contattami',
+                'regions.latam': 'LATAM',
+                'regions.europe': 'Europa',
+                'regions.oceania': 'Oceania',
+                'about.title': 'Chi Sono',
+                'about.subtitle': 'Fornendo trasformazioni agili su scala aziendale con precisione ed esperienza',
+                'about.heading': 'L\'Eccellenza Tecnica Incontra la Leadership di Consegna',
+                'about.p1': 'Con profonda esperienza nella progettazione di ecosistemi Jira e implementazioni su scala aziendale, aiuto le organizzazioni a trasformare le loro capacità di consegna attraverso miglioramenti strategici dei processi e metodologie agili.',
+                'about.p2': 'Il mio approccio combina precisione tecnica con esperienza pratica di consegna, garantendo che le trasformazioni complesse vengano eseguite senza problemi e forniscano valore aziendale misurabile.',
+                'about.p3': 'Specializzato nel ridimensionare le pratiche agili attraverso grandi organizzazioni mantenendo il focus sulla coordinazione del team, ottimizzazione del flusso di lavoro e pratiche di consegna sostenibili.',
+                'services.title': 'Servizi',
+                'services.subtitle': 'Soluzioni complete per la trasformazione agile e l\'eccellenza nella consegna',
+                'contact.title': 'Lavoriamo Insieme',
+                'contact.subtitle': 'Pronto a trasformare le tue capacità di consegna? Discutiamo di come possiamo raggiungere i tuoi obiettivi organizzativi.',
+                'footer.copyright': '© 2025 Damian Burne. Tutti i diritti riservati.'
             }
-        });
-
-        // Smooth fade-in animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
         };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+        // Current language
+        let currentLang = 'en';
+
+        // Language switcher functionality
+        function initLanguageSwitcher() {
+            const languageBtn = document.getElementById('languageBtn');
+            const languageDropdown = document.getElementById('languageDropdown');
+            const languageOptions = document.querySelectorAll('.language-option');
+
+            languageBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                languageDropdown.classList.toggle('active');
+            });
+
+            languageOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const lang = option.dataset.lang;
+                    setLanguage(lang);
+                    languageDropdown.classList.remove('active');
+                });
+            });
+
+            document.addEventListener('click', () => {
+                languageDropdown.classList.remove('active');
+            });
+        }
+
+        // Set language
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Update flag and text in button
+            const languageBtn = document.getElementById('languageBtn');
+            const codes = { en: 'EN', es: 'ES', pt: 'PT', it: 'IT' };
+            
+            languageBtn.innerHTML = `
+                <span class="flag">${codes[lang]}</span>
+                <span>▼</span>
+            `;
+
+            // Update all translatable elements
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.dataset.i18n;
+                if (translations[lang] && translations[lang][key]) {
+                    if (element.tagName === 'A' && element.href.startsWith('mailto:')) {
+                        // Don't translate email addresses
+                        if (!key.includes('email.address')) {
+                            element.textContent = translations[lang][key];
+                        }
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
                 }
             });
-        }, observerOptions);
 
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
-        });
+            // Store language preference
+            localStorage.setItem('preferred-language', lang);
+        }
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    const headerHeight = document.querySelector('.header').offsetHeight;
-                    const targetPosition = target.offsetTop - headerHeight;
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: 'smooth'
-                    });
-                }
+        // Navigation functionality
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            const sections = document.querySelectorAll('.section, .hero');
+
+            // Smooth scrolling
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    
+                    if (targetSection) {
+                        const headerHeight = document.querySelector('.header').offsetHeight;
+                        const targetPosition = targetSection.offsetTop - headerHeight;
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
             });
-        });
 
-        // Header background on scroll
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
+            // Active section highlighting
+            function updateActiveNav() {
+                const scrollPos = window.scrollY + 100;
+                
+                sections.forEach((section, index) => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+                    
+                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+                        }
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', updateActiveNav);
+        }
+
+        // Intersection Observer for animations
+        function initAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Header scroll effect
+        function initHeaderEffects() {
             const header = document.querySelector('.header');
-            const currentScrollY = window.scrollY;
+            let lastScrollY = window.scrollY;
+
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                
+                if (currentScrollY > 100) {
+                    header.style.background = 'rgba(255, 255, 255, 0.95)';
+                    header.style.backdropFilter = 'saturate(180%) blur(20px)';
+                } else {
+                    header.style.background = 'rgba(255, 255, 255, 0.8)';
+                    header.style.backdropFilter = 'saturate(180%) blur(20px)';
+                }
+                
+                lastScrollY = currentScrollY;
+            });
+        }
+
+        // Mobile menu functionality
+        function initMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const navLinks = document.querySelector('.nav-links');
             
-            if (currentScrollY > 100) {
-                header.style.background = 'rgba(251, 251, 253, 0.9)';
-                header.style.backdropFilter = 'saturate(180%) blur(20px)';
-            } else {
-                header.style.background = 'rgba(251, 251, 253, 0.8)';
-                header.style.backdropFilter = 'saturate(180%) blur(20px)';
-            }
+            mobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                navLinks.classList.toggle('mobile-active');
+            });
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved language preference
+            const savedLang = localStorage.getItem('preferred-language') || 'en';
+            setLanguage(savedLang);
             
-            lastScrollY = currentScrollY;
+            // Initialize all functionality
+            initLanguageSwitcher();
+            initNavigation();
+            initAnimations();
+            initHeaderEffects();
+            initMobileMenu();
         });
 
-        // Prevent scroll when mobile menu is open
-        const preventScroll = (e) => {
-            if (mobileNav.classList.contains('active')) {
-                e.preventDefault();
-            }
-        };
+        // Performance optimization: Debounce scroll events
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
 
-        window.addEventListener('wheel', preventScroll, { passive: false });
-        window.addEventListener('touchmove', preventScroll, { passive: false });
+        // Add mobile styles for navigation
+        const mobileStyles = `
+            @media (max-width: 768px) {
+                .nav-links.mobile-active {
+                    display: flex;
+                    position: fixed;
+                    top: 60px;
+                    left: 0;
+                    right: 0;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: saturate(180%) blur(20px);
+                    flex-direction: column;
+                    padding: 20px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                    z-index: 9998;
+                }
+                
+                .nav-links.mobile-active a {
+                    padding: 15px 0;
+                    border-bottom: 1px solid var(--border);
+                }
+                
+                .language-switcher {
+                    order: -1;
+                    margin-bottom: 20px;
+                }
+            }
+        `;
+
+        // Inject mobile styles
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = mobileStyles;
+        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html>
