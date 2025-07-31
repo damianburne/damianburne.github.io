@@ -143,7 +143,7 @@
         .language-dropdown {
             position: absolute;
             top: 100%;
-            right: 0;
+            left: 0;
             background: white;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -417,8 +417,19 @@
             min-height: 100vh;
             padding: 120px 24px 80px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+        }
+
+        /* Services section with reduced top padding */
+        #services {
+            padding: 50px 24px 80px;
+        }
+
+        /* About section optimized for better title positioning */
+        #about {
+            padding: 90px 24px 80px;
+            align-items: flex-start;
         }
 
         .section:nth-child(even) {
@@ -805,8 +816,6 @@
 
             .language-switcher {
                 order: -1;
-                margin-right: auto;
-                margin-left: 0;
             }
 
             .nav {
@@ -814,8 +823,9 @@
             }
 
             .logo {
-                order: 0;
-                margin: 0 auto;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
             }
 
             .hero-regions {
@@ -830,6 +840,16 @@
 
             .section {
                 padding: 80px 16px 60px;
+                align-items: flex-start;
+            }
+
+            #services {
+                padding: 30px 16px 60px;
+            }
+
+            #about {
+                padding: 70px 16px 60px;
+                align-items: flex-start;
             }
 
             .projects-grid {
@@ -852,7 +872,18 @@
 
         /* Section visibility for navigation */
         .section {
-            scroll-margin-top: 80px;
+            scroll-margin-top: 70px;
+        }
+
+        /* Optimized scroll positioning for About section */
+        #about {
+            scroll-margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                scroll-margin-top: 70px;
+            }
         }
     </style>
 </head>
@@ -916,12 +947,12 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1 data-i18n="hero.title">Give your team technical air support</h1>
+            <h1 data-i18n="hero.title">Give your teams<br><strong>air support</strong></h1>
             <p class="hero-subtitle" data-i18n="hero.subtitle">Expert Jira SME with strong scripting capabilities and deep expertise in Agile rollouts, Business Process Improvements & Team Coordination - ready to accelerate your delivery success</p>
             <div class="hero-regions">
-                <span class="region-badge" data-i18n="regions.latam">LATAM</span>
-                <span class="region-badge" data-i18n="regions.europe">Europe</span>
-                <span class="region-badge" data-i18n="regions.oceania">Oceania</span>
+                <span class="region-badge" data-i18n="regions.jira">JIRA</span>
+                <span class="region-badge" data-i18n="regions.agile">AGILE</span>
+                <span class="region-badge" data-i18n="regions.ops">OPS</span>
             </div>
             <a href="mailto:hello@damianburne.com" class="cta-button" data-i18n="hero.cta">Get In Touch</a>
         </div>
@@ -1114,15 +1145,15 @@
                 'nav.thoughtHub': 'Thought Hub',
                 'nav.contact': 'Contact',
                 'lang.english': 'EN',
-                'hero.title': 'Give your team technical air support',
+                'hero.title': 'Give your teams\nair support',
                 'hero.subtitle': 'Expert Jira SME with strong scripting capabilities and deep expertise in Agile rollouts, Business Process Improvements & Team Coordination - ready to accelerate your delivery success',
                 'hero.cta': 'Get In Touch',
-                'regions.latam': 'LATAM',
-                'regions.europe': 'Europe',
-                'regions.oceania': 'Oceania',
+                'regions.jira': 'JIRA',
+                'regions.agile': 'AGILE',
+                'regions.ops': 'OPS',
                 'about.title': 'About',
                 'about.subtitle': 'Delivering enterprise-scale agile transformations with precision and expertise',
-                'about.heading': 'Technical Excellence Meets Delivery Leadership',
+                'about.heading': 'Technical Leadership Meets Delivery Excellence',
                 'about.p1': 'With deep expertise in Jira ecosystem design and enterprise-scale implementations, I help organizations transform their delivery capabilities through strategic process improvement and agile methodologies.',
                 'about.p2': 'My approach combines technical precision with practical delivery experience, ensuring that complex transformations are executed smoothly and deliver measurable business value.',
                 'about.p3': 'Specialized in scaling agile practices across large organizations while maintaining focus on team coordination, workflow optimization, and sustainable delivery practices.',
@@ -1183,15 +1214,15 @@
                 'nav.thoughtHub': 'Centro de Ideas',
                 'nav.contact': 'Contacto',
                 'lang.english': 'ES',
-                'hero.title': 'Brinda soporte técnico aéreo a tu equipo',
+                'hero.title': 'Brinda\n<strong>soporte aéreo</strong>\na tus equipos',
                 'hero.subtitle': 'Experto SME en Jira con sólidas capacidades de scripting y profunda experiencia en implementaciones Ágiles, Mejoras de Procesos Empresariales y Coordinación de Equipos - listo para acelerar tu éxito en entrega',
                 'hero.cta': 'Contáctame',
-                'regions.latam': 'LATAM',
-                'regions.europe': 'Europa',
-                'regions.oceania': 'Oceanía',
+                'regions.jira': 'JIRA',
+                'regions.agile': 'ÁGIL',
+                'regions.ops': 'OPS',
                 'about.title': 'Acerca de',
                 'about.subtitle': 'Entregando transformaciones ágiles a escala empresarial con precisión y experiencia',
-                'about.heading': 'La Excelencia Técnica se Encuentra con el Liderazgo de Entrega',
+                'about.heading': 'El Liderazgo Técnico se Encuentra con la Excelencia de Entrega',
                 'about.p1': 'Con profunda experiencia en diseño de ecosistemas Jira e implementaciones a escala empresarial, ayudo a las organizaciones a transformar sus capacidades de entrega a través de mejoras estratégicas de procesos y metodologías ágiles.',
                 'about.p2': 'Mi enfoque combina precisión técnica con experiencia práctica de entrega, asegurando que las transformaciones complejas se ejecuten sin problemas y entreguen valor empresarial medible.',
                 'about.p3': 'Especializado en escalar prácticas ágiles a través de grandes organizaciones mientras mantengo el foco en la coordinación de equipos, optimización de flujos de trabajo y prácticas de entrega sostenibles.',
@@ -1208,15 +1239,15 @@
                 'nav.thoughtHub': 'Centro de Ideias',
                 'nav.contact': 'Contato',
                 'lang.english': 'PT',
-                'hero.title': 'Fornece suporte técnico aéreo para sua equipe',
+                'hero.title': 'Fornece\n<strong>suporte aéreo</strong>\npara suas equipes',
                 'hero.subtitle': 'SME especialista em Jira com fortes capacidades de scripting e profunda experiência em implementações Ágeis, Melhorias de Processos Empresariais e Coordenação de Equipes - pronto para acelerar seu sucesso de entrega',
                 'hero.cta': 'Entre em Contato',
-                'regions.latam': 'LATAM',
-                'regions.europe': 'Europa',
-                'regions.oceania': 'Oceania',
+                'regions.jira': 'JIRA',
+                'regions.agile': 'ÁGIL',
+                'regions.ops': 'OPS',
                 'about.title': 'Sobre',
                 'about.subtitle': 'Entregando transformações ágeis em escala empresarial com precisão e expertise',
-                'about.heading': 'Excelência Técnica Encontra Liderança de Entrega',
+                'about.heading': 'Liderança Técnica Encontra Excelência de Entrega',
                 'about.p1': 'Com profunda expertise em design de ecossistemas Jira e implementações em escala empresarial, ajudo organizações a transformar suas capacidades de entrega através de melhorias estratégicas de processos e metodologias ágeis.',
                 'about.p2': 'Minha abordagem combina precisão técnica com experiência prática de entrega, garantindo que transformações complexas sejam executadas suavemente e entreguem valor empresarial mensurável.',
                 'about.p3': 'Especializado em escalar práticas ágeis através de grandes organizações mantendo foco na coordenação de equipes, otimização de fluxos de trabalho e práticas de entrega sustentáveis.',
@@ -1233,15 +1264,15 @@
                 'nav.thoughtHub': 'Centro Idee',
                 'nav.contact': 'Contatto',
                 'lang.english': 'IT',
-                'hero.title': 'Fornisci supporto tecnico aereo al tuo team',
+                'hero.title': 'Fornisci\n<strong>supporto aereo</strong>\nai tuoi team',
                 'hero.subtitle': 'SME esperto di Jira con forti capacità di scripting e profonda esperienza in implementazioni Agili, Miglioramenti dei Processi Aziendali e Coordinamento del Team - pronto ad accelerare il tuo successo di consegna',
                 'hero.cta': 'Contattami',
-                'regions.latam': 'LATAM',
-                'regions.europe': 'Europa',
-                'regions.oceania': 'Oceania',
+                'regions.jira': 'JIRA',
+                'regions.agile': 'AGILE',
+                'regions.ops': 'OPS',
                 'about.title': 'Chi Sono',
                 'about.subtitle': 'Fornendo trasformazioni agili su scala aziendale con precisione ed esperienza',
-                'about.heading': 'L\'Eccellenza Tecnica Incontra la Leadership di Consegna',
+                'about.heading': 'La Leadership Tecnica Incontra l\'Eccellenza di Consegna',
                 'about.p1': 'Con profonda esperienza nella progettazione di ecosistemi Jira e implementazioni su scala aziendale, aiuto le organizzazioni a trasformare le loro capacità di consegna attraverso miglioramenti strategici dei processi e metodologie agili.',
                 'about.p2': 'Il mio approccio combina precisione tecnica con esperienza pratica di consegna, garantendo che le trasformazioni complesse vengano eseguite senza problemi e forniscano valore aziendale misurabile.',
                 'about.p3': 'Specializzato nel ridimensionare le pratiche agili attraverso grandi organizzazioni mantenendo il focus sulla coordinazione del team, ottimizzazione del flusso di lavoro e pratiche di consegna sostenibili.',
@@ -1312,6 +1343,22 @@
                         if (!key.includes('email.address')) {
                             element.textContent = translations[lang][key];
                         }
+                    } else if (key === 'hero.title') {
+                        // Handle HTML formatting for hero title
+                        const text = translations[lang][key];
+                        let formattedText = text.replace(/\n/g, '<br>');
+                        
+                        if (formattedText.includes('air support')) {
+                            formattedText = formattedText.replace('air support', '<strong>air support</strong>');
+                        } else if (formattedText.includes('soporte aéreo')) {
+                            formattedText = formattedText.replace('soporte aéreo', '<strong>soporte aéreo</strong>');
+                        } else if (formattedText.includes('suporte aéreo')) {
+                            formattedText = formattedText.replace('suporte aéreo', '<strong>suporte aéreo</strong>');
+                        } else if (formattedText.includes('supporto aereo')) {
+                            formattedText = formattedText.replace('supporto aereo', '<strong>supporto aereo</strong>');
+                        }
+                        
+                        element.innerHTML = formattedText;
                     } else {
                         element.textContent = translations[lang][key];
                     }
