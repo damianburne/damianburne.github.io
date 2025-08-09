@@ -43,12 +43,14 @@
   .header-hidden { transform: translateY(-100%); }
     /* Header */
     header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.9); backdrop-filter: blur(6px); border-bottom: 1px solid var(--border); }
-    .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .nav { position: relative; display: flex; align-items: center; justify-content: space-between; height: 64px; }
   .nav nav { margin-left: auto; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
     .brand { display: flex; align-items: baseline; gap: 6px; font-weight: 700; letter-spacing: .2px; }
     .brand span:first-child { color: var(--brand); }
-    .nav a.btn { background: var(--brand); color: #fff; padding: 10px 14px; border-radius: 10px; font-weight: 600; }
-    .nav a.btn:hover { background: var(--brand-700); text-decoration: none; }
+  /* Header nav buttons: subtle by default; primary stands out */
+  .nav a.btn { background: transparent; color: var(--text); padding: 10px 12px; border-radius: 10px; font-weight: 600; border-color: var(--border); }
+  .nav a.btn:hover { background: var(--accent); text-decoration: none; }
+  .nav a.btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
 
     /* Hero */
     .hero { padding: 56px 0 24px; }
@@ -67,6 +69,11 @@
   .map-embed { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #f8fafc; }
   .map-embed iframe { width: 100%; aspect-ratio: 4 / 3; border: 0; display: block; }
   .map-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(11, 18, 32, .92); color: #fff; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+
+    /* Mobile menu toggle */
+    .menu-toggle { display: none; margin-left: auto; border: 1px solid var(--border); background: #fff; color: var(--text); border-radius: 10px; padding: 8px 10px; font-weight: 600; }
+    .menu-toggle .bars { display: inline-flex; flex-direction: column; gap: 3px; margin-left: 6px; }
+    .menu-toggle .bar { width: 16px; height: 2px; background: currentColor; border-radius: 2px; }
 
     /* Sections */
     section { padding: 40px 0; }
@@ -98,13 +105,28 @@
       .grid.cols-2 { grid-template-columns: 1fr; }
       .kpis { grid-template-columns: 1fr; }
     }
+    @media (max-width: 700px) {
+      .menu-toggle { display: inline-flex; align-items: center; }
+      .nav { height: 64px; padding: 0; }
+      .nav nav { position: absolute; top: 64px; right: 20px; background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 8px; box-shadow: 0 10px 24px rgba(2,6,23,.12); display: none; flex-direction: column; gap: 6px; min-width: 220px; }
+      .nav nav.open { display: flex; }
+      .nav a.btn { padding: 10px 12px; font-size: 14px; width: 100%; justify-content: center; }
+    }
+    @media (max-width: 700px) {
+      .nav { height: auto; padding: 8px 0; }
+      .nav nav { gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .nav nav::-webkit-scrollbar { display: none; }
+      .nav a.btn { padding: 8px 10px; font-size: 14px; }
+      .nav a.btn.primary { padding: 8px 10px; }
+    }
   </style>
 </head>
 <body>
   <header aria-label="Primary">
     <div class="container nav">
-      <div class="brand"><span>azubel</span><span>DENTAL</span></div>
-      <nav>
+  <div class="brand"><span>azubel</span><span>DENTAL</span></div>
+  <button class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav">Menu <span class="bars" aria-hidden="true"><span class="bar"></span><span class="bar"></span><span class="bar"></span></span></button>
+  <nav id="site-nav">
         <a class="btn" href="#services">Services</a>
         <a class="btn" href="#about">About</a>
         <a class="btn" href="#contact">Contact</a>
@@ -121,8 +143,7 @@
           <h1>Gentle, modern dental care for every smile</h1>
           <p class="sub">Our mission is lifelong oral health and wellness for you, your family, and your friends. We take the time to listen, explain options clearly, and tailor care to your needs in a calm, comfortable setting. Dr Rodrigo Azubel and our caring team provide comprehensive general, cosmetic, and implant dentistry with individual, uninterrupted attention.</p>
           <div class="ctas">
-            <a class="btn primary" href="https://appointments.praktika.net.au/online-booking/step1?Apikey=811c47cf-ba4e-4e5b-bac2-28a349050b31">Book an appointment</a>
-            <a class="btn" href="tel:+61398091768">Call 03 9809 1768</a>
+            <a class="btn primary" href="tel:+61398091768">Call 03 9809 1768</a>
             <a class="btn" href="http://www.azubeldental.com.au/uploads/1/0/4/2/10421319/medical_history_form_full.pdf">Medical history form (PDF)</a>
           </div>
         </div>
@@ -211,6 +232,8 @@
   <script>
     (function(){
       const header = document.querySelector('header');
+  const toggle = document.querySelector('.menu-toggle');
+  const nav = document.getElementById('site-nav');
       let lastY = window.scrollY || 0;
       let ticking = false;
       function onScroll(){
@@ -229,6 +252,34 @@
           ticking = true;
         }
       }, { passive: true });
+      // Mobile menu toggle
+      if(toggle && nav){
+        toggle.addEventListener('click', function(e){
+          e.stopPropagation();
+          const open = nav.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', String(open));
+        });
+        // Close on link click
+        nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+          nav.classList.remove('open');
+          toggle.setAttribute('aria-expanded','false');
+        }));
+        // Close on outside click
+        document.addEventListener('click', function(e){
+          if(!nav.classList.contains('open')) return;
+          if(!nav.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)){
+            nav.classList.remove('open');
+            toggle.setAttribute('aria-expanded','false');
+          }
+        });
+        // Reset when resizing up
+        window.addEventListener('resize', function(){
+          if(window.innerWidth > 700){
+            nav.classList.remove('open');
+            toggle.setAttribute('aria-expanded','false');
+          }
+        });
+      }
     })();
   </script>
   <footer>
