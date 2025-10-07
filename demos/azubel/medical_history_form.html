@@ -19,8 +19,11 @@
     .form-body{display:block}
     .division .fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
     .group-row{display:grid;gap:8px}
-    .group-2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-    .group-3{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+  .group-2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .group-3{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+  /* Force rows that must stay on a single line at typical desktop widths */
+  .row-2{grid-template-columns:repeat(2,1fr)}
+  .row-3{grid-template-columns:repeat(3,1fr)}
     .group-addr{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
     .stretch{grid-column:1 / -1}
     @media (min-width:960px){
@@ -76,25 +79,29 @@
           <div class="division" id="personal-details">
             <h3 class="full div-title">Personal Details</h3>
             <div class="fields">
-              <div>
-                <label for="firstName">First name *</label>
-                <input id="firstName" name="given-name" autocomplete="given-name" type="text" required>
+              <div class="group-row group-3 row-3 stretch">
+                <div>
+                  <label for="firstName">First name *</label>
+                  <input id="firstName" name="given-name" autocomplete="given-name" type="text" required>
+                </div>
+                <div>
+                  <label for="lastName">Last name *</label>
+                  <input id="lastName" name="family-name" autocomplete="family-name" type="text" required>
+                </div>
+                <div>
+                  <label for="dob">Date of birth</label>
+                  <input id="dob" name="bday" autocomplete="bday" type="date">
+                </div>
               </div>
-              <div>
-                <label for="lastName">Last name *</label>
-                <input id="lastName" name="family-name" autocomplete="family-name" type="text" required>
-              </div>
-              <div>
-                <label for="dob">Date of birth</label>
-                <input id="dob" name="bday" autocomplete="bday" type="date">
-              </div>
-              <div>
-                <label for="email">Email *</label>
-                <input id="email" name="email" autocomplete="email" type="email" required>
-              </div>
-              <div>
-                <label for="occupation">Occupation</label>
-                <input id="occupation" name="occupation" type="text">
+              <div class="group-row group-2 row-2 stretch">
+                <div>
+                  <label for="email">Email *</label>
+                  <input id="email" name="email" autocomplete="email" type="email" required>
+                </div>
+                <div>
+                  <label for="occupation">Occupation</label>
+                  <input id="occupation" name="occupation" type="text">
+                </div>
               </div>
               <div class="stretch">
                 <label for="address">Address</label>
@@ -150,8 +157,8 @@
                 </div>
               </div>
               <div class="stretch">
-                <h4 style="margin:12px 0 6px;font-size:14px">Emergency contact & Insurance</h4>
-                <div class="group-row group-2">
+                <h4 style="margin:12px 0 6px;font-size:14px">Emergency Contact Information</h4>
+                <div class="group-row group-3 row-3" style="align-items:center">
                   <div>
                     <label for="emergency_name">Emergency Contact Name</label>
                     <input id="emergency_name" name="emergency_name" type="text">
@@ -160,8 +167,6 @@
                     <label for="emergency_rel">Relationship</label>
                     <input id="emergency_rel" name="emergency_rel" type="text">
                   </div>
-                </div>
-                <div class="group-row group-2" style="margin-top:8px">
                   <div>
                     <label for="emergency_mobile">Emergency Contact Mobile</label>
                     <input id="emergency_mobile" name="emergency_mobile" type="tel">
@@ -179,29 +184,33 @@
                 <label for="reason_visit">What is the reason for your visit today?</label>
                 <input id="reason_visit" name="reason_visit" type="text" placeholder="e.g. check-up / pain">
               </div>
-              <div>
-                <label for="last_visit">Date of last dental visit</label>
-                <input id="last_visit" name="last_visit" type="date">
-              </div>
-              <div>
-                <label for="last_cleaning">Last dental cleaning (date)</label>
-                <input id="last_cleaning" name="last_cleaning" type="date">
-              </div>
-              <div>
-                <label for="last_xrays">Last full mouth x-rays (date)</label>
-                <input id="last_xrays" name="last_xrays" type="date">
+              <div class="group-row group-3 row-3 stretch">
+                <div>
+                  <label for="last_visit">Date of last dental visit</label>
+                  <input id="last_visit" name="last_visit" type="date">
+                </div>
+                <div>
+                  <label for="last_cleaning">Last dental cleaning (date)</label>
+                  <input id="last_cleaning" name="last_cleaning" type="date">
+                </div>
+                <div>
+                  <label for="last_xrays">Last full mouth x-rays (date)</label>
+                  <input id="last_xrays" name="last_xrays" type="date">
+                </div>
               </div>
               <div class="stretch">
                 <label for="last_done">What was done at your last dental visit?</label>
                 <textarea id="last_done" name="last_done" placeholder="Describe procedures or treatment"></textarea>
               </div>
-              <div>
-                <label for="prev_dentist">Previous dentist's name</label>
-                <input id="prev_dentist" name="prev_dentist" type="text">
-              </div>
-              <div class="stretch">
-                <label for="prev_dent_addr">Previous dentist address</label>
-                <input id="prev_dent_addr" name="prev_dent_addr" type="text">
+              <div class="group-row group-2 row-2 stretch">
+                <div>
+                  <label for="prev_dentist">Previous dentist's name</label>
+                  <input id="prev_dentist" name="prev_dentist" type="text">
+                </div>
+                <div>
+                  <label for="prev_dent_addr">Previous dentist address</label>
+                  <input id="prev_dent_addr" name="prev_dent_addr" type="text">
+                </div>
               </div>
               <div>
                 <label for="prev_dent_state">State</label>
@@ -236,9 +245,58 @@
                 <label for="dental_problems">Current dental problems</label>
                 <textarea id="dental_problems" name="dental_problems" placeholder="Describe current dental problems (pain, swelling, loose teeth)"></textarea>
               </div>
-              <div>
-                <label for="reason_visit_small">Reason summary</label>
-                <input id="reason_visit_small" name="reason_visit_small" type="text" placeholder="e.g. check-up">
+              <div class="stretch">
+                <h4 style="margin:12px 0 6px;font-size:14px">Tooth Sensitivity</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">
+                  <label><input type="checkbox" name="sens_hot" value="hot"> Do you experience sensitivity to hot or cold?</label>
+                  <label><input type="checkbox" name="sens_sweets" value="sweets"> Do you experience sensitivity to sweets?</label>
+                  <label><input type="checkbox" name="sens_bite" value="bite"> Do you experience sensitivity when biting or chewing?</label>
+                </div>
+
+                <h4 style="margin:12px 0 6px;font-size:14px">Oral Health Symptoms</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">
+                  <label><input type="checkbox" name="oral_odour" value="odour"> Have you noticed mouth odours or a bad taste?</label>
+                  <label><input type="checkbox" name="oral_sores" value="sores"> Do you frequently get sores, blisters, or other oral lesions?</label>
+                  <label><input type="checkbox" name="oral_gums" value="gums"> Do your gums bleed or hurt?</label>
+                  <label><input type="checkbox" name="oral_family" value="family"> Have your parents experienced gum disease or tooth loss?</label>
+                </div>
+
+                <h4 style="margin:12px 0 6px;font-size:14px">Habits</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;align-items:center">
+                  <label><input type="checkbox" name="habit_clench" value="clench"> Do you clench or grind your teeth (while awake or asleep)?</label>
+                  <label><input type="checkbox" name="habit_bite" value="bite"> Do you bite your lips or cheeks?</label>
+                  <label><input type="checkbox" name="habit_hold" value="hold"> Do you hold foreign objects in your teeth (pencils, pipe, pins, nails, fingernails)?</label>
+                  <label><input type="checkbox" name="habit_breathe" value="breathe"> Do you breathe through your mouth (while awake or asleep)?</label>
+                  <label><input type="checkbox" name="habit_sleep_trouble" value="sleep"> Do you have trouble sleeping, especially in the morning?</label>
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <label style="margin:0"><input type="checkbox" name="habit_smoke" value="smoke"> Do you smoke?</label>
+                    <input id="habit_smoke_qty" name="habit_smoke_qty" type="text" placeholder="If yes, how many?" style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6e9ef">
+                  </div>
+                  <label style="grid-column:1/-1"><input type="checkbox" name="habit_keep_teeth" value="keep"> Would you like to keep all of your teeth for life?</label>
+                </div>
+
+                <h4 style="margin:12px 0 6px;font-size:14px">Previous Dental Treatments</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">
+                  <label><input type="checkbox" name="prev_implants" value="implants"> Have you had dental implants?</label>
+                  <label><input type="checkbox" name="prev_ortho" value="ortho"> Have you had orthodontic treatment?</label>
+                  <label><input type="checkbox" name="prev_oral_surg" value="oral_surg"> Have you had oral surgery?</label>
+                  <label><input type="checkbox" name="prev_periodontal" value="periodontal"> Have you had periodontal (gum) treatment?</label>
+                  <label><input type="checkbox" name="prev_bite_treat" value="bite_treat"> Have you had treatment for bite issues or used a mouth guard?</label>
+                  <label><input type="checkbox" name="prev_injury" value="injury"> Have you had a serious injury to the mouth or head?</label>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <label><input type="checkbox" name="prev_infection" value="infection"> Have you had any previous dental infections?</label>
+                    <input id="prev_infection_desc" name="prev_infection_desc" type="text" placeholder="If yes, please describe and include date" style="padding:8px;border-radius:6px;border:1px solid #e6e9ef">
+                  </div>
+                </div>
+
+                <h4 style="margin:12px 0 6px;font-size:14px">Jaw & Muscle Issues</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px">
+                  <label><input type="checkbox" name="tmd_click" value="click"> Do you experience clicking or popping of the jaw?</label>
+                  <label><input type="checkbox" name="tmd_pain" value="pain"> Do you experience pain in the joint, ear, or side of the face?</label>
+                  <label><input type="checkbox" name="tmd_open" value="open"> Do you have difficulty opening or closing your mouth?</label>
+                  <label><input type="checkbox" name="tmd_headaches" value="headaches"> Do you experience headaches, neck aches, or shoulder aches?</label>
+                  <label><input type="checkbox" name="tmd_sore_muscles" value="sore_muscles"> Do you have sore muscles in the neck or shoulders?</label>
+                </div>
               </div>
             </div>
           </div>
@@ -282,14 +340,14 @@
                 <textarea id="allergies" name="allergies" placeholder="e.g. Penicillin — rash"></textarea>
               </div>
               <div class="stretch">
-                <h4 style="margin:12px 0 6px;font-size:14px">General practitioner / Physician</h4>
-                <div class="group-row group-2">
+                <h4 style="margin:12px 0 6px;font-size:14px">General practitioner Information</h4>
+                <div class="group-row group-2 row-2">
                   <div>
-                    <label for="gp_name">Physician / GP name</label>
+                    <label for="gp_name">GP name</label>
                     <input id="gp_name" name="gp_name" type="text">
                   </div>
                   <div>
-                    <label for="gp_phone">Phone</label>
+                    <label for="gp_phone">GP Phone</label>
                     <input id="gp_phone" name="gp_phone" type="tel">
                   </div>
                 </div>
@@ -349,6 +407,9 @@
 
     <script>
       const form = document.getElementById('medicalForm');
+
+      
+
 
       document.getElementById('printBtn').addEventListener('click', function(){
         // stronger validation: check required fields and consent, then run HTML5 validity
