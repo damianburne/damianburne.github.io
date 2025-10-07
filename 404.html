@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Page not found — attempting auto-fix</title>
+    <style>
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;padding:36px;color:#111;background:#fff}
+      .wrap{max-width:720px;margin:0 auto}
+      a{color:#0366d6}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Page not found</h1>
+      <p>If you're here because a directory URL was requested without a trailing slash, I'll try to fix that for you automatically.</p>
+      <p id="status">Checking...</p>
+      <p>If nothing happens, try going back or visit <a href="/">home</a>.</p>
+    </div>
+
+    <script>
+      (async function(){
+        try{
+          const p = location.pathname;
+          // Only attempt for paths that look like a directory (no dot, no trailing slash)
+          if(!p.endsWith('/') && !p.includes('.') ){
+            const trial = p + '/';
+            // Try a cheap fetch to see if the directory index exists.
+            const res = await fetch(trial, { method: 'GET', cache: 'no-store' });
+            if(res && res.status === 200){
+              // Replace the URL with trailing slash so relative resources work normally.
+              location.replace(trial + location.search + location.hash);
+              return;
+            }
+          }
+          document.getElementById('status').textContent = 'No automatic redirect available.';
+        }catch(e){
+          document.getElementById('status').textContent = 'No automatic redirect available.';
+        }
+      })();
+    </script>
+  </body>
+</html>
