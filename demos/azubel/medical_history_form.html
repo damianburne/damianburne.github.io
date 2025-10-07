@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Azubel DENTAL — Medical History Form</title>
+  <meta name="description" content="Fillable medical history form for azubel DENTAL. Complete online and print to PDF." />
+  <style>
+    :root{--bg:#f8fafc;--card:#fff;--muted:#667085;--brand:#2b77e7}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:var(--bg);color:#0b1220}
+    .wrap{max-width:900px;margin:28px auto;padding:20px}
+    .card{background:var(--card);border-radius:12px;padding:22px;box-shadow:0 6px 18px rgba(11,18,32,.06)}
+    h1{font-size:20px;margin:0 0 6px;text-align:center}
+    p.lead{color:var(--muted);text-align:center;margin:0 0 18px}
+    form{margin-top:12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    /* main divisions stack; inner .fields handle responsive distribution */
+    .form-body{display:block}
+    .division .fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+    .group-row{display:grid;gap:8px}
+    .group-2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+    .group-3{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+    .group-addr{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+    .stretch{grid-column:1 / -1}
+    @media (min-width:960px){
+      .division .fields{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    }
+    label{display:block;font-size:13px;color:#111827;margin-bottom:6px}
+    input[type=text], input[type=email], input[type=date], input[type=tel], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px}
+    textarea{min-height:90px;resize:vertical}
+  .full{grid-column:1 / -1;width:100%;display:block}
+  .actions{display:flex;gap:10px;justify-content:center;margin-top:16px;width:100%;clear:both}
+    button{padding:10px 16px;border-radius:10px;border:0;cursor:pointer}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-ghost{background:#f3f4f6;color:#0b1220}
+    .section{margin-top:16px;padding-top:12px;border-top:1px dashed #eef2f7}
+    .note{font-size:13px;color:var(--muted);margin-top:6px}
+
+   /* Bold the label text when its checkbox is checked. Use :has where supported
+     and a JS fallback that toggles the .checked class on the label. */
+   label:has(input:checked) { font-weight:700; }
+   label.checked { font-weight:700; }
+
+    /* Print styles: remove shadows and adjust layout to fit page cleanly */
+    @media print{
+      body, .wrap{background:white}
+      .card{box-shadow:none;border-radius:0;padding:8px}
+      .actions{display:none}
+      input,textarea,select{border:1px solid #111827}
+    }
+
+    @media (max-width:720px){.grid{grid-template-columns:1fr}.actions{flex-direction:column}}
+    /* Division headers and print page breaks to ensure three-page distribution */
+    .division {margin-top:18px;padding-top:12px;border-top:1px solid #eef2f7}
+    .division .div-title {font-size:16px;margin:0 0 10px;font-weight:700}
+    @media print{
+      /* Each main division should start on its own page for clean PDF output */
+      .division {page-break-after: always; padding-top:6px}
+      .division:last-of-type {page-break-after: auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>
+        <img src="/demos/azubel/images/azubel-logo.png" alt="Azubel DENTAL" style="max-width:240px;height:auto;display:block;margin:0 auto">
+      </h1>
+      <p class="lead">Welcome to our practice & thank you for choosing to entrust us with your dental care. <br> <br>
+        To assist us in providing you with the best possible treatment and standard of care, we ask that you complete this confidential medical history questionnaire.</p>
+
+      <form id="medicalForm">
+        <div class="form-body">
+          <!-- Personal Details Division -->
+          <div class="division" id="personal-details">
+            <h3 class="full div-title">Personal Details</h3>
+            <div class="fields">
+              <div>
+                <label for="firstName">First name *</label>
+                <input id="firstName" name="given-name" autocomplete="given-name" type="text" required>
+              </div>
+              <div>
+                <label for="lastName">Last name *</label>
+                <input id="lastName" name="family-name" autocomplete="family-name" type="text" required>
+              </div>
+              <div>
+                <label for="dob">Date of birth</label>
+                <input id="dob" name="bday" autocomplete="bday" type="date">
+              </div>
+              <div>
+                <label for="email">Email *</label>
+                <input id="email" name="email" autocomplete="email" type="email" required>
+              </div>
+              <div>
+                <label for="occupation">Occupation</label>
+                <input id="occupation" name="occupation" type="text">
+              </div>
+              <div class="stretch">
+                <label for="address">Address</label>
+                <input id="address" name="street-address" autocomplete="street-address" type="text">
+              </div>
+              <div class="group-row group-3 stretch">
+                <div>
+                  <label for="suburb">Suburb / City</label>
+                  <input id="suburb" name="address-level2" autocomplete="address-level2" type="text">
+                </div>
+                <div>
+                  <label for="postcode">Postal code</label>
+                  <input id="postcode" name="postal-code" autocomplete="postal-code" type="text">
+                </div>
+                <div>
+                  <label for="state">State / Region</label>
+                  <select id="state" name="address-level1" autocomplete="address-level1">
+                    <option value="">Select state</option>
+                    <option value="NSW">NSW</option>
+                    <option value="VIC">VIC</option>
+                    <option value="QLD">QLD</option>
+                    <option value="WA">WA</option>
+                    <option value="SA">SA</option>
+                    <option value="TAS">TAS</option>
+                    <option value="ACT">ACT</option>
+                    <option value="NT">NT</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="group-row group-2 stretch">
+                <div>
+                  <label for="phone">Mobile phone</label>
+                  <input id="phone" name="tel" autocomplete="tel" type="tel">
+                </div>
+                <div>
+                  <label for="land">Home phone</label>
+                  <input id="land" name="home-phone" autocomplete="tel" type="tel">
+                </div>
+              </div>
+              <div class="group-row group-3 stretch">
+                <div>
+                  <label for="medicare_no">Medicare / Govt no.</label>
+                  <input id="medicare_no" name="medicare_no" type="text">
+                </div>
+                <div>
+                  <label for="healthfund">Private Health Fund</label>
+                  <input id="healthfund" name="healthfund" type="text">
+                </div>
+                <div>
+                  <label for="member_no">Member / Card number</label>
+                  <input id="member_no" name="member_no" type="text">
+                </div>
+              </div>
+              <div class="stretch">
+                <h4 style="margin:12px 0 6px;font-size:14px">Emergency contact & Insurance</h4>
+                <div class="group-row group-2">
+                  <div>
+                    <label for="emergency_name">Emergency Contact Name</label>
+                    <input id="emergency_name" name="emergency_name" type="text">
+                  </div>
+                  <div>
+                    <label for="emergency_rel">Relationship</label>
+                    <input id="emergency_rel" name="emergency_rel" type="text">
+                  </div>
+                </div>
+                <div class="group-row group-2" style="margin-top:8px">
+                  <div>
+                    <label for="emergency_mobile">Emergency Contact Mobile</label>
+                    <input id="emergency_mobile" name="emergency_mobile" type="tel">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dental History Division -->
+          <div class="division" id="dental-history">
+            <h3 class="full div-title">Dental History</h3>
+            <div class="fields">
+              <div class="stretch">
+                <label for="reason_visit">What is the reason for your visit today?</label>
+                <input id="reason_visit" name="reason_visit" type="text" placeholder="e.g. check-up / pain">
+              </div>
+              <div>
+                <label for="last_visit">Date of last dental visit</label>
+                <input id="last_visit" name="last_visit" type="date">
+              </div>
+              <div>
+                <label for="last_cleaning">Last dental cleaning (date)</label>
+                <input id="last_cleaning" name="last_cleaning" type="date">
+              </div>
+              <div>
+                <label for="last_xrays">Last full mouth x-rays (date)</label>
+                <input id="last_xrays" name="last_xrays" type="date">
+              </div>
+              <div class="stretch">
+                <label for="last_done">What was done at your last dental visit?</label>
+                <textarea id="last_done" name="last_done" placeholder="Describe procedures or treatment"></textarea>
+              </div>
+              <div>
+                <label for="prev_dentist">Previous dentist's name</label>
+                <input id="prev_dentist" name="prev_dentist" type="text">
+              </div>
+              <div class="stretch">
+                <label for="prev_dent_addr">Previous dentist address</label>
+                <input id="prev_dent_addr" name="prev_dent_addr" type="text">
+              </div>
+              <div>
+                <label for="prev_dent_state">State</label>
+                <input id="prev_dent_state" name="prev_dent_state" type="text">
+              </div>
+              <div>
+                <label for="prev_dent_postcode">Postcode</label>
+                <input id="prev_dent_postcode" name="prev_dent_postcode" type="text">
+              </div>
+              <div>
+                <label for="exam_freq">Dental examinations frequency</label>
+                <select id="exam_freq" name="exam_freq">
+                  <option value="">Select</option>
+                  <option value="6m">Every 6 months</option>
+                  <option value="12m">Every 12 months</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label for="brush_freq">How often do you brush?</label>
+                <input id="brush_freq" name="brush_freq" type="text" placeholder="e.g. twice daily">
+              </div>
+              <div>
+                <label for="floss_freq">How often do you floss?</label>
+                <input id="floss_freq" name="floss_freq" type="text" placeholder="e.g. daily">
+              </div>
+              <div>
+                <label for="other_aids">Other aids used</label>
+                <input id="other_aids" name="other_aids" type="text" placeholder="e.g. interdental brushes, mouthwash">
+              </div>
+              <div class="stretch">
+                <label for="dental_problems">Current dental problems</label>
+                <textarea id="dental_problems" name="dental_problems" placeholder="Describe current dental problems (pain, swelling, loose teeth)"></textarea>
+              </div>
+              <div>
+                <label for="reason_visit_small">Reason summary</label>
+                <input id="reason_visit_small" name="reason_visit_small" type="text" placeholder="e.g. check-up">
+              </div>
+            </div>
+          </div>
+
+          <!-- Medical History Division -->
+          <div class="division" id="medical-history">
+            <h3 class="full div-title">Medical History</h3>
+            <div class="fields">
+              <div class="stretch">
+                <label for="medical">Medical conditions / allergies / medications (summary)</label>
+                <textarea id="medical" name="medical-conditions" autocomplete="off"></textarea>
+              </div>
+              <div class="stretch">
+                <h4 style="margin:12px 0 6px;font-size:14px">General health — tick any that apply</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px">
+                  <label><input type="checkbox" name="cond_heart" value="heart"> Heart disease / murmur</label>
+                  <label><input type="checkbox" name="cond_highbp" value="highbp"> High blood pressure</label>
+                  <label><input type="checkbox" name="cond_stroke" value="stroke"> Stroke</label>
+                  <label><input type="checkbox" name="cond_diabetes" value="diabetes"> Diabetes</label>
+                  <label><input type="checkbox" name="cond_asthma" value="asthma"> Asthma / bronchitis</label>
+                  <label><input type="checkbox" name="cond_hepatitis" value="hepatitis"> Hepatitis</label>
+                  <label><input type="checkbox" name="cond_hiv" value="hiv"> HIV / AIDS</label>
+                  <label><input type="checkbox" name="cond_bleeding" value="bleeding"> Bleeding disorder</label>
+                  <label><input type="checkbox" name="cond_kidney" value="kidney"> Kidney disease</label>
+                  <label><input type="checkbox" name="cond_thyroid" value="thyroid"> Thyroid disorder</label>
+                  <label><input type="checkbox" name="cond_osteoporosis" value="osteoporosis"> Osteoporosis</label>
+                  <label><input type="checkbox" name="cond_arthritis" value="arthritis"> Arthritis</label>
+                  <label><input type="checkbox" name="cond_mental" value="mental"> Mental health condition</label>
+                  <label><input type="checkbox" name="cond_other" value="other"> Other</label>
+                </div>
+                <div style="margin-top:8px">
+                  <label for="cond_other_text">If other, please describe</label>
+                  <input id="cond_other_text" name="cond_other_text" type="text">
+                </div>
+              </div>
+              <div class="stretch">
+                <h4 style="margin:12px 0 6px;font-size:14px">Medications & Allergies</h4>
+                <label for="medications">Medications (name & dosage)</label>
+                <textarea id="medications" name="medications" placeholder="e.g. Atenolol 50mg daily"></textarea>
+                <label for="allergies" style="margin-top:8px">Allergies / adverse reactions</label>
+                <textarea id="allergies" name="allergies" placeholder="e.g. Penicillin — rash"></textarea>
+              </div>
+              <div class="stretch">
+                <h4 style="margin:12px 0 6px;font-size:14px">General practitioner / Physician</h4>
+                <div class="group-row group-2">
+                  <div>
+                    <label for="gp_name">Physician / GP name</label>
+                    <input id="gp_name" name="gp_name" type="text">
+                  </div>
+                  <div>
+                    <label for="gp_phone">Phone</label>
+                    <input id="gp_phone" name="gp_phone" type="tel">
+                  </div>
+                </div>
+                <div style="margin-top:8px">
+                  <label for="gp_address">GP Address</label>
+                  <input id="gp_address" name="gp_address" type="text">
+                </div>
+              </div>
+              <div class="stretch">
+                <h4 style="margin:12px 0 6px;font-size:14px">Smoking, Alcohol & Pregnancy</h4>
+                <div class="group-row group-2">
+                  <label>Do you smoke?
+                    <select name="smoke" id="smoke">
+                      <option value="">Prefer not to say</option>
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </label>
+                  <label>Alcohol use per week
+                    <input id="alcohol" name="alcohol" type="text" placeholder="units per week">
+                  </label>
+                </div>
+                <div class="group-row group-2" style="margin-top:8px">
+                  <label>Are you pregnant?
+                    <select name="pregnant" id="pregnant">
+                      <option value="">N/A</option>
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </label>
+                  <label>Weeks pregnant (if applicable)
+                    <input id="preg_weeks" name="preg_weeks" type="text" placeholder="e.g. 12">
+                  </label>
+                </div>
+              </div>
+              <div class="stretch">
+                <label for="signature">Signature (type full name)</label>
+                <input id="signature" name="signature" type="text" autocomplete="name">
+                <div class="group-row group-2" style="margin-top:8px;align-items:start">
+                  <label style="line-height:1.3"><input type="checkbox" id="consent" name="consent" value="yes" required> I consent to treatment and confirm the information provided is correct.</label>
+                  <div>
+                    <label for="sig_date">Date</label>
+                    <input id="sig_date" name="sig_date" type="date" required>
+                  </div>
+                </div>
+                <div class="note">Typing your full name counts as a signature for printing purposes. Consent and date are required for treatment.</div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- end form-body -->
+
+          <div class="actions">
+            <button type="button" class="btn-primary" id="printBtn">Print to PDF</button>
+            <button type="button" class="btn-ghost" id="clearBtn">Clear</button>
+          </div>
+        </form>
+
+    <script>
+      const form = document.getElementById('medicalForm');
+
+      document.getElementById('printBtn').addEventListener('click', function(){
+        // stronger validation: check required fields and consent, then run HTML5 validity
+        const required = form.querySelectorAll('[required]');
+        for (const el of required) {
+          if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) {
+            el.focus();
+            alert('Please complete required fields before printing (consent/date).');
+            return;
+          }
+          if ((el.type !== 'checkbox' && el.type !== 'radio') && !el.value) {
+            el.focus();
+            alert('Please complete required fields before printing.');
+            return;
+          }
+        }
+
+        if (!form.checkValidity()) {
+          const invalid = form.querySelector(':invalid');
+          if (invalid) {
+            let labelText = invalid.id || invalid.name || 'field';
+            try {
+              const lab = form.querySelector("label[for='" + invalid.id + "']");
+              if (lab && lab.innerText) labelText = lab.innerText.replace(/\*/g, '').trim();
+            } catch (e) {}
+            invalid.focus();
+            alert('Please enter a valid value for: ' + labelText);
+          } else {
+            alert('Please correct invalid fields before printing.');
+          }
+          return;
+        }
+
+        setTimeout(()=> window.print(), 100);
+      });
+
+      document.getElementById('clearBtn').addEventListener('click', function(){
+        if (confirm('Clear all entered information?')) {
+          form.reset();
+          try { localStorage.removeItem('azubel_medical_form'); } catch(e){}
+        }
+      });
+
+      function saveForm() {
+        try {
+          const fd = new FormData(form);
+          const obj = {};
+          for (const [k, v] of fd.entries()) {
+            if (Object.prototype.hasOwnProperty.call(obj, k)) {
+              if (!Array.isArray(obj[k])) obj[k] = [obj[k]];
+              obj[k].push(v);
+            } else {
+              obj[k] = v;
+            }
+          }
+          localStorage.setItem('azubel_medical_form', JSON.stringify(obj));
+        } catch (e) { /* no-op */ }
+      }
+
+      function restoreForm() {
+        try {
+          const saved = localStorage.getItem('azubel_medical_form');
+          if (!saved) return;
+          const obj = JSON.parse(saved);
+          for (const k of Object.keys(obj)) {
+            const val = obj[k];
+            const els = form.elements[k];
+            if (!els) continue;
+            if (typeof els.length === 'number' && els.length > 0 && els[0]) {
+              for (const el of els) {
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                  if (Array.isArray(val)) el.checked = val.includes(el.value);
+                  else el.checked = (el.value === val) || Boolean(val);
+                } else {
+                  el.value = Array.isArray(val) ? val[0] : val;
+                }
+              }
+            } else {
+              const el = els;
+              if (!el) continue;
+              if (el.type === 'checkbox' || el.type === 'radio') {
+                if (Array.isArray(val)) el.checked = val.includes(el.value);
+                else el.checked = Boolean(val);
+              } else {
+                el.value = Array.isArray(val) ? val[0] : val;
+              }
+            }
+          }
+        } catch (e) { /* ignore parse errors */ }
+      }
+
+      // save on input/change
+      form.addEventListener('input', saveForm);
+      form.addEventListener('change', saveForm);
+
+      // Restore on load and initialize label styles
+      window.addEventListener('DOMContentLoaded', () => {
+        restoreForm();
+        try {
+          const inputs = form.querySelectorAll('input[type=checkbox], input[type=radio]');
+          for (const inp of inputs) {
+            const lab = form.querySelector("label[for='" + inp.id + "']") || inp.closest('label');
+            if (lab) lab.classList.toggle('checked', !!inp.checked);
+            inp.addEventListener('change', function(){
+              if (lab) lab.classList.toggle('checked', !!this.checked);
+            });
+          }
+        } catch (e) { /* ignore */ }
+      });
+    </script>
+  </div>
+  </div>
+</body>
+</html>
