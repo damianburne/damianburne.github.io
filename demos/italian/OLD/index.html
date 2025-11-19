@@ -333,7 +333,7 @@
                     <div class="stat-label">Topic Progress</div>
                 </div>
             </div>
-            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Course progress">
+            <div class="progress-bar">
                 <div class="progress-fill" id="progressBar" style="width: 0%"></div>
             </div>
             <div class="level-nav">
@@ -342,7 +342,6 @@
                 <button class="level-btn" onclick="jumpToLevel('B1'); return false;">B1</button>
                 <button class="level-btn" onclick="jumpToLevel('B2'); return false;">B2</button>
                 <button class="level-btn" onclick="toggleVerbsMode(); return false;">VERBS</button>
-                <button class="level-btn" style="margin-left: auto;" onclick="resetProgress(); return false;" title="Clear saved progress and start over">🔄 Reset</button>
             </div>
         </div>
 
@@ -1354,10 +1353,6 @@
             ]
         };
 
-        // Deep clone curriculum data to prevent state mutation
-        const originalCurriculum = curriculum;
-        const originalVerbsCurriculum = verbsCurriculum;
-        
         let currentLevel = 'A1';
         let currentTopicIndex = 0;
         let currentQuestionIndex = 0;
@@ -1381,106 +1376,7 @@
             return shuffled;
         }
 
-        // ========== LOCALSTORAGE PERSISTENCE ==========
-        function saveState() {
-            try {
-                const state = {
-                    currentLevel,
-                    currentTopicIndex,
-                    currentQuestionIndex,
-                    score,
-                    inLesson,
-                    lessonExerciseCount,
-                    assessmentMode,
-                    assessmentPart,
-                    verbsMode,
-                    verbsLevel,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem('italianQuizState', JSON.stringify(state));
-            } catch (e) {
-                console.warn('Failed to save state:', e);
-            }
-        }
-
-        function loadState() {
-            try {
-                const saved = localStorage.getItem('italianQuizState');
-                if (!saved) return null;
-                const state = JSON.parse(saved);
-                // Only restore if less than 7 days old
-                if (Date.now() - state.timestamp > 7 * 24 * 60 * 60 * 1000) {
-                    localStorage.removeItem('italianQuizState');
-                    return null;
-                }
-                return state;
-            } catch (e) {
-                console.warn('Failed to load state:', e);
-                return null;
-            }
-        }
-
-        function clearState() {
-            try {
-                localStorage.removeItem('italianQuizState');
-            } catch (e) {
-                console.warn('Failed to clear state:', e);
-            }
-        }
-
-        function restoreState(state) {
-            currentLevel = state.currentLevel || 'A1';
-            currentTopicIndex = state.currentTopicIndex || 0;
-            currentQuestionIndex = state.currentQuestionIndex || 0;
-            score = state.score || 0;
-            inLesson = state.inLesson || false;
-            lessonExerciseCount = state.lessonExerciseCount || 0;
-            assessmentMode = state.assessmentMode || false;
-            assessmentPart = state.assessmentPart || 1;
-            verbsMode = state.verbsMode || false;
-            verbsLevel = state.verbsLevel || 'A1';
-        }
-
         function init() {
-            // Check for saved state
-            const savedState = loadState();
-            if (savedState) {
-                const content = document.getElementById('content');
-                content.innerHTML = `
-                    <div class="card" style="text-align: center;">
-                        <h2>Welcome Back!</h2>
-                        <p>You have saved progress. Would you like to continue where you left off?</p>
-                        <div style="margin-top: 20px;">
-                            <strong>Level:</strong> ${savedState.currentLevel}${savedState.verbsMode ? ' VERBS' : ''}<br>
-                            <strong>Score:</strong> ${savedState.score}<br>
-                            <strong>Progress:</strong> Topic ${savedState.currentTopicIndex + 1}
-                        </div>
-                        <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
-                            <button class="btn" onclick="continueFromSaved(); return false;">Continue</button>
-                            <button class="btn btn-secondary" onclick="startFresh(); return false;">Start Fresh</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                startFresh();
-            }
-        }
-
-        function continueFromSaved() {
-            const savedState = loadState();
-            if (savedState) {
-                restoreState(savedState);
-            }
-            updateLevelNavigation();
-            if (verbsMode) {
-                showVerbsQuestion();
-            } else {
-                showQuestion();
-            }
-        }
-
-        function startFresh() {
-            clearState();
             updateLevelNavigation();
             if (verbsMode) {
                 showVerbsQuestion();
@@ -1535,7 +1431,6 @@
                 score = 0;
                 inLesson = false;
                 failedTopic = null;
-                saveState();
                 updateLevelNavigation();
                 updateHeader();
                 showVerbsQuestion();
@@ -1563,7 +1458,6 @@
                         updateLevelNavigation();
                         updateHeader();
                         hideLoading();
-                        saveState();
                         showQuestion();
                     }, 100);
                 }
@@ -1591,18 +1485,14 @@
                 document.getElementById('topicDisplay').textContent = `${currentQuestionIndex + 1}/${verbsCurriculum[verbsLevel].length}`;
                 const totalQuestions = verbsCurriculum[verbsLevel].length;
                 const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-                const progressBar = document.getElementById('progressBar');
-                progressBar.style.width = `${progress}%`;
-                progressBar.parentElement.setAttribute('aria-valuenow', Math.round(progress));
+                document.getElementById('progressBar').style.width = `${progress}%`;
             } else {
                 document.getElementById('levelDisplay').textContent = currentLevel;
                 document.getElementById('scoreDisplay').textContent = score;
                 document.getElementById('topicDisplay').textContent = `${currentTopicIndex + 1}/${curriculum[currentLevel].length}`;
                 const totalTopics = curriculum[currentLevel].length;
                 const progress = ((currentTopicIndex + currentQuestionIndex / 3) / totalTopics) * 100;
-                const progressBar = document.getElementById('progressBar');
-                progressBar.style.width = `${progress}%`;
-                progressBar.parentElement.setAttribute('aria-valuenow', Math.round(progress));
+                document.getElementById('progressBar').style.width = `${progress}%`;
             }
         }
 
@@ -1622,7 +1512,7 @@
 
             let html = `
                 <div class="card">
-                    <div class="question" lang="it">${question.q}</div>
+                    <div class="question">${question.q}</div>
             `;
 
             if (question.type === 'mc') {
@@ -1633,7 +1523,7 @@
                 html += '</div>';
             } else {
                 html += `
-                    <input type="text" class="input-answer" id="answerInput" placeholder="Type your answer..." autocomplete="off" autocorrect="off" spellcheck="false" lang="it">
+                    <input type="text" class="input-answer" id="answerInput" placeholder="Type your answer...">
                     <button class="btn" onclick="checkTextAnswer()">Submit</button>
                 `;
             }
@@ -1650,8 +1540,6 @@
             }
 
             // Add keyboard listener for Enter on feedback "Next" button
-            // Remove any existing listener first to prevent duplicates
-            document.removeEventListener('keypress', handleGlobalEnter);
             document.addEventListener('keypress', handleGlobalEnter);
         }
 
@@ -1698,8 +1586,8 @@
         function showFeedback(correct, correctAnswer) {
             const content = document.getElementById('content');
             let feedbackHtml = `
-                <div class="feedback ${correct ? 'correct' : 'incorrect'}" role="status" aria-live="polite">
-                    ${correct ? '✓ Correct!' : `✗ Incorrect. The correct answer is: <span lang="it">${correctAnswer}</span>`}
+                <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+                    ${correct ? '✓ Correct!' : `✗ Incorrect. The correct answer is: ${correctAnswer}`}
                 </div>
             `;
 
@@ -1728,19 +1616,15 @@
                     currentTopicIndex++;
 
                     if (currentTopicIndex >= curriculum[currentLevel].length) {
-                        saveState();
                         startAssessment();
                     } else {
-                        saveState();
                         showQuestion();
                     }
                 } else {
-                    saveState();
                     showQuestion();
                 }
             } else {
                 failedTopic = curriculum[currentLevel][currentTopicIndex];
-                saveState();
                 showLesson();
             }
         }
@@ -2029,7 +1913,7 @@
                 html += '</div>';
             } else {
                 html += `
-                    <input type="text" class="input-answer" id="verbsAnswerInput" placeholder="Type your answer..." autocomplete="off" autocorrect="off" spellcheck="false" lang="it">
+                    <input type="text" class="input-answer" id="verbsAnswerInput" placeholder="Type your answer...">
                     <button class="btn" onclick="checkVerbsTextAnswer()">Submit</button>
                 `;
             }
@@ -2270,7 +2154,7 @@
                 html += '</div>';
             } else {
                 html += `
-                    <input type="text" class="input-answer" id="practiceAnswerInput" placeholder="Type your answer..." autocomplete="off" autocorrect="off" spellcheck="false" lang="it">
+                    <input type="text" class="input-answer" id="practiceAnswerInput" placeholder="Type your answer...">
                     <button class="btn" onclick="checkPracticeTextAnswer()">Submit</button>
                 `;
             }
@@ -2363,6 +2247,20 @@
             }
         }
 
+        function continueVerbsLesson(correct) {
+            if (correct) {
+                lessonExerciseCount++;
+                if (lessonExerciseCount >= 3) {
+                    inLesson = false;
+                    lessonExerciseCount = 0;
+                    currentQuestionIndex++;
+                }
+                showVerbsQuestion();
+            } else {
+                showVerbsQuestion();
+            }
+        }
+
         function restartVerbsLevel() {
             currentQuestionIndex = 0;
             score = 0;
@@ -2370,36 +2268,6 @@
             failedTopic = null;
             lessonExerciseCount = 0;
             showVerbsQuestion();
-        }
-
-        function resetProgress() {
-            if (confirm('Are you sure you want to reset all progress? This will clear your saved state and start over from the beginning.')) {
-                clearState();
-                currentLevel = 'A1';
-                currentTopicIndex = 0;
-                currentQuestionIndex = 0;
-                score = 0;
-                failedTopic = null;
-                inLesson = false;
-                lessonExerciseCount = 0;
-                assessmentMode = false;
-                assessmentPart = 1;
-                assessmentQuestions = [];
-                assessmentAnswers = [];
-                verbsMode = false;
-                verbsLevel = 'A1';
-                
-                // Reset all shuffled states
-                Object.keys(curriculum).forEach(level => {
-                    curriculum[level].forEach(topic => {
-                        topic.shuffled = false;
-                    });
-                });
-                
-                updateLevelNavigation();
-                updateHeader();
-                showQuestion();
-            }
         }
 
         init();
