@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italian Learning Game</title>
+    <style>
+        :root {
+            --color-background: #fcfcf9;
+            --color-surface: #fffffe;
+            --color-text: #13343b;
+            --color-text-secondary: #626c71;
+            --color-primary: #21808d;
+            --color-primary-hover: #1d7480;
+            --color-primary-active: #1a6873;
+            --color-secondary: rgba(94, 82, 64, 0.12);
+            --color-secondary-hover: rgba(94, 82, 64, 0.2);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-success: #21808d;
+            --color-error: #c0152f;
+            --color-warning: #a84b2f;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-background: #1f2121;
+                --color-surface: #262828;
+                --color-text: #f5f5f5;
+                --color-text-secondary: rgba(167, 169, 169, 0.7);
+                --color-primary: #32b8c6;
+                --color-primary-hover: #2da6b2;
+                --color-primary-active: #2996a1;
+                --color-secondary: rgba(119, 124, 124, 0.15);
+                --color-secondary-hover: rgba(119, 124, 124, 0.25);
+                --color-border: rgba(119, 124, 124, 0.3);
+                --color-success: #32b8c6;
+                --color-error: #ff5459;
+                --color-warning: #e68161;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            padding: var(--space-20);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-24);
+            border: 1px solid var(--color-border);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: var(--space-8);
+        }
+
+        .progress-bar {
+            background: var(--color-secondary);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: var(--space-12);
+        }
+
+        .progress-fill {
+            background: var(--color-primary);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            border: 1px solid var(--color-border);
+            margin-bottom: var(--space-16);
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-20);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-12);
+        }
+
+        .option-btn {
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-16);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--color-text);
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: var(--color-secondary-hover);
+            border-color: var(--color-primary);
+        }
+
+        .option-btn.correct {
+            background: rgba(33, 128, 141, 0.15);
+            border-color: var(--color-success);
+        }
+
+        .option-btn.incorrect {
+            background: rgba(192, 21, 47, 0.15);
+            border-color: var(--color-error);
+        }
+
+        .input-answer {
+            width: 100%;
+            padding: var(--space-12);
+            font-size: 16px;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background: var(--color-background);
+            color: var(--color-text);
+        }
+
+        .btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-base);
+            padding: var(--space-12) var(--space-24);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-top: var(--space-16);
+        }
+
+        .btn:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--color-secondary);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-secondary-hover);
+        }
+
+        .lesson {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            border: 1px solid var(--color-border);
+        }
+
+        .lesson h2 {
+            color: var(--color-primary);
+            margin-bottom: var(--space-16);
+        }
+
+        .lesson p {
+            margin-bottom: var(--space-12);
+        }
+
+        .lesson ul {
+            margin-left: var(--space-24);
+            margin-bottom: var(--space-16);
+        }
+
+        .feedback {
+            margin-top: var(--space-16);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: rgba(33, 128, 141, 0.15);
+            color: var(--color-success);
+            border: 1px solid var(--color-success);
+        }
+
+        .feedback.incorrect {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-error);
+            border: 1px solid var(--color-error);
+        }
+
+        .stats {
+            display: flex;
+            gap: var(--space-16);
+            margin-top: var(--space-12);
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .level-nav {
+            display: flex;
+            gap: var(--space-8);
+            margin-top: var(--space-16);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: var(--space-8) var(--space-16);
+            border: 2px solid var(--color-border);
+            background: var(--color-surface);
+            color: var(--color-text);
+            border-radius: var(--radius-base);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .level-btn:hover {
+            background: var(--color-secondary-hover);
+            border-color: var(--color-primary);
+        }
+
+        .level-btn.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .completion-message {
+            text-align: center;
+            padding: var(--space-24);
+        }
+
+        .completion-message h2 {
+            color: var(--color-success);
+            margin-bottom: var(--space-16);
+        }
+
+        .assessment-info {
+            background: rgba(33, 128, 141, 0.1);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-20);
+            border: 1px solid var(--color-primary);
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--color-secondary);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇮🇹 Italian Learning Game</h1>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="levelDisplay">A1</div>
+                    <div class="stat-label">Current Level</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="scoreDisplay">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="topicDisplay">1/10</div>
+                    <div class="stat-label">Topic Progress</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="level-nav">
+                <button class="level-btn active" onclick="jumpToLevel('A1'); return false;">A1</button>
+                <button class="level-btn" onclick="jumpToLevel('A2'); return false;">A2</button>
+                <button class="level-btn" onclick="jumpToLevel('B1'); return false;">B1</button>
+                <button class="level-btn" onclick="jumpToLevel('B2'); return false;">B2</button>
+                <button class="level-btn" onclick="toggleVerbsMode(); return false;">VERBS</button>
+            </div>
+        </div>
+
+        <div id="content"></div>
+    </div>
+
+    <script>
+        const verbsCurriculum = {
+            A1: [
+                { q: 'Io (parlare) italiano', type: 'mc', options: ['parlo', 'parli', 'parla', 'parliamo'], answer: 0, topic: 'Presente indicativo', explanation: 'Prima persona singolare di "parlare" termina in -o', lesson: 'Il presente indicativo dei verbi regolari -ARE: io -o, tu -i, lui/lei -a, noi -iamo, voi -ate, loro -ano' },
+                { q: 'Tu (mangiare) una pizza?', type: 'mc', options: ['mangi', 'mangia', 'mangio', 'mangiate'], answer: 0, topic: 'Presente indicativo', explanation: 'Seconda persona singolare di "mangiare" termina in -i', lesson: 'Verbi regolari -ARE: la seconda persona singolare termina sempre in -i' },
+                { q: 'Lei (leggere) un libro', type: 'mc', options: ['leggo', 'leggi', 'legge', 'leggono'], answer: 2, topic: 'Presente indicativo', explanation: 'Terza persona singolare di "leggere" termina in -e', lesson: 'Verbi regolari -ERE: io -o, tu -i, lui/lei -e, noi -iamo, voi -ete, loro -ono' },
+                { q: 'Noi (aprire) la porta', type: 'mc', options: ['apro', 'apri', 'apriamo', 'aprono'], answer: 2, topic: 'Presente indicativo', explanation: 'Prima persona plurale di "aprire" termina in -iamo', lesson: 'Verbi regolari -IRE: io -o, tu -i, lui/lei -e, noi -iamo, voi -ite, loro -ono' },
+                { q: 'Io (essere) italiano', type: 'text', answer: 'sono', topic: 'Presente indicativo - irregolari', explanation: 'Prima persona singolare di "essere" è "sono"', lesson: '"Essere": sono, sei, è, siamo, siete, sono - uno dei verbi più importanti' },
+                { q: 'Tu (avere) una casa?', type: 'text', answer: 'hai', topic: 'Presente indicativo - irregolari', explanation: 'Seconda persona singolare di "avere" è "hai"', lesson: '"Avere": ho, hai, ha, abbiamo, avete, hanno' },
+                { q: 'Loro (andare) in banca', type: 'mc', options: ['va', 'vai', 'vanno', 'andiamo'], answer: 2, topic: 'Presente indicativo - irregolari', explanation: 'Terza persona plurale di "andare" è "vanno"', lesson: '"Andare" è irregolare: vado, vai, va, andiamo, andate, vanno' },
+                { q: 'Noi (fare) il mutuo', type: 'mc', options: ['faccio', 'fai', 'facciamo', 'fanno'], answer: 2, topic: 'Presente indicativo - irregolari', explanation: 'Prima persona plurale di "fare" è "facciamo"', lesson: '"Fare": faccio, fai, fa, facciamo, fate, fanno' },
+                { q: 'Lei (venire) domani?', type: 'text', answer: 'viene', topic: 'Presente indicativo - irregolari', explanation: 'Terza persona singolare di "venire" è "viene"', lesson: '"Venire": vengo, vieni, viene, veniamo, venite, vengono' },
+                { q: 'Lui (stare) bene', type: 'text', answer: 'sta', topic: 'Presente indicativo - irregolari', explanation: 'Terza persona singolare di "stare" è "sta"', lesson: '"Stare": sto, stai, sta, stiamo, state, stanno' },
+                { q: 'Io (dire) la verità', type: 'mc', options: ['dico', 'dici', 'dice', 'diciamo'], answer: 0, topic: 'Presente indicativo - irregolari', explanation: 'Prima persona singolare di "dire" è "dico"', lesson: '"Dire": dico, dici, dice, diciamo, dite, dicono' },
+                { q: 'Io (mangiare) una pizza - Passato prossimo', type: 'mc', options: ['ho mangiato', 'hai mangiato', 'ha mangiato', 'abbiamo mangiato'], answer: 0, topic: 'Passato prossimo', explanation: 'Passato prossimo: ho (ausiliare) + mangiato (participio)', lesson: 'Passato prossimo con AVERE: ho, hai, ha, abbiamo, avete, hanno + participio' },
+                { q: 'Tu (vedere) il film?', type: 'text', answer: 'hai visto', topic: 'Passato prossimo', explanation: 'Hai visto: tu hai + visto (participio irregolare)', lesson: 'Participi irregolari: visto (vedere), fatto (fare), scritto (scrivere)' },
+                { q: 'Noi (comprare) i biglietti', type: 'mc', options: ['ho comprato', 'hai comprato', 'abbiamo comprato', 'hanno comprato'], answer: 2, topic: 'Passato prossimo', explanation: 'Abbiamo comprato: noi abbiamo + comprato', lesson: 'Passato prossimo con AVERE per azioni completate: io ho parlato, tu hai mangiato, lui ha comprato' },
+                { q: 'Voi (bere) il caffè?', type: 'text', answer: 'avete bevuto', topic: 'Passato prossimo', explanation: 'Avete bevuto: voi avete + bevuto (participio irregolare di bere)', lesson: 'Participio di BERE è BEVUTO (irregolare). Altri irregolari: scritto, letto, detto, fatto' },
+                { q: 'Loro (parlare) con il direttore', type: 'mc', options: ['ho parlato', 'ha parlato', 'abbiamo parlato', 'hanno parlato'], answer: 3, topic: 'Passato prossimo', explanation: 'Hanno parlato: loro hanno + parlato', lesson: 'Terza persona plurale con AVERE: loro hanno + participio' },
+                { q: 'Io (scrivere) una lettera', type: 'text', answer: 'ho scritto', topic: 'Passato prossimo', explanation: 'Ho scritto: io ho + scritto (participio irregolare)', lesson: 'SCRIVERE → SCRITTO (participio irregolare). Altri: leggere → letto, dire → detto' },
+                { q: 'Tu (aprire) la porta?', type: 'mc', options: ['ho aperto', 'hai aperto', 'ha aperto', 'abbiamo aperto'], answer: 1, topic: 'Passato prossimo', explanation: 'Hai aperto: tu hai + aperto', lesson: 'APRIRE → APERTO. Verbi -IRE regolari: finire → finito, partire → partito' },
+                { q: 'Lei (prendere) il treno', type: 'text', answer: 'ha preso', topic: 'Passato prossimo', explanation: 'Ha preso: lei ha + preso (participio irregolare)', lesson: 'PRENDERE → PRESO (irregolare). Altri: mettere → messo, chiudere → chiuso' },
+                { q: 'Noi (fare) i compiti', type: 'mc', options: ['ho fatto', 'hai fatto', 'abbiamo fatto', 'hanno fatto'], answer: 2, topic: 'Passato prossimo', explanation: 'Abbiamo fatto: noi abbiamo + fatto', lesson: 'FARE → FATTO (irregolare importante). Io ho fatto, tu hai fatto, lui ha fatto' },
+                { q: 'Voi (leggere) il giornale?', type: 'text', answer: 'avete letto', topic: 'Passato prossimo', explanation: 'Avete letto: voi avete + letto (participio irregolare)', lesson: 'LEGGERE → LETTO (irregolare). Altri: mettere → messo, rispondere → risposto' },
+                { q: 'Lui (andare) in banca', type: 'text', answer: 'è andato', topic: 'Passato prossimo con essere', explanation: 'È andato: lui è + andato (con essere)', lesson: 'Passato prossimo con ESSERE: sono, sei, è + participio. Usa "essere" con verbi di movimento' },
+                { q: 'Lei (arrivare) a casa', type: 'mc', options: ['è arrivato', 'è arrivata', 'è arrivate', 'è arrivati'], answer: 1, topic: 'Passato prossimo con essere', explanation: 'È arrivata: lei (femminile) è + arrivata (accordo)', lesson: 'Con "essere", il participio SI ACCORDA: arrivato (m.s.), arrivata (f.s.)' },
+                { q: 'Io (tornare) a casa - maschile', type: 'text', answer: 'sono tornato', topic: 'Passato prossimo con essere', explanation: 'Sono tornato: io (maschile) sono + tornato', lesson: 'ESSERE + participio: accordo obbligatorio. Io sono tornato/a, tu sei tornato/a' },
+                { q: 'Tu (partire) ieri - femminile', type: 'mc', options: ['sei partito', 'sei partita', 'è partito', 'è partita'], answer: 1, topic: 'Passato prossimo con essere', explanation: 'Sei partita: tu (femminile) sei + partita', lesson: 'Con ESSERE, accordo sempre: lui è partito, lei è partita, loro sono partiti/e' },
+                { q: 'Noi (venire) insieme - maschile', type: 'text', answer: 'siamo venuti', topic: 'Passato prossimo con essere', explanation: 'Siamo venuti: noi (maschile) siamo + venuti', lesson: 'VENIRE usa ESSERE: sono venuto/a, sei venuto/a, è venuto/a, siamo venuti/e' },
+                { q: 'Voi (restare) qui - femminile', type: 'mc', options: ['siete restati', 'siete restate', 'sono restati', 'sono restate'], answer: 1, topic: 'Passato prossimo con essere', explanation: 'Siete restate: voi (femminile plurale) siete + restate', lesson: 'Accordo plurale: noi siamo restati/e, voi siete restati/e, loro sono restati/e' },
+                { q: 'Loro (uscire) presto - maschile', type: 'text', answer: 'sono usciti', topic: 'Passato prossimo con essere', explanation: 'Sono usciti: loro (maschile) sono + usciti', lesson: 'USCIRE usa ESSERE: sono uscito/a, sei uscito/a, è uscito/a' },
+                { q: 'Io (nascere) a Roma - femminile', type: 'mc', options: ['sono nato', 'sono nata', 'ho nato', 'ho nata'], answer: 1, topic: 'Passato prossimo con essere', explanation: 'Sono nata: io (femminile) sono + nata', lesson: 'NASCERE usa ESSERE sempre. Participio: nato/a/i/e. Dove sei nato/a?' },
+                { q: 'Lei (cadere) dalle scale', type: 'text', answer: 'è caduta', topic: 'Passato prossimo con essere', explanation: 'È caduta: lei è + caduta (accordo femminile)', lesson: 'CADERE usa ESSERE: sono caduto/a, sei caduto/a, è caduto/a' },
+                { q: 'Noi (rimanere) a casa - femminile', type: 'mc', options: ['siamo rimasti', 'siamo rimaste', 'abbiamo rimasti', 'abbiamo rimaste'], answer: 1, topic: 'Passato prossimo con essere', explanation: 'Siamo rimaste: noi (femminile) siamo + rimaste', lesson: 'RIMANERE usa ESSERE. Participio irregolare: RIMASTO/A/I/E' },
+                { q: 'Loro (morire) nel 1990 - maschile', type: 'text', answer: 'sono morti', topic: 'Passato prossimo con essere', explanation: 'Sono morti: loro (maschile) sono + morti', lesson: 'MORIRE usa ESSERE. Participio irregolare: MORTO/A/I/E' },
+                { q: 'Domani io ___ alla banca (Futuro)', type: 'mc', options: ['andò', 'andrò', 'andava', 'sono andato'], answer: 1, topic: 'Futuro semplice', explanation: 'Futuro di "andare": andrò', lesson: 'Futuro semplice RICONOSCIMENTO: andrò, farò, vedrò (solo riconoscere)' },
+                { q: 'La settimana prossima lei ___ il mutuo (fare - Futuro)', type: 'text', answer: 'farà', topic: 'Futuro semplice', explanation: 'Futuro di "fare": farà', lesson: 'Forme comuni di futuro: andrò, farai, farà, vedremo' },
+                { q: 'Ascolta! (imperativo tu - ascoltare)', type: 'text', answer: 'ascolta', topic: 'Imperativo tu', explanation: 'Imperativo di "ascoltare" (tu): Ascolta!', lesson: 'Imperativo TU: per -ARE, usa terza singolare: parla!, ascolta!' },
+                { q: 'Vieni! è l\'imperativo di quale verbo?', type: 'mc', options: ['venire', 'andare', 'stare', 'fare'], answer: 0, topic: 'Imperativo tu', explanation: 'Vieni! è imperativo tu di "venire"', lesson: 'Imperativo TU irregolare: vieni (venire), va\' (andare), fa\' (fare)' },
+                { q: 'Guarda! (imperativo - guardare)', type: 'text', answer: 'guarda', topic: 'Imperativo tu', explanation: 'Imperativo di "guardare": Guarda!', lesson: 'Imperativo tu per -ARE: parla, ascolta, guarda' }
+            ],
+            A2: [
+                { q: 'Io mi sono (svegliare) presto', type: 'text', answer: 'svegliato', topic: 'Passato prossimo riflessivo', explanation: 'Mi sono svegliato: verbo riflessivo con accordo', lesson: 'Verbi riflessivi: mi sono + participio (accordo con soggetto)' },
+                { q: 'Tu ti sei (lavare) le mani', type: 'mc', options: ['lavato', 'lavata', 'lavati', 'lavate'], answer: 0, topic: 'Passato prossimo riflessivo', explanation: 'Ti sei lavato: tu (maschile) ti sei + lavato', lesson: 'Riflessivi con ESSERE: mi sono lavato/a, ti sei lavato/a, si è lavato/a' },
+                { q: 'Lei si è (vestire) - femminile', type: 'text', answer: 'vestita', topic: 'Passato prossimo riflessivo', explanation: 'Si è vestita: lei si è + vestita (accordo femminile)', lesson: 'VESTIRSI: mi sono vestito/a, ti sei vestito/a, si è vestito/a' },
+                { q: 'Noi ci siamo (preparare) - maschile', type: 'mc', options: ['preparato', 'preparata', 'preparati', 'preparate'], answer: 2, topic: 'Passato prossimo riflessivo', explanation: 'Ci siamo preparati: noi (maschile) ci siamo + preparati', lesson: 'Riflessivi plurale: ci siamo preparati/e, vi siete preparati/e, si sono preparati/e' },
+                { q: 'Voi vi siete (alzare) presto - femminile', type: 'text', answer: 'alzate', topic: 'Passato prossimo riflessivo', explanation: 'Vi siete alzate: voi (femminile) vi siete + alzate', lesson: 'ALZARSI: mi sono alzato/a, ti sei alzato/a. Sempre con ESSERE!' },
+                { q: 'Loro si sono (incontrare) al bar - maschile', type: 'mc', options: ['incontrato', 'incontrata', 'incontrati', 'incontrate'], answer: 2, topic: 'Passato prossimo riflessivo', explanation: 'Si sono incontrati: loro (maschile) si sono + incontrati', lesson: 'INCONTRARSI usa ESSERE: ci siamo incontrati/e (we met each other)' },
+                { q: 'Io mi sono (addormentare) tardi - femminile', type: 'text', answer: 'addormentata', topic: 'Passato prossimo riflessivo', explanation: 'Mi sono addormentata: io (femminile) mi sono + addormentata', lesson: 'ADDORMENTARSI: mi sono addormentato/a, ti sei addormentato/a' },
+                { q: 'Tu ti sei (divertire) alla festa? - maschile', type: 'mc', options: ['divertito', 'divertita', 'divertiti', 'divertite'], answer: 0, topic: 'Passato prossimo riflessivo', explanation: 'Ti sei divertito: tu (maschile) ti sei + divertito', lesson: 'DIVERTIRSI: mi sono divertito/a (I had fun), ti sei divertito/a' },
+                { q: 'Lei si è (sentire) male', type: 'text', answer: 'sentita', topic: 'Passato prossimo riflessivo', explanation: 'Si è sentita: lei si è + sentita male (she felt ill)', lesson: 'SENTIRSI: mi sono sentito/a, ti sei sentito/a. Sentirsi male = to feel ill' },
+                { q: 'Noi ci siamo (sposare) nel 2020 - maschile', type: 'mc', options: ['sposato', 'sposata', 'sposati', 'sposate'], answer: 2, topic: 'Passato prossimo riflessivo', explanation: 'Ci siamo sposati: noi (maschile) ci siamo + sposati', lesson: 'SPOSARSI: ci siamo sposati/e (we got married). Sempre con ESSERE!' },
+                { q: 'Voi vi siete (truccare) - femminile', type: 'text', answer: 'truccate', topic: 'Passato prossimo riflessivo', explanation: 'Vi siete truccate: voi (femminile) vi siete + truccate', lesson: 'TRUCCARSI: mi sono truccato/a, ti sei truccato/a (to put on makeup)' },
+                { q: 'Loro si sono (sedere) qui - femminile', type: 'mc', options: ['seduto', 'seduta', 'seduti', 'sedute'], answer: 3, topic: 'Passato prossimo riflessivo', explanation: 'Si sono sedute: loro (femminile) si sono + sedute', lesson: 'SEDERSI: mi sono seduto/a, ti sei seduto/a (to sit down). Participio: seduto/a/i/e' },
+                { q: 'Io mi sono (fermare) alla stazione - maschile', type: 'text', answer: 'fermato', topic: 'Passato prossimo riflessivo', explanation: 'Mi sono fermato: io (maschile) mi sono + fermato', lesson: 'FERMARSI: mi sono fermato/a (I stopped), ti sei fermato/a. Sempre ESSERE!' },
+                { q: 'Tu ti sei (dimenticare) le chiavi - femminile', type: 'mc', options: ['dimenticato', 'dimenticata', 'dimenticati', 'dimenticate'], answer: 1, topic: 'Passato prossimo riflessivo', explanation: 'Ti sei dimenticata: tu (femminile) ti sei + dimenticata', lesson: 'DIMENTICARSI: mi sono dimenticato/a (I forgot). Differenza: ho dimenticato (non riflessivo)' },
+                { q: 'Lei si è (sbagliare)', type: 'text', answer: 'sbagliata', topic: 'Passato prossimo riflessivo', explanation: 'Si è sbagliata: lei si è + sbagliata (she made a mistake)', lesson: 'SBAGLIARSI: mi sono sbagliato/a (I was wrong/made a mistake)' },
+                { q: 'Noi ci siamo (rilassare) - femminile', type: 'mc', options: ['rilassato', 'rilassata', 'rilassati', 'rilassate'], answer: 3, topic: 'Passato prossimo riflessivo', explanation: 'Ci siamo rilassate: noi (femminile) ci siamo + rilassate', lesson: 'RILASSARSI: mi sono rilassato/a (I relaxed), ti sei rilassato/a' },
+                { q: 'Voi vi siete (annoiare) - maschile', type: 'text', answer: 'annoiati', topic: 'Passato prossimo riflessivo', explanation: 'Vi siete annoiati: voi (maschile) vi siete + annoiati', lesson: 'ANNOIARSI: mi sono annoiato/a (I got bored), ti sei annoiato/a' },
+                { q: 'Loro si sono (laureare) - maschile', type: 'mc', options: ['laureato', 'laureata', 'laureati', 'laureate'], answer: 2, topic: 'Passato prossimo riflessivo', explanation: 'Si sono laureati: loro (maschile) si sono + laureati', lesson: 'LAUREARSI: mi sono laureato/a (I graduated from university)' },
+                { q: 'Io mi sono (arrabbiare) - femminile', type: 'text', answer: 'arrabbiata', topic: 'Passato prossimo riflessivo', explanation: 'Mi sono arrabbiata: io (femminile) mi sono + arrabbiata', lesson: 'ARRABBIARSI: mi sono arrabbiato/a (I got angry), ti sei arrabbiato/a' },
+                { q: 'Tu ti sei (accorgere) del problema? - maschile', type: 'mc', options: ['accorto', 'accorta', 'accorti', 'accorte'], answer: 0, topic: 'Passato prossimo riflessivo', explanation: 'Ti sei accorto: tu (maschile) ti sei + accorto', lesson: 'ACCORGERSI: mi sono accorto/a (I realized/noticed). Participio irregolare: accorto/a/i/e' },
+                { q: 'Lei è (andare) in banca', type: 'mc', options: ['andato', 'andata', 'andati', 'andate'], answer: 1, topic: 'Accordo participio', explanation: 'È andata: lei (femminile) + andata', lesson: 'Con essere, participio SI ACCORDA sempre' },
+                { q: 'Da bambino io (giocare) sempre', type: 'text', answer: 'giocavo', topic: 'Imperfetto', explanation: 'Giocavo: imperfetto (azione ripetuta)', lesson: 'Imperfetto: -AVO, -EVO, -IVO per azioni ripetute nel passato' },
+                { q: 'Lei (descrivere) la situazione', type: 'mc', options: ['descrivevo', 'descrivevi', 'descriveva', 'descrivevano'], answer: 2, topic: 'Imperfetto', explanation: 'Descriveva: terza singolare imperfetto', lesson: 'Imperfetto per descrizioni nel passato' },
+                { q: 'Loro (abitare) a Roma', type: 'text', answer: 'abitavano', topic: 'Imperfetto', explanation: 'Abitavano: terza plurale imperfetto', lesson: 'Imperfetto: azioni abituali nel passato' },
+                { q: 'Noi (andare) domani - Futuro', type: 'text', answer: 'andremo', topic: 'Futuro semplice', explanation: 'Andremo: futuro prima plurale', lesson: 'Futuro per piani: andrò, andrai, andrà, andremo' },
+                { q: 'Tu (aprire) un conto? - Futuro', type: 'mc', options: ['aprirai', 'apriva', 'ho aperto', 'apri'], answer: 0, topic: 'Futuro semplice', explanation: 'Aprirai: futuro seconda singolare', lesson: 'Futuro -IRE: aprirò, aprirai, aprirà' },
+                { q: 'Ascoltate! è imperativo per:', type: 'mc', options: ['tu', 'noi', 'voi', 'loro'], answer: 2, topic: 'Imperativo voi', explanation: 'Ascoltate! = imperativo voi', lesson: 'Imperativo VOI: ascoltate, leggete, aprite' },
+                { q: 'Leggiamo! è imperativo per:', type: 'mc', options: ['tu', 'noi', 'voi', 'loro'], answer: 1, topic: 'Imperativo noi', explanation: 'Leggiamo! = imperativo noi', lesson: 'Imperativo NOI: ascoltiamo, leggiamo, apriamo' },
+                { q: 'Io sto (mangiare)', type: 'text', answer: 'mangiando', topic: 'Stare + gerundio', explanation: 'Sto mangiando: presente continuo', lesson: 'Stare + gerundio = azione in corso' },
+                { q: 'Noi (studiare) l\'italiano - stare + gerundio', type: 'mc', options: ['studiamo', 'abbiamo studiato', 'stiamo studiando', 'studieremo'], answer: 2, topic: 'Stare + gerundio', explanation: 'Stiamo studiando: noi stiamo + gerundio', lesson: 'Gerundio: -ANDO (parlando), -ENDO (leggendo)' },
+                { q: 'Io (dovere) andare', type: 'text', answer: 'devo', topic: 'Verbi modali', explanation: 'Devo: prima singolare dovere', lesson: 'Dovere: devo, devi, deve = necessità/obbligo' },
+                { q: 'Tu (potere) venire?', type: 'mc', options: ['posso', 'puoi', 'può', 'possiamo'], answer: 1, topic: 'Verbi modali', explanation: 'Puoi: seconda singolare potere', lesson: 'Potere: posso, puoi, può = capacità/permesso' },
+                { q: 'Lei (volere) aprire un conto?', type: 'text', answer: 'vuole', topic: 'Verbi modali', explanation: 'Vuole: terza singolare volere', lesson: 'Volere: voglio, vuoi, vuole = desiderio' },
+                { q: 'Noi (dovere) aspettare - passato', type: 'mc', options: ['abbiamo dovuto', 'avete dovuto', 'hanno dovuto', 'ha dovuto'], answer: 0, topic: 'Verbi modali passato', explanation: 'Abbiamo dovuto: passato prossimo dovere', lesson: 'Modali passato: ho dovuto, hai dovuto, ha dovuto' },
+                { q: 'Lui (potere) trovare - passato', type: 'text', answer: 'ha potuto', topic: 'Verbi modali passato', explanation: 'Ha potuto: passato potere', lesson: 'Ho potuto = I was able to (nel passato)' },
+                { q: 'Mentre io (leggere), suonò il campanello', type: 'mc', options: ['leggevo', 'leggo', 'ho letto', 'leggerò'], answer: 0, topic: 'Imperfetto', explanation: 'Leggevo: imperfetto (azione in corso)', lesson: 'Imperfetto: azione in corso interrotta' },
+                { q: 'Loro (vivere) a Milano', type: 'text', answer: 'vivevano', topic: 'Imperfetto', explanation: 'Vivevano: terza plurale imperfetto', lesson: 'Imperfetto: -EVANO (vivere, leggere)' },
+                { q: 'Noi ci siamo (incontrare)', type: 'text', answer: 'incontrati', topic: 'Riflessivi passato', explanation: 'Incontrati: riflessivo plurale maschile', lesson: 'Riflessivi: ci siamo + participio accordato' },
+                { q: 'Loro stanno (cercare) la banca', type: 'text', answer: 'cercando', topic: 'Stare + gerundio', explanation: 'Cercando: gerundio di cercare', lesson: 'Il gerundio è invariabile (-ando, -endo)' }
+            ]
+        };
+
+        const curriculum = {
+            A1: [
+                {
+                    topic: 'Basic Greetings',
+                    lesson: {
+                        title: 'Basic Greetings in Italian',
+                        content: `<p>In Italian, greetings vary by time of day:</p>
+                        <ul>
+                            <li><strong>Ciao</strong> (chow) - Hi/Bye (informal)</li>
+                            <li><strong>Buongiorno</strong> (bwon-JOR-no) - Good morning/Good day (formal)</li>
+                            <li><strong>Buonasera</strong> (bwon-ah-SEH-rah) - Good evening (formal)</li>
+                            <li><strong>Arrivederci</strong> (ah-ree-veh-DEHR-chee) - Goodbye (formal)</li>
+                            <li><strong>Come stai?</strong> (KOH-meh STAI) - How are you? (informal)</li>
+                            <li><strong>Come sta?</strong> (KOH-meh STAH) - How are you? (formal)</li>
+                        </ul>
+                        <p><strong>Note:</strong> Use formal greetings with strangers, elderly people, and in professional settings.</p>`
+                    },
+                    questions: [
+                        { q: 'How do you say "Good morning" in Italian?', type: 'mc', options: ['Ciao', 'Buongiorno', 'Buonasera', 'Arrivederci'], answer: 1 },
+                        { q: 'What is the informal way to say "Hi" in Italian?', type: 'text', answer: 'ciao' },
+                        { q: 'How do you formally ask "How are you?"', type: 'mc', options: ['Come stai?', 'Come sta?', 'Ciao!', 'Buongiorno!'], answer: 1 },
+                        { q: 'How do you say "Good evening" in Italian?', type: 'text', answer: 'buonasera' },
+                        { q: 'What does "Arrivederci" mean?', type: 'mc', options: ['Hello', 'Goodbye', 'Thank you', 'Please'], answer: 1 },
+                        { q: 'Which greeting is informal?', type: 'mc', options: ['Buongiorno', 'Ciao', 'Arrivederci', 'Come sta?'], answer: 1 },
+                        { q: 'How do you say "How are you?" informally?', type: 'text', answer: 'come stai' },
+                        { q: 'What is the formal way to say "Goodbye"?', type: 'mc', options: ['Ciao', 'Arrivederci', 'Buonasera', 'Grazie'], answer: 1 },
+                        { q: 'When do you use "Buonasera"?', type: 'mc', options: ['Morning', 'Afternoon', 'Evening', 'Night'], answer: 2 }
+                    ]
+                },
+                {
+                    topic: 'Numbers 1-20',
+                    lesson: {
+                        title: 'Italian Numbers 1-20',
+                        content: `<p>Learning numbers is essential for shopping, telling time, and asking prices:</p>
+                        <ul>
+                            <li>1 = uno, 2 = due, 3 = tre, 4 = quattro, 5 = cinque</li>
+                            <li>6 = sei, 7 = sette, 8 = otto, 9 = nove, 10 = dieci</li>
+                            <li>11 = undici, 12 = dodici, 13 = tredici, 14 = quattordici, 15 = quindici</li>
+                            <li>16 = sedici, 17 = diciassette, 18 = diciotto, 19 = diciannove, 20 = venti</li>
+                        </ul>
+                        <p><strong>Tip:</strong> Numbers 11-19 follow a pattern with "dici" (ten) + the unit number.</p>`
+                    },
+                    questions: [
+                        { q: 'How do you say "5" in Italian?', type: 'text', answer: 'cinque' },
+                        { q: 'What number is "dodici"?', type: 'mc', options: ['10', '11', '12', '13'], answer: 2 },
+                        { q: 'How do you say "15" in Italian?', type: 'text', answer: 'quindici' },
+                        { q: 'What is "tre" in English?', type: 'mc', options: ['1', '2', '3', '4'], answer: 2 },
+                        { q: 'How do you say "8" in Italian?', type: 'text', answer: 'otto' },
+                        { q: 'What number is "diciassette"?', type: 'mc', options: ['16', '17', '18', '19'], answer: 1 },
+                        { q: 'How do you say "20" in Italian?', type: 'text', answer: 'venti' },
+                        { q: 'What is "undici"?', type: 'mc', options: ['9', '10', '11', '12'], answer: 2 },
+                        { q: 'How do you say "13" in Italian?', type: 'text', answer: 'tredici' }
+                    ]
+                },
+                {
+                    topic: 'Asking for Directions',
+                    lesson: {
+                        title: 'Basic Directions in Italian',
+                        content: `<p>Essential phrases for navigating Italian cities:</p>
+                        <ul>
+                            <li><strong>Dov'è...?</strong> (doh-VEH) - Where is...?</li>
+                            <li><strong>Dove si trova...?</strong> (DOH-veh see TRO-vah) - Where is located...?</li>
+                            <li><strong>la banca</strong> (lah BAHN-kah) - the bank</li>
+                            <li><strong>Vada dritto</strong> (VAH-dah DREET-toh) - Go straight</li>
+                            <li><strong>Giri a sinistra</strong> (JEE-ree ah see-NEE-strah) - Turn left</li>
+                            <li><strong>Giri a destra</strong> (JEE-ree ah DEH-strah) - Turn right</li>
+                        </ul>
+                        <p><strong>Example:</strong> "Dov'è la banca più vicina?" (Where is the nearest bank?)</p>`
+                    },
+                    questions: [
+                        { q: 'How do you ask "Where is the bank?"', type: 'mc', options: ['Dov\'è la banca?', 'Come stai?', 'Quanto costa?', 'Grazie!'], answer: 0 },
+                        { q: 'What does "Giri a sinistra" mean?', type: 'mc', options: ['Go straight', 'Turn left', 'Turn right', 'Stop here'], answer: 1 },
+                        { q: 'How do you say "Turn right" in Italian?', type: 'text', answer: 'giri a destra' },
+                        { q: 'What does "Vada dritto" mean?', type: 'mc', options: ['Turn left', 'Turn right', 'Go straight', 'Stop'], answer: 2 },
+                        { q: 'How do you say "the bank" in Italian?', type: 'text', answer: 'la banca' },
+                        { q: 'What does "Dove si trova la banca?" mean?', type: 'mc', options: ['How are you?', 'Where is the bank?', 'Thank you', 'Good morning'], answer: 1 },
+                        { q: 'How do you say "Go straight" in Italian?', type: 'text', answer: 'vada dritto' },
+                        { q: 'What is "più vicina" in English?', type: 'mc', options: ['farthest', 'nearest', 'biggest', 'smallest'], answer: 1 },
+                        { q: 'How do you ask where something is located?', type: 'text', answer: 'dove si trova' }
+                    ]
+                },
+                {
+                    topic: 'Basic Banking Vocabulary',
+                    lesson: {
+                        title: 'Banking Terms in Italian',
+                        content: `<p>Important vocabulary for banking in Italy:</p>
+                        <ul>
+                            <li><strong>la banca</strong> (lah BAHN-kah) - the bank</li>
+                            <li><strong>il conto</strong> (eel KOHN-toh) - the account</li>
+                            <li><strong>i soldi</strong> (ee SOHL-dee) - money</li>
+                            <li><strong>l'euro</strong> (leh-OO-roh) - euro</li>
+                            <li><strong>prelevare</strong> (preh-leh-VAH-reh) - to withdraw</li>
+                            <li><strong>depositare</strong> (deh-poh-zee-TAH-reh) - to deposit</li>
+                        </ul>
+                        <p><strong>Useful phrase:</strong> "Vorrei aprire un conto" (I would like to open an account)</p>`
+                    },
+                    questions: [
+                        { q: 'What is "the bank" in Italian?', type: 'text', answer: 'la banca' },
+                        { q: 'How do you say "money" in Italian?', type: 'mc', options: ['i soldi', 'il conto', 'l\'euro', 'la banca'], answer: 0 },
+                        { q: 'What does "prelevare" mean?', type: 'mc', options: ['to deposit', 'to open', 'to withdraw', 'to close'], answer: 2 }
+                    ]
+                },
+                {
+                    topic: 'Personal Pronouns',
+                    lesson: {
+                        title: 'Italian Personal Pronouns',
+                        content: `<p>Subject pronouns in Italian:</p>
+                        <ul>
+                            <li><strong>io</strong> (EE-oh) - I</li>
+                            <li><strong>tu</strong> (too) - you (informal)</li>
+                            <li><strong>lui</strong> (LOO-ee) - he</li>
+                            <li><strong>lei</strong> (LAY) - she</li>
+                            <li><strong>Lei</strong> (LAY) - you (formal, capitalized)</li>
+                            <li><strong>noi</strong> (noy) - we</li>
+                            <li><strong>voi</strong> (voy) - you (plural)</li>
+                            <li><strong>loro</strong> (LOH-roh) - they</li>
+                        </ul>
+                        <p><strong>Note:</strong> Italian often omits pronouns since the verb ending indicates the subject.</p>`
+                    },
+                    questions: [
+                        { q: 'What is "I" in Italian?', type: 'text', answer: 'io' },
+                        { q: 'Which pronoun means "they"?', type: 'mc', options: ['voi', 'noi', 'loro', 'Lei'], answer: 2 },
+                        { q: 'What is the informal "you" in Italian?', type: 'mc', options: ['Lei', 'tu', 'voi', 'lui'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Common Verbs (essere, avere)',
+                    lesson: {
+                        title: 'Essential Italian Verbs: Essere & Avere',
+                        content: `<p><strong>Essere (to be):</strong></p>
+                        <ul>
+                            <li>io sono - I am</li>
+                            <li>tu sei - you are (informal)</li>
+                            <li>lui/lei è - he/she is</li>
+                            <li>noi siamo - we are</li>
+                            <li>voi siete - you are (plural)</li>
+                            <li>loro sono - they are</li>
+                        </ul>
+                        <p><strong>Avere (to have):</strong></p>
+                        <ul>
+                            <li>io ho - I have</li>
+                            <li>tu hai - you have</li>
+                            <li>lui/lei ha - he/she has</li>
+                            <li>noi abbiamo - we have</li>
+                            <li>voi avete - you have</li>
+                            <li>loro hanno - they have</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'How do you say "I am" in Italian?', type: 'text', answer: 'io sono' },
+                        { q: 'What is "we have" in Italian?', type: 'mc', options: ['noi siamo', 'noi abbiamo', 'voi avete', 'loro hanno'], answer: 1 },
+                        { q: 'Translate "tu sei":', type: 'mc', options: ['I am', 'you are', 'he is', 'we are'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Days of the Week',
+                    lesson: {
+                        title: 'Days of the Week in Italian',
+                        content: `<p>Italian days of the week (not capitalized):</p>
+                        <ul>
+                            <li><strong>lunedì</strong> (loo-neh-DEE) - Monday</li>
+                            <li><strong>martedì</strong> (mar-teh-DEE) - Tuesday</li>
+                            <li><strong>mercoledì</strong> (mehr-koh-leh-DEE) - Wednesday</li>
+                            <li><strong>giovedì</strong> (joh-veh-DEE) - Thursday</li>
+                            <li><strong>venerdì</strong> (veh-nehr-DEE) - Friday</li>
+                            <li><strong>sabato</strong> (SAH-bah-toh) - Saturday</li>
+                            <li><strong>domenica</strong> (doh-MEH-nee-kah) - Sunday</li>
+                        </ul>
+                        <p><strong>Note:</strong> Days ending in -dì take the stress on the last syllable.</p>`
+                    },
+                    questions: [
+                        { q: 'What is "Monday" in Italian?', type: 'text', answer: 'lunedì' },
+                        { q: 'Which day is "sabato"?', type: 'mc', options: ['Friday', 'Saturday', 'Sunday', 'Thursday'], answer: 1 },
+                        { q: 'How do you say "Friday" in Italian?', type: 'text', answer: 'venerdì' }
+                    ]
+                },
+                {
+                    topic: 'Food & Ordering',
+                    lesson: {
+                        title: 'Ordering Food in Italian',
+                        content: `<p>Essential phrases for restaurants and cafes:</p>
+                        <ul>
+                            <li><strong>Vorrei...</strong> (vor-RAY) - I would like...</li>
+                            <li><strong>un caffè</strong> (oon kaf-FEH) - a coffee</li>
+                            <li><strong>un'acqua</strong> (oo-NAH-kwah) - a water</li>
+                            <li><strong>Il conto, per favore</strong> (eel KOHN-toh pehr fah-VOH-reh) - The bill, please</li>
+                            <li><strong>Quanto costa?</strong> (KWAN-toh KOH-stah) - How much does it cost?</li>
+                            <li><strong>Buono!</strong> (BWOH-noh) - Good/Delicious!</li>
+                        </ul>
+                        <p><strong>Example:</strong> "Vorrei un caffè, per favore" (I would like a coffee, please)</p>`
+                    },
+                    questions: [
+                        { q: 'How do you say "I would like" in Italian?', type: 'text', answer: 'vorrei' },
+                        { q: 'What does "Il conto, per favore" mean?', type: 'mc', options: ['Good morning', 'The bill, please', 'Thank you', 'How much?'], answer: 1 },
+                        { q: 'How do you ask "How much does it cost?"', type: 'mc', options: ['Quanto costa?', 'Come stai?', 'Dov\'è?', 'Che ore sono?'], answer: 0 }
+                    ]
+                },
+                {
+                    topic: 'Polite Expressions',
+                    lesson: {
+                        title: 'Polite Expressions in Italian',
+                        content: `<p>Essential phrases for polite conversation:</p>
+                        <ul>
+                            <li><strong>Per favore</strong> (pehr fah-VOH-reh) - Please</li>
+                            <li><strong>Grazie</strong> (GRAH-tsee-eh) - Thank you</li>
+                            <li><strong>Prego</strong> (PREH-goh) - You're welcome</li>
+                            <li><strong>Mi scusi</strong> (mee SKOO-zee) - Excuse me (formal)</li>
+                            <li><strong>Scusa</strong> (SKOO-zah) - Excuse me (informal)</li>
+                            <li><strong>Mi dispiace</strong> (mee dee-SPYAH-cheh) - I'm sorry</li>
+                            <li><strong>Non capisco</strong> (nohn kah-PEE-skoh) - I don't understand</li>
+                        </ul>
+                        <p><strong>Tip:</strong> Always use "per favore" when asking for something!</p>`
+                    },
+                    questions: [
+                        { q: 'How do you say "Thank you" in Italian?', type: 'text', answer: 'grazie' },
+                        { q: 'What does "Mi scusi" mean?', type: 'mc', options: ['Thank you', 'Please', 'Excuse me', 'I\'m sorry'], answer: 2 },
+                        { q: 'How do you say "I don\'t understand"?', type: 'text', answer: 'non capisco' }
+                    ]
+                },
+                {
+                    topic: 'Location Prepositions',
+                    lesson: {
+                        title: 'Prepositions of Location',
+                        content: `<p>Essential prepositions for describing location:</p>
+                        <ul>
+                            <li><strong>vicino a</strong> (vee-CHEE-noh ah) - near to</li>
+                            <li><strong>lontano da</strong> (lohn-TAH-noh dah) - far from</li>
+                            <li><strong>davanti a</strong> (dah-VAHN-tee ah) - in front of</li>
+                            <li><strong>dietro a</strong> (DYEH-troh ah) - behind</li>
+                            <li><strong>accanto a</strong> (ah-KAHN-toh ah) - next to</li>
+                            <li><strong>di fronte a</strong> (dee FROHN-teh ah) - opposite/across from</li>
+                        </ul>
+                        <p><strong>Example:</strong> "La banca è vicino alla piazza" (The bank is near the square)</p>`
+                    },
+                    questions: [
+                        { q: 'What does "vicino a" mean?', type: 'mc', options: ['far from', 'near to', 'behind', 'in front of'], answer: 1 },
+                        { q: 'How do you say "in front of" in Italian?', type: 'text', answer: 'davanti a' },
+                        { q: 'What is "opposite/across from"?', type: 'mc', options: ['dietro a', 'accanto a', 'di fronte a', 'lontano da'], answer: 2 }
+                    ]
+                }
+            ],
+            A2: [
+                {
+                    topic: 'Past Tense (Passato Prossimo)',
+                    lesson: {
+                        title: 'Introduction to Passato Prossimo',
+                        content: `<p>The passato prossimo is used to talk about completed actions in the past.</p>
+                        <p><strong>Formation:</strong> avere/essere (present) + past participle</p>
+                        <p><strong>With "avere":</strong></p>
+                        <ul>
+                            <li>ho mangiato - I ate/have eaten</li>
+                            <li>hai parlato - you spoke/have spoken</li>
+                            <li>ha comprato - he/she bought/has bought</li>
+                        </ul>
+                        <p><strong>With "essere" (agreement with subject):</strong></p>
+                        <ul>
+                            <li>sono andato/a - I went</li>
+                            <li>sei partito/a - you left</li>
+                            <li>è arrivato/a - he/she arrived</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'What is "I ate" in Italian?', type: 'text', answer: 'ho mangiato' },
+                        { q: 'Which auxiliary verb goes with "andare"?', type: 'mc', options: ['avere', 'essere', 'both', 'neither'], answer: 1 },
+                        { q: 'Translate "sono arrivato":', type: 'mc', options: ['I am arriving', 'I arrived', 'I will arrive', 'I arrive'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Shopping Vocabulary',
+                    lesson: {
+                        title: 'Shopping in Italy',
+                        content: `<p>Essential vocabulary for shopping:</p>
+                        <ul>
+                            <li><strong>il negozio</strong> - the shop</li>
+                            <li><strong>il mercato</strong> - the market</li>
+                            <li><strong>il prezzo</strong> - the price</li>
+                            <li><strong>comprare</strong> - to buy</li>
+                            <li><strong>vendere</strong> - to sell</li>
+                            <li><strong>lo sconto</strong> - the discount</li>
+                            <li><strong>la carta di credito</strong> - credit card</li>
+                            <li><strong>i contanti</strong> - cash</li>
+                        </ul>
+                        <p><strong>Useful phrases:</strong> "Posso pagare con carta?" (Can I pay by card?)</p>`
+                    },
+                    questions: [
+                        { q: 'What is "the market" in Italian?', type: 'text', answer: 'il mercato' },
+                        { q: 'How do you say "credit card"?', type: 'mc', options: ['i contanti', 'la carta di credito', 'il prezzo', 'lo sconto'], answer: 1 },
+                        { q: 'What does "comprare" mean?', type: 'mc', options: ['to sell', 'to buy', 'to pay', 'to shop'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Bank Services',
+                    lesson: {
+                        title: 'Banking Services in Italy',
+                        content: `<p>Key banking vocabulary:</p>
+                        <ul>
+                            <li><strong>il bancomat</strong> - ATM / debit card</li>
+                            <li><strong>la carta di credito</strong> - credit card</li>
+                            <li><strong>il saldo</strong> - balance</li>
+                            <li><strong>il bonifico</strong> - bank transfer</li>
+                            <li><strong>il prestito</strong> - loan</li>
+                            <li><strong>il tasso di interesse</strong> - interest rate</li>
+                            <li><strong>aprire un conto</strong> - to open an account</li>
+                        </ul>
+                        <p><strong>Useful:</strong> "Vorrei fare un bonifico" (I would like to make a transfer)</p>`
+                    },
+                    questions: [
+                        { q: 'What is "ATM" in Italian?', type: 'text', answer: 'il bancomat' },
+                        { q: 'How do you say "bank transfer"?', type: 'mc', options: ['il prestito', 'il bonifico', 'il saldo', 'il conto'], answer: 1 },
+                        { q: 'What does "il saldo" mean?', type: 'mc', options: ['the loan', 'the balance', 'the card', 'the rate'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Making Appointments',
+                    lesson: {
+                        title: 'Scheduling Appointments',
+                        content: `<p>Essential phrases for making appointments:</p>
+                        <ul>
+                            <li><strong>Vorrei fissare un appuntamento</strong> - I would like to schedule an appointment</li>
+                            <li><strong>Quando è disponibile?</strong> - When are you available?</li>
+                            <li><strong>Va bene lunedì?</strong> - Is Monday okay?</li>
+                            <li><strong>A che ora?</strong> - At what time?</li>
+                            <li><strong>alle nove</strong> - at nine o'clock</li>
+                            <li><strong>di mattina/pomeriggio</strong> - in the morning/afternoon</li>
+                        </ul>
+                        <p><strong>Context:</strong> Essential for bank appointments!</p>`
+                    },
+                    questions: [
+                        { q: 'How do you say "I would like to schedule an appointment"?', type: 'mc', options: ['Vorrei un caffè', 'Vorrei fissare un appuntamento', 'Quando è disponibile?', 'A che ora?'], answer: 1 },
+                        { q: 'What does "A che ora?" mean?', type: 'text', answer: 'at what time' },
+                        { q: 'How do you ask "When are you available?"', type: 'text', answer: 'quando è disponibile' }
+                    ]
+                },
+                {
+                    topic: 'Transportation',
+                    lesson: {
+                        title: 'Getting Around Italy',
+                        content: `<p>Transportation vocabulary:</p>
+                        <ul>
+                            <li><strong>il treno</strong> - the train</li>
+                            <li><strong>l'autobus</strong> - the bus</li>
+                            <li><strong>la metropolitana</strong> - the subway</li>
+                            <li><strong>il taxi</strong> - the taxi</li>
+                            <li><strong>la stazione</strong> - the station</li>
+                            <li><strong>la fermata</strong> - the stop</li>
+                            <li><strong>il biglietto</strong> - the ticket</li>
+                            <li><strong>Quanto costa il biglietto?</strong> - How much is the ticket?</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'What is "the train" in Italian?', type: 'text', answer: 'il treno' },
+                        { q: 'How do you say "the ticket"?', type: 'mc', options: ['la fermata', 'la stazione', 'il biglietto', 'il taxi'], answer: 2 },
+                        { q: 'What is "la metropolitana"?', type: 'mc', options: ['the bus', 'the subway', 'the station', 'the stop'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Describing Places',
+                    lesson: {
+                        title: 'Describing Locations',
+                        content: `<p>Adjectives for describing places:</p>
+                        <ul>
+                            <li><strong>grande</strong> - big</li>
+                            <li><strong>piccolo/a</strong> - small</li>
+                            <li><strong>vicino/a</strong> - near/close</li>
+                            <li><strong>lontano/a</strong> - far</li>
+                            <li><strong>nuovo/a</strong> - new</li>
+                            <li><strong>vecchio/a</strong> - old</li>
+                            <li><strong>moderno/a</strong> - modern</li>
+                            <li><strong>comodo/a</strong> - convenient/comfortable</li>
+                        </ul>
+                        <p><strong>Example:</strong> "La banca è grande e moderna" (The bank is big and modern)</p>`
+                    },
+                    questions: [
+                        { q: 'What does "grande" mean?', type: 'mc', options: ['small', 'big', 'near', 'old'], answer: 1 },
+                        { q: 'How do you say "convenient" in Italian?', type: 'text', answer: 'comodo' },
+                        { q: 'What is "new" in Italian?', type: 'mc', options: ['vecchio', 'moderno', 'nuovo', 'grande'], answer: 2 }
+                    ]
+                },
+                {
+                    topic: 'Weather',
+                    lesson: {
+                        title: 'Talking About Weather',
+                        content: `<p>Weather expressions in Italian:</p>
+                        <ul>
+                            <li><strong>Che tempo fa?</strong> - What's the weather like?</li>
+                            <li><strong>Fa bel tempo</strong> - The weather is nice</li>
+                            <li><strong>Fa brutto tempo</strong> - The weather is bad</li>
+                            <li><strong>Fa caldo</strong> - It's hot</li>
+                            <li><strong>Fa freddo</strong> - It's cold</li>
+                            <li><strong>Piove</strong> - It's raining</li>
+                            <li><strong>C'è il sole</strong> - It's sunny</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'How do you ask "What\'s the weather like?"', type: 'text', answer: 'che tempo fa' },
+                        { q: 'What does "Fa caldo" mean?', type: 'mc', options: ['It\'s cold', 'It\'s hot', 'It\'s raining', 'It\'s windy'], answer: 1 },
+                        { q: 'How do you say "It\'s raining"?', type: 'text', answer: 'piove' }
+                    ]
+                },
+                {
+                    topic: 'Phone Conversations',
+                    lesson: {
+                        title: 'Phone Etiquette in Italian',
+                        content: `<p>Key phrases for phone calls:</p>
+                        <ul>
+                            <li><strong>Pronto?</strong> - Hello? (answering phone)</li>
+                            <li><strong>Chi parla?</strong> - Who's speaking?</li>
+                            <li><strong>Sono [name]</strong> - This is [name]</li>
+                            <li><strong>Posso parlare con...?</strong> - Can I speak with...?</li>
+                            <li><strong>Un attimo, prego</strong> - One moment, please</li>
+                            <li><strong>Può richiamare?</strong> - Can you call back?</li>
+                            <li><strong>Lascio un messaggio</strong> - I'll leave a message</li>
+                        </ul>
+                        <p><strong>Important for banking!</strong> Calling the bank to inquire about services.</p>`
+                    },
+                    questions: [
+                        { q: 'What do you say when answering the phone in Italian?', type: 'text', answer: 'pronto' },
+                        { q: 'How do you say "Can I speak with...?"', type: 'mc', options: ['Chi parla?', 'Posso parlare con...?', 'Sono Maria', 'Pronto?'], answer: 1 },
+                        { q: 'What does "Un attimo, prego" mean?', type: 'mc', options: ['Who\'s speaking?', 'Call back', 'One moment, please', 'Leave a message'], answer: 2 }
+                    ]
+                },
+                {
+                    topic: 'Expressing Needs',
+                    lesson: {
+                        title: 'Expressing What You Need',
+                        content: `<p>Key expressions for stating needs:</p>
+                        <ul>
+                            <li><strong>Ho bisogno di...</strong> - I need...</li>
+                            <li><strong>Mi serve...</strong> - I need... (literally: it serves me)</li>
+                            <li><strong>Devo...</strong> - I must/have to...</li>
+                            <li><strong>Vorrei...</strong> - I would like...</li>
+                            <li><strong>Mi può aiutare?</strong> - Can you help me?</li>
+                            <li><strong>Ho bisogno di aiuto</strong> - I need help</li>
+                        </ul>
+                        <p><strong>Banking example:</strong> "Ho bisogno di aprire un conto corrente" (I need to open a checking account)</p>`
+                    },
+                    questions: [
+                        { q: 'How do you say "I need" in Italian?', type: 'text', answer: 'ho bisogno di' },
+                        { q: 'What does "Mi può aiutare?" mean?', type: 'mc', options: ['I need help', 'Can you help me?', 'I would like', 'I must'], answer: 1 },
+                        { q: 'How do you say "I must/have to"?', type: 'mc', options: ['Vorrei', 'Mi serve', 'Devo', 'Ho bisogno'], answer: 2 }
+                    ]
+                },
+                {
+                    topic: 'Common Irregular Verbs',
+                    lesson: {
+                        title: 'Important Irregular Verbs',
+                        content: `<p>Essential irregular verbs in present tense:</p>
+                        <p><strong>Fare (to do/make):</strong> faccio, fai, fa, facciamo, fate, fanno</p>
+                        <p><strong>Andare (to go):</strong> vado, vai, va, andiamo, andate, vanno</p>
+                        <p><strong>Venire (to come):</strong> vengo, vieni, viene, veniamo, venite, vengono</p>
+                        <p><strong>Dare (to give):</strong> do, dai, dà, diamo, date, danno</p>
+                        <p><strong>Stare (to stay/be):</strong> sto, stai, sta, stiamo, state, stanno</p>`
+                    },
+                    questions: [
+                        { q: 'What is "I do/make" in Italian?', type: 'text', answer: 'faccio' },
+                        { q: 'How do you say "I go"?', type: 'mc', options: ['vado', 'vengo', 'faccio', 'do'], answer: 0 },
+                        { q: 'What is the first person of "venire"?', type: 'text', answer: 'vengo' }
+                    ]
+                }
+            ],
+            B1: [
+                {
+                    topic: 'Future Tense',
+                    lesson: {
+                        title: 'Talking About the Future',
+                        content: `<p>The future tense expresses what will happen:</p>
+                        <p><strong>Regular verbs:</strong> drop final -e and add: -ò, -ai, -à, -emo, -ete, -anno</p>
+                        <p><strong>Parlare (to speak):</strong></p>
+                        <ul>
+                            <li>parlerò - I will speak</li>
+                            <li>parlerai - you will speak</li>
+                            <li>parlerà - he/she will speak</li>
+                            <li>parleremo - we will speak</li>
+                            <li>parlerete - you will speak (plural)</li>
+                            <li>parleranno - they will speak</li>
+                        </ul>
+                        <p><strong>Irregular:</strong> essere → sarò, avere → avrò, fare → farò, andare → andrò</p>`
+                    },
+                    questions: [
+                        { q: 'What is "I will speak" in Italian?', type: 'text', answer: 'parlerò' },
+                        { q: 'What is the future of "essere" (I will be)?', type: 'mc', options: ['sarò', 'avrò', 'farò', 'andrò'], answer: 0 },
+                        { q: 'How do you say "they will have"?', type: 'text', answer: 'avranno' }
+                    ]
+                },
+                {
+                    topic: 'Mortgage Vocabulary',
+                    lesson: {
+                        title: 'Understanding Mortgages (Il Mutuo)',
+                        content: `<p>Key mortgage vocabulary in Italian:</p>
+                        <ul>
+                            <li><strong>il mutuo</strong> - mortgage/loan</li>
+                            <li><strong>il contratto di mutuo</strong> - mortgage contract</li>
+                            <li><strong>l'ipoteca</strong> - mortgage lien</li>
+                            <li><strong>il tasso fisso</strong> - fixed rate</li>
+                            <li><strong>il tasso variabile</strong> - variable rate</li>
+                            <li><strong>la rata mensile</strong> - monthly payment</li>
+                            <li><strong>il finanziamento</strong> - financing</li>
+                            <li><strong>la surroga</strong> - refinancing/subrogation</li>
+                        </ul>
+                        <p><strong>Important:</strong> "Vorrei richiedere un mutuo" (I would like to apply for a mortgage)</p>`
+                    },
+                    questions: [
+                        { q: 'What is "mortgage" in Italian?', type: 'text', answer: 'il mutuo' },
+                        { q: 'How do you say "fixed rate"?', type: 'mc', options: ['il tasso variabile', 'il tasso fisso', 'la rata mensile', 'l\'ipoteca'], answer: 1 },
+                        { q: 'What does "la rata mensile" mean?', type: 'mc', options: ['the loan', 'the contract', 'monthly payment', 'interest rate'], answer: 2 }
+                    ]
+                },
+                {
+                    topic: 'Mortgage Application Process',
+                    lesson: {
+                        title: 'Applying for a Mortgage',
+                        content: `<p>Steps and vocabulary for mortgage application:</p>
+                        <ul>
+                            <li><strong>richiedere un mutuo</strong> - to apply for a mortgage</li>
+                            <li><strong>i documenti richiesti</strong> - required documents</li>
+                            <li><strong>la busta paga</strong> - pay slip</li>
+                            <li><strong>la dichiarazione dei redditi</strong> - tax return</li>
+                            <li><strong>il documento d'identità</strong> - ID document</li>
+                            <li><strong>la valutazione dell'immobile</strong> - property appraisal</li>
+                            <li><strong>il notaio</strong> - notary</li>
+                            <li><strong>firmare il contratto</strong> - to sign the contract</li>
+                        </ul>
+                        <p><strong>Key phrase:</strong> "Quali documenti devo presentare?" (Which documents must I present?)</p>`
+                    },
+                    questions: [
+                        { q: 'How do you say "to apply for a mortgage"?', type: 'text', answer: 'richiedere un mutuo' },
+                        { q: 'What is "pay slip" in Italian?', type: 'mc', options: ['la busta paga', 'il notaio', 'la rata', 'il documento'], answer: 0 },
+                        { q: 'What does "il notaio" mean?', type: 'mc', options: ['the bank', 'the notary', 'the contract', 'the payment'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Conditional Mood',
+                    lesson: {
+                        title: 'Using the Conditional',
+                        content: `<p>The conditional expresses politeness, wishes, or hypothetical situations:</p>
+                        <p><strong>Formation:</strong> future stem + -ei, -esti, -ebbe, -emmo, -este, -ebbero</p>
+                        <p><strong>Parlare:</strong></p>
+                        <ul>
+                            <li>parlerei - I would speak</li>
+                            <li>parleresti - you would speak</li>
+                            <li>parlerebbe - he/she would speak</li>
+                        </ul>
+                        <p><strong>Common uses:</strong></p>
+                        <ul>
+                            <li>Vorrei un mutuo (I would like a mortgage)</li>
+                            <li>Potrebbe aiutarmi? (Could you help me?)</li>
+                            <li>Dovrei parlare con il direttore (I should speak with the manager)</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'What is "I would speak" in Italian?', type: 'text', answer: 'parlerei' },
+                        { q: 'Translate "Vorrei un caffè":', type: 'mc', options: ['I want a coffee', 'I would like a coffee', 'I need a coffee', 'I have a coffee'], answer: 1 },
+                        { q: 'How do you politely say "Could you help me?"', type: 'text', answer: 'potrebbe aiutarmi' }
+                    ]
+                },
+                {
+                    topic: 'Subjunctive Mood (Present)',
+                    lesson: {
+                        title: 'Introduction to Subjunctive',
+                        content: `<p>The subjunctive expresses doubt, opinion, or emotion:</p>
+                        <p><strong>Parlare (that I speak):</strong></p>
+                        <ul>
+                            <li>che io parli</li>
+                            <li>che tu parli</li>
+                            <li>che lui/lei parli</li>
+                            <li>che noi parliamo</li>
+                            <li>che voi parliate</li>
+                            <li>che loro parlino</li>
+                        </ul>
+                        <p><strong>Common triggers:</strong></p>
+                        <ul>
+                            <li>Penso che... (I think that...)</li>
+                            <li>È importante che... (It's important that...)</li>
+                            <li>Credo che... (I believe that...)</li>
+                        </ul>
+                        <p><strong>Example:</strong> "Penso che la banca sia vicina" (I think the bank is near)</p>`
+                    },
+                    questions: [
+                        { q: 'What is the subjunctive of "io" with "parlare"?', type: 'text', answer: 'che io parli' },
+                        { q: 'Which phrase requires subjunctive?', type: 'mc', options: ['So che...', 'Penso che...', 'È vero che...', 'È ovvio che...'], answer: 1 },
+                        { q: 'Complete: "È importante che tu _____ (parlare)"', type: 'text', answer: 'parli' }
+                    ]
+                },
+                {
+                    topic: 'Financial Terms',
+                    lesson: {
+                        title: 'Advanced Banking Vocabulary',
+                        content: `<p>Professional financial vocabulary:</p>
+                        <ul>
+                            <li><strong>il capitale</strong> - capital/principal</li>
+                            <li><strong>gli interessi</strong> - interest (plural)</li>
+                            <li><strong>l'ammortamento</strong> - amortization</li>
+                            <li><strong>il creditore</strong> - lender/creditor</li>
+                            <li><strong>il debitore</strong> - borrower/debtor</li>
+                            <li><strong>la garanzia</strong> - guarantee/collateral</li>
+                            <li><strong>il rischio di credito</strong> - credit risk</li>
+                            <li><strong>la scadenza</strong> - deadline/maturity date</li>
+                            <li><strong>il rimborso</strong> - repayment</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'What is "capital/principal" in Italian?', type: 'text', answer: 'il capitale' },
+                        { q: 'How do you say "amortization"?', type: 'mc', options: ['l\'ammortamento', 'il rimborso', 'la garanzia', 'la scadenza'], answer: 0 },
+                        { q: 'What does "il debitore" mean?', type: 'mc', options: ['the lender', 'the borrower', 'the guarantee', 'the deadline'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Formal Letter Writing',
+                    lesson: {
+                        title: 'Writing Formal Letters',
+                        content: `<p>Structure of formal Italian letters:</p>
+                        <p><strong>Opening:</strong></p>
+                        <ul>
+                            <li><strong>Egregio/a</strong> - Dear (very formal)</li>
+                            <li><strong>Gentile</strong> - Dear (formal)</li>
+                            <li><strong>Spett.le</strong> (Spettabile) - To the attention of (company)</li>
+                        </ul>
+                        <p><strong>Closing:</strong></p>
+                        <ul>
+                            <li><strong>Distinti saluti</strong> - Yours sincerely</li>
+                            <li><strong>Cordiali saluti</strong> - Kind regards</li>
+                        </ul>
+                        <p><strong>Useful phrases:</strong></p>
+                        <ul>
+                            <li>Con la presente - Hereby</li>
+                            <li>In riferimento a - With reference to</li>
+                            <li>In attesa di un Suo riscontro - Awaiting your reply</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'How do you formally address a company?', type: 'mc', options: ['Caro', 'Gentile', 'Spett.le', 'Ciao'], answer: 2 },
+                        { q: 'What does "Distinti saluti" mean?', type: 'text', answer: 'yours sincerely' },
+                        { q: 'How do you say "With reference to"?', type: 'mc', options: ['Con la presente', 'In riferimento a', 'Distinti saluti', 'In attesa'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Negotiations',
+                    lesson: {
+                        title: 'Negotiating Terms',
+                        content: `<p>Key phrases for negotiations:</p>
+                        <ul>
+                            <li><strong>Possiamo discutere i termini?</strong> - Can we discuss the terms?</li>
+                            <li><strong>Sarebbe possibile...?</strong> - Would it be possible...?</li>
+                            <li><strong>Potremmo trovare un accordo</strong> - We could reach an agreement</li>
+                            <li><strong>Le mie condizioni sono...</strong> - My conditions are...</li>
+                            <li><strong>È accettabile</strong> - It's acceptable</li>
+                            <li><strong>Non sono d'accordo</strong> - I don't agree</li>
+                            <li><strong>Propongo che...</strong> - I propose that...</li>
+                        </ul>
+                        <p><strong>Banking context:</strong> Negotiating mortgage terms, interest rates, payment schedules.</p>`
+                    },
+                    questions: [
+                        { q: 'How do you ask "Can we discuss the terms?"', type: 'text', answer: 'possiamo discutere i termini' },
+                        { q: 'What does "Sarebbe possibile...?" mean?', type: 'mc', options: ['It\'s possible', 'Would it be possible?', 'I propose', 'I don\'t agree'], answer: 1 },
+                        { q: 'How do you say "I propose that..."?', type: 'text', answer: 'propongo che' }
+                    ]
+                },
+                {
+                    topic: 'Complex Directions',
+                    lesson: {
+                        title: 'Advanced Navigation',
+                        content: `<p>More complex directional vocabulary:</p>
+                        <ul>
+                            <li><strong>Prosegua dritto fino al semaforo</strong> - Continue straight until the traffic light</li>
+                            <li><strong>Prenda la seconda a sinistra</strong> - Take the second left</li>
+                            <li><strong>Attraversi la piazza</strong> - Cross the square</li>
+                            <li><strong>Superi il ponte</strong> - Go past the bridge</li>
+                            <li><strong>È proprio di fronte</strong> - It's right in front</li>
+                            <li><strong>all'angolo</strong> - at the corner</li>
+                            <li><strong>in fondo alla strada</strong> - at the end of the street</li>
+                        </ul>
+                        <p><strong>Example:</strong> "Prosegua dritto, prenda la seconda a destra, e la banca è all'angolo"</p>`
+                    },
+                    questions: [
+                        { q: 'What does "Prenda la seconda a sinistra" mean?', type: 'mc', options: ['Go straight', 'Take the second left', 'Cross the square', 'Turn right'], answer: 1 },
+                        { q: 'How do you say "at the end of the street"?', type: 'text', answer: 'in fondo alla strada' },
+                        { q: 'What does "Attraversi la piazza" mean?', type: 'mc', options: ['Cross the square', 'Go straight', 'Take the first', 'At the corner'], answer: 0 }
+                    ]
+                },
+                {
+                    topic: 'Relative Pronouns',
+                    lesson: {
+                        title: 'Using Relative Pronouns',
+                        content: `<p>Connecting clauses with relative pronouns:</p>
+                        <ul>
+                            <li><strong>che</strong> - who, which, that (subject or object)</li>
+                            <li><strong>cui</strong> - whom, which (after preposition)</li>
+                            <li><strong>il quale / la quale</strong> - who, which (formal, agrees in gender/number)</li>
+                        </ul>
+                        <p><strong>Examples:</strong></p>
+                        <ul>
+                            <li>La banca che è vicina alla piazza (The bank that is near the square)</li>
+                            <li>L'impiegato con cui ho parlato (The employee with whom I spoke)</li>
+                            <li>Il mutuo di cui ho bisogno (The mortgage that I need)</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'Which relative pronoun follows a preposition?', type: 'mc', options: ['che', 'cui', 'quando', 'dove'], answer: 1 },
+                        { q: 'Complete: "La persona ___ lavora qui" (who works here)', type: 'text', answer: 'che' },
+                        { q: 'Translate: "Il mutuo di cui ho bisogno"', type: 'mc', options: ['The mortgage I have', 'The mortgage that I need', 'The mortgage I want', 'The mortgage here'], answer: 1 }
+                    ]
+                }
+            ],
+            B2: [
+                {
+                    topic: 'Advanced Subjunctive',
+                    lesson: {
+                        title: 'Past Subjunctive & Imperfect Subjunctive',
+                        content: `<p><strong>Past Subjunctive (Congiuntivo Passato):</strong></p>
+                        <p>Formation: subjunctive of avere/essere + past participle</p>
+                        <ul>
+                            <li>che io abbia parlato - that I spoke/have spoken</li>
+                            <li>che tu sia andato/a - that you went/have gone</li>
+                        </ul>
+                        <p><strong>Imperfect Subjunctive (Congiuntivo Imperfetto):</strong></p>
+                        <ul>
+                            <li>che io parlassi - that I spoke (ongoing in past)</li>
+                            <li>che tu andassi - that you went</li>
+                        </ul>
+                        <p><strong>Usage:</strong> "Pensavo che la banca fosse chiusa" (I thought the bank was closed)</p>`
+                    },
+                    questions: [
+                        { q: 'What is the past subjunctive of "parlare" (io)?', type: 'text', answer: 'che io abbia parlato' },
+                        { q: 'Complete: "Pensavo che lui _____ (essere) qui" (imperfect subjunctive)', type: 'mc', options: ['sia', 'è', 'fosse', 'sarà'], answer: 2 },
+                        { q: 'When do you use imperfect subjunctive?', type: 'mc', options: ['With present main clause', 'With past main clause', 'With future', 'Never'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Mortgage Contract Terms',
+                    lesson: {
+                        title: 'Understanding Mortgage Contracts',
+                        content: `<p>Advanced mortgage contract terminology:</p>
+                        <ul>
+                            <li><strong>le clausole contrattuali</strong> - contractual clauses</li>
+                            <li><strong>la penale per estinzione anticipata</strong> - early repayment penalty</li>
+                            <li><strong>il piano di ammortamento</strong> - amortization schedule</li>
+                            <li><strong>la perizia</strong> - appraisal/expert assessment</li>
+                            <li><strong>l'assicurazione sulla vita</strong> - life insurance</li>
+                            <li><strong>l'assicurazione incendio</strong> - fire insurance</li>
+                            <li><strong>le spese di istruttoria</strong> - processing fees</li>
+                            <li><strong>il LTV (loan-to-value)</strong> - loan-to-value ratio</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'What is "early repayment penalty" in Italian?', type: 'text', answer: 'la penale per estinzione anticipata' },
+                        { q: 'How do you say "processing fees"?', type: 'mc', options: ['le spese di istruttoria', 'la perizia', 'il piano', 'la penale'], answer: 0 },
+                        { q: 'What does "la perizia" mean?', type: 'mc', options: ['penalty', 'appraisal', 'insurance', 'contract'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Legal Language',
+                    lesson: {
+                        title: 'Legal and Bureaucratic Language',
+                        content: `<p>Formal legal expressions:</p>
+                        <ul>
+                            <li><strong>in ottemperanza a</strong> - in compliance with</li>
+                            <li><strong>ai sensi dell'articolo</strong> - pursuant to the article</li>
+                            <li><strong>il suddetto / la suddetta</strong> - the aforementioned</li>
+                            <li><strong>la presente scrittura</strong> - this document</li>
+                            <li><strong>dare atto che</strong> - to acknowledge that</li>
+                            <li><strong>sottoscrivere</strong> - to sign/subscribe</li>
+                            <li><strong>le parti contraenti</strong> - the contracting parties</li>
+                            <li><strong>recesso dal contratto</strong> - withdrawal from contract</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'How do you say "in compliance with"?', type: 'text', answer: 'in ottemperanza a' },
+                        { q: 'What does "le parti contraenti" mean?', type: 'mc', options: ['the document', 'the contracting parties', 'the article', 'the signature'], answer: 1 },
+                        { q: 'What is "to sign/subscribe" formally?', type: 'text', answer: 'sottoscrivere' }
+                    ]
+                },
+                {
+                    topic: 'Passive Voice',
+                    lesson: {
+                        title: 'Using Passive Constructions',
+                        content: `<p>The passive voice emphasizes the action rather than the actor:</p>
+                        <p><strong>Formation:</strong> essere (conjugated) + past participle (agrees with subject)</p>
+                        <ul>
+                            <li>La casa è venduta - The house is sold</li>
+                            <li>Il contratto è stato firmato - The contract has been signed</li>
+                            <li>I documenti saranno esaminati - The documents will be examined</li>
+                        </ul>
+                        <p><strong>Alternative with "si" (si passivante):</strong></p>
+                        <ul>
+                            <li>Si vende casa - House for sale (lit: house sells itself)</li>
+                            <li>Si richiede documento - Document required</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'Transform to passive: "Il notaio firma il contratto" → "Il contratto _____ dal notaio"', type: 'text', answer: 'è firmato' },
+                        { q: 'What does "Il mutuo è stato approvato" mean?', type: 'mc', options: ['The mortgage is approved', 'The mortgage has been approved', 'The mortgage will be approved', 'The mortgage was approving'], answer: 1 },
+                        { q: 'What is the alternative passive construction in Italian?', type: 'mc', options: ['venire + participle', 'si + verb', 'both', 'none'], answer: 2 }
+                    ]
+                },
+                {
+                    topic: 'Complex Negotiations',
+                    lesson: {
+                        title: 'Advanced Negotiation Strategies',
+                        content: `<p>Professional negotiation language:</p>
+                        <ul>
+                            <li><strong>Vorremmo riconsiderare i termini</strong> - We would like to reconsider the terms</li>
+                            <li><strong>Dal nostro punto di vista</strong> - From our point of view</li>
+                            <li><strong>Tuttavia, bisogna considerare che...</strong> - However, one must consider that...</li>
+                            <li><strong>Proponiamo un compromesso</strong> - We propose a compromise</li>
+                            <li><strong>È nell'interesse di entrambe le parti</strong> - It's in both parties' interest</li>
+                            <li><strong>Ciò comporterebbe</strong> - This would entail</li>
+                            <li><strong>Subordinatamente a</strong> - Subject to</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'How do you say "We propose a compromise"?', type: 'text', answer: 'proponiamo un compromesso' },
+                        { q: 'What does "Dal nostro punto di vista" mean?', type: 'mc', options: ['In our opinion', 'From our point of view', 'We propose', 'However'], answer: 1 },
+                        { q: 'How do you say "Subject to"?', type: 'text', answer: 'subordinatamente a' }
+                    ]
+                },
+                {
+                    topic: 'Conditional Sentences',
+                    lesson: {
+                        title: 'Hypothetical and Conditional Clauses',
+                        content: `<p>Three types of conditional sentences:</p>
+                        <p><strong>Type 1 (Real/Probable):</strong> present + future</p>
+                        <ul><li>Se avrò i documenti, richiederò il mutuo (If I have the documents, I'll apply for the mortgage)</li></ul>
+                        <p><strong>Type 2 (Hypothetical):</strong> imperfect subjunctive + conditional</p>
+                        <ul><li>Se avessi i soldi, comprerei una casa (If I had the money, I would buy a house)</li></ul>
+                        <p><strong>Type 3 (Impossible past):</strong> pluperfect subjunctive + past conditional</p>
+                        <ul><li>Se avessi saputo, avrei firmato (If I had known, I would have signed)</li></ul>`
+                    },
+                    questions: [
+                        { q: 'Complete Type 2: "Se io _____ (avere) tempo, andrei" (imperfect subjunctive)', type: 'text', answer: 'avessi' },
+                        { q: 'Which type uses imperfect subjunctive + conditional?', type: 'mc', options: ['Type 1', 'Type 2', 'Type 3', 'None'], answer: 1 },
+                        { q: 'Translate: "Se avessi i documenti, richiederei il mutuo"', type: 'mc', options: ['If I have, I will apply', 'If I had, I would apply', 'If I had had, I would have applied', 'I will apply'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Financial Analysis',
+                    lesson: {
+                        title: 'Understanding Financial Reports',
+                        content: `<p>Advanced financial vocabulary:</p>
+                        <ul>
+                            <li><strong>il bilancio</strong> - balance sheet</li>
+                            <li><strong>l'attivo / il passivo</strong> - assets / liabilities</li>
+                            <li><strong>il patrimonio netto</strong> - net worth/equity</li>
+                            <li><strong>il flusso di cassa</strong> - cash flow</li>
+                            <li><strong>la liquidità</strong> - liquidity</li>
+                            <li><strong>il reddito imponibile</strong> - taxable income</li>
+                            <li><strong>la solvibilità</strong> - solvency/creditworthiness</li>
+                            <li><strong>il rapporto debito/reddito</strong> - debt-to-income ratio</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'What is "balance sheet" in Italian?', type: 'text', answer: 'il bilancio' },
+                        { q: 'How do you say "cash flow"?', type: 'mc', options: ['il flusso di cassa', 'la liquidità', 'l\'attivo', 'il patrimonio'], answer: 0 },
+                        { q: 'What does "la solvibilità" mean?', type: 'mc', options: ['liquidity', 'solvency', 'income', 'debt'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Formal Presentations',
+                    lesson: {
+                        title: 'Presenting to Bank Officials',
+                        content: `<p>Language for formal presentations:</p>
+                        <ul>
+                            <li><strong>Oggi presenterò...</strong> - Today I will present...</li>
+                            <li><strong>Come potete vedere dal grafico</strong> - As you can see from the chart</li>
+                            <li><strong>Vorrei attirare la vostra attenzione su...</strong> - I'd like to draw your attention to...</li>
+                            <li><strong>I dati dimostrano che...</strong> - The data shows that...</li>
+                            <li><strong>In conclusione</strong> - In conclusion</li>
+                            <li><strong>Sono a vostra disposizione per domande</strong> - I'm available for questions</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'How do you say "As you can see from the chart"?', type: 'text', answer: 'come potete vedere dal grafico' },
+                        { q: 'What does "I dati dimostrano che..." mean?', type: 'mc', options: ['The data is here', 'The data shows that', 'I have data', 'The chart'], answer: 1 },
+                        { q: 'How do you end with "I\'m available for questions"?', type: 'text', answer: 'sono a vostra disposizione per domande' }
+                    ]
+                },
+                {
+                    topic: 'Idiomatic Expressions',
+                    lesson: {
+                        title: 'Common Banking Idioms',
+                        content: `<p>Colloquial expressions related to banking and money:</p>
+                        <ul>
+                            <li><strong>Essere al verde</strong> - To be broke (literally: to be at the green)</li>
+                            <li><strong>Costare un occhio della testa</strong> - To cost an arm and a leg</li>
+                            <li><strong>Tirare la cinghia</strong> - To tighten one's belt</li>
+                            <li><strong>Fare i conti in tasca</strong> - To check someone's finances</li>
+                            <li><strong>Mettere da parte</strong> - To save up/put aside</li>
+                            <li><strong>Avere le mani bucate</strong> - To be a spendthrift (have holes in hands)</li>
+                            <li><strong>Essere pieno di soldi</strong> - To be loaded with money</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'What does "essere al verde" mean?', type: 'mc', options: ['To be rich', 'To be broke', 'To be green', 'To be happy'], answer: 1 },
+                        { q: 'How do you say "to save up" idiomatically?', type: 'text', answer: 'mettere da parte' },
+                        { q: 'What does "avere le mani bucate" literally mean?', type: 'mc', options: ['to have money', 'to have holes in hands', 'to be careful', 'to save money'], answer: 1 }
+                    ]
+                },
+                {
+                    topic: 'Discourse Markers',
+                    lesson: {
+                        title: 'Advanced Connectors and Transitions',
+                        content: `<p>Sophisticated discourse markers for fluid speech:</p>
+                        <ul>
+                            <li><strong>Innanzitutto</strong> - First of all</li>
+                            <li><strong>Inoltre</strong> - Furthermore/Moreover</li>
+                            <li><strong>Tuttavia</strong> - However</li>
+                            <li><strong>Nonostante ciò</strong> - Despite this</li>
+                            <li><strong>D'altronde / D'altra parte</strong> - On the other hand</li>
+                            <li><strong>Pertanto / Dunque</strong> - Therefore</li>
+                            <li><strong>In ogni caso</strong> - In any case</li>
+                            <li><strong>Per quanto riguarda</strong> - As far as...is concerned</li>
+                        </ul>`
+                    },
+                    questions: [
+                        { q: 'How do you say "Furthermore" in Italian?', type: 'text', answer: 'inoltre' },
+                        { q: 'What does "Nonostante ciò" mean?', type: 'mc', options: ['Therefore', 'Despite this', 'Moreover', 'First of all'], answer: 1 },
+                        { q: 'What is "On the other hand"?', type: 'mc', options: ['Innanzitutto', 'Tuttavia', 'D\'altra parte', 'Pertanto'], answer: 2 }
+                    ]
+                }
+            ]
+        };
+
+        let currentLevel = 'A1';
+        let currentTopicIndex = 0;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let failedTopic = null;
+        let inLesson = false;
+        let lessonExerciseCount = 0;
+        let assessmentMode = false;
+        let assessmentPart = 1;
+        let assessmentQuestions = [];
+        let assessmentAnswers = [];
+        let verbsMode = false;
+        let verbsLevel = 'A1';
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function init() {
+            updateLevelNavigation();
+            if (verbsMode) {
+                showVerbsQuestion();
+            } else {
+                showQuestion();
+            }
+        }
+
+        function toggleVerbsMode() {
+            verbsMode = !verbsMode;
+            if (verbsMode) {
+                verbsLevel = currentLevel;
+                currentQuestionIndex = 0;
+                score = 0;
+                inLesson = false;
+                failedTopic = null;
+                lessonExerciseCount = 0;
+            } else {
+                currentTopicIndex = 0;
+                currentQuestionIndex = 0;
+                score = 0;
+                inLesson = false;
+                failedTopic = null;
+                lessonExerciseCount = 0;
+            }
+            updateLevelNavigation();
+            updateHeader();
+            if (verbsMode) {
+                showVerbsQuestion();
+            } else {
+                showQuestion();
+            }
+        }
+
+        function updateLevelNavigation() {
+            const buttons = document.querySelectorAll('.level-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                const btnText = btn.textContent.trim();
+                if (verbsMode && btnText === 'VERBS') {
+                    btn.classList.add('active');
+                } else if (!verbsMode && btnText === currentLevel) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function jumpToLevel(level) {
+            if (verbsMode) {
+                verbsLevel = level;
+                currentQuestionIndex = 0;
+                score = 0;
+                inLesson = false;
+                failedTopic = null;
+                updateLevelNavigation();
+                updateHeader();
+                showVerbsQuestion();
+            } else {
+                if (confirm(`Are you sure you want to jump to level ${level}? Your current progress will be saved.`)) {
+                    showLoading();
+                    
+                    setTimeout(() => {
+                        currentLevel = level;
+                        currentTopicIndex = 0;
+                        currentQuestionIndex = 0;
+                        assessmentMode = false;
+                        inLesson = false;
+                        failedTopic = null;
+                        lessonExerciseCount = 0;
+                        assessmentPart = 1;
+                        assessmentQuestions = [];
+                        assessmentAnswers = [];
+                        
+                        // Reset shuffled state for all topics in new level
+                        curriculum[level].forEach(topic => {
+                            topic.shuffled = false;
+                        });
+                        
+                        updateLevelNavigation();
+                        updateHeader();
+                        hideLoading();
+                        showQuestion();
+                    }, 100);
+                }
+            }
+        }
+
+        function showLoading() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="card" style="text-align: center; padding: 48px;">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 20px; color: var(--color-text-secondary);">Loading level...</p>
+                </div>
+            `;
+        }
+
+        function hideLoading() {
+            // Loading will be replaced by showQuestion()
+        }
+
+        function updateHeader() {
+            if (verbsMode) {
+                document.getElementById('levelDisplay').textContent = `${verbsLevel} VERBS`;
+                document.getElementById('scoreDisplay').textContent = score;
+                document.getElementById('topicDisplay').textContent = `${currentQuestionIndex + 1}/${verbsCurriculum[verbsLevel].length}`;
+                const totalQuestions = verbsCurriculum[verbsLevel].length;
+                const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            } else {
+                document.getElementById('levelDisplay').textContent = currentLevel;
+                document.getElementById('scoreDisplay').textContent = score;
+                document.getElementById('topicDisplay').textContent = `${currentTopicIndex + 1}/${curriculum[currentLevel].length}`;
+                const totalTopics = curriculum[currentLevel].length;
+                const progress = ((currentTopicIndex + currentQuestionIndex / 3) / totalTopics) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+        }
+
+        function showQuestion() {
+            updateHeader();
+            const content = document.getElementById('content');
+            
+            const topic = curriculum[currentLevel][currentTopicIndex];
+            
+            // Shuffle questions if this is the first question of the topic
+            if (currentQuestionIndex === 0 && !topic.shuffled) {
+                topic.questions = shuffleArray([...topic.questions]);
+                topic.shuffled = true;
+            }
+            
+            const question = topic.questions[currentQuestionIndex];
+
+            let html = `
+                <div class="card">
+                    <div class="question">${question.q}</div>
+            `;
+
+            if (question.type === 'mc') {
+                html += '<div class="options">';
+                question.options.forEach((option, index) => {
+                    html += `<button class="option-btn" onclick="checkAnswer(${index})">${option}</button>`;
+                });
+                html += '</div>';
+            } else {
+                html += `
+                    <input type="text" class="input-answer" id="answerInput" placeholder="Type your answer...">
+                    <button class="btn" onclick="checkTextAnswer()">Submit</button>
+                `;
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            if (question.type === 'text') {
+                const input = document.getElementById('answerInput');
+                input.focus();
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') checkTextAnswer();
+                });
+            }
+
+            // Add keyboard listener for Enter on feedback "Next" button
+            document.addEventListener('keypress', handleGlobalEnter);
+        }
+
+        function handleGlobalEnter(e) {
+            if (e.key === 'Enter') {
+                // Check if there's a visible Next/Continue button
+                const nextBtn = document.querySelector('.btn:not([disabled])');
+                if (nextBtn && nextBtn.textContent.includes('Next')) {
+                    nextBtn.click();
+                } else if (nextBtn && nextBtn.textContent.includes('Continue')) {
+                    nextBtn.click();
+                }
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            const topic = curriculum[currentLevel][currentTopicIndex];
+            const question = topic.questions[currentQuestionIndex];
+            const correct = selectedIndex === question.answer;
+
+            const options = document.querySelectorAll('.option-btn');
+            options.forEach(btn => btn.style.pointerEvents = 'none');
+            options[selectedIndex].classList.add(correct ? 'correct' : 'incorrect');
+            if (!correct) {
+                options[question.answer].classList.add('correct');
+            }
+
+            showFeedback(correct, question.options[question.answer]);
+        }
+
+        function checkTextAnswer() {
+            const topic = curriculum[currentLevel][currentTopicIndex];
+            const question = topic.questions[currentQuestionIndex];
+            const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+            const correctAnswer = question.answer.toLowerCase();
+            
+            const correct = userAnswer === correctAnswer || 
+                           userAnswer === correctAnswer.replace(/^(il |la |i |gli |l'|un |una |uno )/, '');
+
+            document.getElementById('answerInput').disabled = true;
+            showFeedback(correct, question.answer);
+        }
+
+        function showFeedback(correct, correctAnswer) {
+            const content = document.getElementById('content');
+            let feedbackHtml = `
+                <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+                    ${correct ? '✓ Correct!' : `✗ Incorrect. The correct answer is: ${correctAnswer}`}
+                </div>
+            `;
+
+            if (inLesson) {
+                feedbackHtml += `<button class="btn" onclick="continueLesson(${correct}); return false;">Continue (Press Enter)</button>`;
+            } else {
+                feedbackHtml += `<button class="btn" onclick="nextQuestion(${correct}); return false;">Next (Press Enter)</button>`;
+            }
+
+            content.innerHTML += feedbackHtml;
+            
+            // Focus the button so Enter works immediately
+            setTimeout(() => {
+                const btn = document.querySelector('.btn');
+                if (btn) btn.focus();
+            }, 100);
+        }
+
+        function nextQuestion(correct) {
+            if (correct) {
+                score++;
+                currentQuestionIndex++;
+
+                if (currentQuestionIndex >= 3) {
+                    currentQuestionIndex = 0;
+                    currentTopicIndex++;
+
+                    if (currentTopicIndex >= curriculum[currentLevel].length) {
+                        startAssessment();
+                    } else {
+                        showQuestion();
+                    }
+                } else {
+                    showQuestion();
+                }
+            } else {
+                failedTopic = curriculum[currentLevel][currentTopicIndex];
+                showLesson();
+            }
+        }
+
+        function showLesson() {
+            const content = document.getElementById('content');
+            const lesson = failedTopic.lesson;
+
+            content.innerHTML = `
+                <div class="lesson">
+                    <h2>${lesson.title}</h2>
+                    ${lesson.content}
+                    <button class="btn" onclick="startLessonExercises()">Continue</button>
+                </div>
+            `;
+        }
+
+        function startLessonExercises() {
+            inLesson = true;
+            lessonExerciseCount = 0;
+            currentQuestionIndex = 0;
+            showQuestion();
+        }
+
+        function continueLesson(correct) {
+            if (correct) {
+                lessonExerciseCount++;
+                currentQuestionIndex++;
+
+                if (lessonExerciseCount >= 3 || currentQuestionIndex >= 3) {
+                    inLesson = false;
+                    lessonExerciseCount = 0;
+                    currentQuestionIndex = 0;
+                    currentTopicIndex++;
+
+                    if (currentTopicIndex >= curriculum[currentLevel].length) {
+                        startAssessment();
+                    } else {
+                        showQuestion();
+                    }
+                } else {
+                    showQuestion();
+                }
+            } else {
+                currentQuestionIndex = 0;
+                showQuestion();
+            }
+        }
+
+        function startAssessment() {
+            assessmentMode = true;
+            assessmentPart = 1;
+            assessmentQuestions = [];
+            assessmentAnswers = [];
+
+            const allTopics = curriculum[currentLevel];
+            const selectedIndices = new Set();
+            
+            while (selectedIndices.size < 5) {
+                selectedIndices.add(Math.floor(Math.random() * allTopics.length));
+            }
+
+            selectedIndices.forEach(topicIdx => {
+                const topic = allTopics[topicIdx];
+                const qIdx = Math.floor(Math.random() * topic.questions.length);
+                assessmentQuestions.push({
+                    topic: topic.topic,
+                    question: topic.questions[qIdx]
+                });
+            });
+
+            showAssessmentQuestion(0);
+        }
+
+        function showAssessmentQuestion(qIndex) {
+            updateHeader();
+            const content = document.getElementById('content');
+            const assessmentQ = assessmentQuestions[qIndex];
+            const question = assessmentQ.question;
+
+            let html = `
+                <div class="assessment-info">
+                    <strong>Assessment - Part ${assessmentPart}/2</strong><br>
+                    Question ${qIndex + 1} of 5 (Topic: ${assessmentQ.topic})<br>
+                    Pass requirement: 75% (4 out of 5 correct)
+                </div>
+                <div class="card">
+                    <div class="question">${question.q}</div>
+            `;
+
+            if (question.type === 'mc') {
+                html += '<div class="options">';
+                question.options.forEach((option, index) => {
+                    html += `<button class="option-btn" onclick="submitAssessmentAnswer(${qIndex}, ${index}, '${question.answer}')">${option}</button>`;
+                });
+                html += '</div>';
+            } else {
+                html += `
+                    <input type="text" class="input-answer" id="assessmentInput" placeholder="Type your answer...">
+                    <button class="btn" onclick="submitAssessmentTextAnswer(${qIndex}, '${question.answer}')">Submit</button>
+                `;
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            if (question.type === 'text') {
+                const input = document.getElementById('assessmentInput');
+                input.focus();
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const btn = document.querySelector('.btn');
+                        if (btn) btn.click();
+                    }
+                });
+            }
+        }
+
+        function submitAssessmentAnswer(qIndex, selectedIndex, correctAnswer) {
+            const correct = selectedIndex == correctAnswer;
+            assessmentAnswers.push(correct);
+
+            const options = document.querySelectorAll('.option-btn');
+            options.forEach(btn => btn.style.pointerEvents = 'none');
+            options[selectedIndex].classList.add(correct ? 'correct' : 'incorrect');
+            if (!correct) {
+                options[correctAnswer].classList.add('correct');
+            }
+
+            setTimeout(() => {
+                if (qIndex < 4) {
+                    showAssessmentQuestion(qIndex + 1);
+                } else {
+                    evaluateAssessment();
+                }
+            }, 1500);
+        }
+
+        function submitAssessmentTextAnswer(qIndex, correctAnswer) {
+            const userAnswer = document.getElementById('assessmentInput').value.trim().toLowerCase();
+            const correct = userAnswer === correctAnswer.toLowerCase() || 
+                           userAnswer === correctAnswer.toLowerCase().replace(/^(il |la |i |gli |l'|un |una |uno )/, '');
+            
+            assessmentAnswers.push(correct);
+            document.getElementById('assessmentInput').disabled = true;
+
+            setTimeout(() => {
+                if (qIndex < 4) {
+                    showAssessmentQuestion(qIndex + 1);
+                } else {
+                    evaluateAssessment();
+                }
+            }, 1500);
+        }
+
+        function evaluateAssessment() {
+            const correctCount = assessmentAnswers.filter(a => a).length;
+            const percentage = (correctCount / 5) * 100;
+            const passed = percentage >= 75;
+
+            const content = document.getElementById('content');
+
+            if (passed) {
+                if (assessmentPart === 1) {
+                    content.innerHTML = `
+                        <div class="completion-message">
+                            <h2>Part 1 Passed! ✓</h2>
+                            <p>You scored ${correctCount}/5 (${percentage}%)</p>
+                            <p>Ready for Part 2?</p>
+                            <button class="btn" onclick="startAssessmentPart2()">Start Part 2</button>
+                        </div>
+                    `;
+                } else {
+                    if (currentLevel === 'B2') {
+                        content.innerHTML = `
+                            <div class="completion-message">
+                                <h2>🎉 Congratulations! 🎉</h2>
+                                <p>You've completed the entire course!</p>
+                                <p>You can now confidently navigate to a bank and apply for a mutuo in Italian!</p>
+                                <p><strong>Final Score: ${score}</strong></p>
+                                <div style="margin-top: 24px; padding: 16px; background: var(--color-secondary); border-radius: 8px;">
+                                    <strong>Key Achievement:</strong><br>
+                                    ✓ Find directions to the bank<br>
+                                    ✓ Open a bank account<br>
+                                    ✓ Apply for and negotiate a mutuo<br>
+                                    ✓ Understand mortgage contracts<br>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        const nextLevel = currentLevel === 'A1' ? 'A2' : currentLevel === 'A2' ? 'B1' : 'B2';
+                        content.innerHTML = `
+                            <div class="completion-message">
+                                <h2>Level ${currentLevel} Complete! 🎉</h2>
+                                <p>You scored ${correctCount}/5 (${percentage}%) on Part 2</p>
+                                <p>You're ready to advance to <strong>${nextLevel}</strong>!</p>
+                                <button class="btn" onclick="advanceLevel('${nextLevel}')">Start ${nextLevel}</button>
+                            </div>
+                        `;
+                    }
+                }
+            } else {
+                content.innerHTML = `
+                    <div class="completion-message">
+                        <h2>Assessment Not Passed</h2>
+                        <p>You scored ${correctCount}/5 (${percentage}%)</p>
+                        <p>You need at least 75% to advance. Let's review and try again!</p>
+                        <button class="btn" onclick="restartLevel()">Restart Level</button>
+                    </div>
+                `;
+            }
+        }
+
+        function startAssessmentPart2() {
+            assessmentPart = 2;
+            assessmentQuestions = [];
+            assessmentAnswers = [];
+
+            const allTopics = curriculum[currentLevel];
+            const selectedIndices = new Set();
+            
+            while (selectedIndices.size < 5) {
+                selectedIndices.add(Math.floor(Math.random() * allTopics.length));
+            }
+
+            selectedIndices.forEach(topicIdx => {
+                const topic = allTopics[topicIdx];
+                const qIdx = Math.floor(Math.random() * topic.questions.length);
+                assessmentQuestions.push({
+                    topic: topic.topic,
+                    question: topic.questions[qIdx]
+                });
+            });
+
+            showAssessmentQuestion(0);
+        }
+
+        function advanceLevel(nextLevel) {
+            currentLevel = nextLevel;
+            currentTopicIndex = 0;
+            currentQuestionIndex = 0;
+            assessmentMode = false;
+            showQuestion();
+        }
+
+        function restartLevel() {
+            currentTopicIndex = 0;
+            currentQuestionIndex = 0;
+            assessmentMode = false;
+            showQuestion();
+        }
+
+        function showVerbsQuestion() {
+            updateHeader();
+            const content = document.getElementById('content');
+            
+            const exercises = verbsCurriculum[verbsLevel];
+            if (currentQuestionIndex >= exercises.length) {
+                content.innerHTML = `
+                    <div class="completion-message">
+                        <h2>🎉 Level ${verbsLevel} Verbs Complete!</h2>
+                        <p>You've completed all ${exercises.length} verb exercises!</p>
+                        <p>Final Score: ${score}/${exercises.length}</p>
+                        <button class="btn" onclick="restartVerbsLevel()">Restart Level</button>
+                        <button class="btn btn-secondary" onclick="toggleVerbsMode()">Return to Main Course</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const exercise = exercises[currentQuestionIndex];
+
+            let html = `
+                <div class="card">
+                    <div style="margin-bottom: 12px; color: var(--color-text-secondary); font-size: 14px;">
+                        <strong>${exercise.topic}</strong> | Exercise ${currentQuestionIndex + 1}/${exercises.length}
+                    </div>
+                    <div class="question">${exercise.q}</div>
+            `;
+
+            if (exercise.type === 'mc') {
+                html += '<div class="options">';
+                exercise.options.forEach((option, index) => {
+                    html += `<button class="option-btn" onclick="checkVerbsAnswer(${index})">${option}</button>`;
+                });
+                html += '</div>';
+            } else {
+                html += `
+                    <input type="text" class="input-answer" id="verbsAnswerInput" placeholder="Type your answer...">
+                    <button class="btn" onclick="checkVerbsTextAnswer()">Submit</button>
+                `;
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            if (exercise.type === 'text') {
+                const input = document.getElementById('verbsAnswerInput');
+                input.focus();
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') checkVerbsTextAnswer();
+                });
+            }
+        }
+
+        function checkVerbsAnswer(selectedIndex) {
+            const exercise = verbsCurriculum[verbsLevel][currentQuestionIndex];
+            const correct = selectedIndex === exercise.answer;
+
+            const options = document.querySelectorAll('.option-btn');
+            options.forEach(btn => btn.style.pointerEvents = 'none');
+            options[selectedIndex].classList.add(correct ? 'correct' : 'incorrect');
+            if (!correct) {
+                options[exercise.answer].classList.add('correct');
+            }
+
+            showVerbsFeedback(correct, exercise.options[exercise.answer], exercise);
+        }
+
+        function checkVerbsTextAnswer() {
+            const exercise = verbsCurriculum[verbsLevel][currentQuestionIndex];
+            const userAnswer = document.getElementById('verbsAnswerInput').value.trim().toLowerCase();
+            const correctAnswer = exercise.answer.toLowerCase();
+            
+            const correct = userAnswer === correctAnswer || 
+                           userAnswer === correctAnswer.replace(/^(io |tu |lui |lei |noi |voi |loro |che |mi |ti |si |ci |vi )/, '');
+
+            document.getElementById('verbsAnswerInput').disabled = true;
+            showVerbsFeedback(correct, exercise.answer, exercise);
+        }
+
+        function showVerbsFeedback(correct, correctAnswer, exercise) {
+            const content = document.getElementById('content');
+            let feedbackHtml = `
+                <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+                    ${correct ? '✓ Correct!' : `✗ Incorrect. The correct answer is: ${correctAnswer}`}
+                </div>
+            `;
+
+            if (!correct && !inLesson) {
+                feedbackHtml += `
+                    <div class="lesson" style="margin-top: 16px;">
+                        <h2>Quick Lesson</h2>
+                        <p><strong>Explanation:</strong> ${exercise.explanation}</p>
+                        <p>${exercise.lesson}</p>
+                    </div>
+                `;
+            }
+
+            if (inLesson) {
+                feedbackHtml += `<button class="btn" onclick="continueVerbsLesson(${correct}); return false;">Continue (Press Enter)</button>`;
+            } else {
+                feedbackHtml += `<button class="btn" onclick="nextVerbsQuestion(${correct}); return false;">Next (Press Enter)</button>`;
+            }
+
+            content.innerHTML += feedbackHtml;
+            
+            setTimeout(() => {
+                const btn = document.querySelector('.btn');
+                if (btn) btn.focus();
+            }, 100);
+        }
+
+        function nextVerbsQuestion(correct) {
+            if (correct) {
+                score++;
+                currentQuestionIndex++;
+                showVerbsQuestion();
+            } else {
+                failedTopic = verbsCurriculum[verbsLevel][currentQuestionIndex];
+                showVerbsLesson();
+            }
+        }
+
+        let practiceDeck = [];
+        let practiceQuestionIndex = 0;
+
+        function showVerbsLesson() {
+            const content = document.getElementById('content');
+            const exercise = failedTopic;
+
+            // Generate 5 related practice questions
+            practiceDeck = generatePracticeQuestions(exercise);
+            
+            // Shuffle and take first 3
+            practiceDeck = shuffleArray(practiceDeck).slice(0, 3);
+
+            content.innerHTML = `
+                <div class="lesson">
+                    <h2>${exercise.topic} - Practice Exercises</h2>
+                    <p><strong>Explanation:</strong> ${exercise.explanation}</p>
+                    <p>${exercise.lesson}</p>
+                    <button class="btn" onclick="startVerbsLessonExercises()">Start Practice (3 different exercises)</button>
+                </div>
+            `;
+        }
+
+        function generatePracticeQuestions(originalExercise) {
+            const topic = originalExercise.topic;
+            const pool = [];
+
+            if (topic.includes('Presente indicativo')) {
+                if (topic.includes('regolari')) {
+                    pool.push(
+                        { q: 'Tu (cantare) bene?', type: 'mc', options: ['canto', 'canti', 'canta', 'cantano'], answer: 1, explanation: 'Tu canti: seconda persona singolare -ARE' },
+                        { q: 'Loro (ballare) il tango', type: 'mc', options: ['ballo', 'balli', 'balliamo', 'ballano'], answer: 3, explanation: 'Loro ballano: terza plurale -ARE' },
+                        { q: 'Voi (guardare) il film?', type: 'text', answer: 'guardate', explanation: 'Voi guardate: seconda plurale -ARE' },
+                        { q: 'Lei (chiamare) la mamma', type: 'text', answer: 'chiama', explanation: 'Lei chiama: terza singolare -ARE' },
+                        { q: 'Noi (ascoltare) la radio', type: 'mc', options: ['ascolto', 'ascolti', 'ascoltiamo', 'ascoltano'], answer: 2, explanation: 'Noi ascoltiamo: prima plurale -ARE' }
+                    );
+                } else if (topic.includes('irregolari')) {
+                    pool.push(
+                        { q: 'Voi (essere) italiani?', type: 'mc', options: ['siamo', 'siete', 'sono', 'sei'], answer: 1, explanation: 'Voi siete: seconda plurale di essere' },
+                        { q: 'Loro (avere) fame', type: 'text', answer: 'hanno', explanation: 'Loro hanno: terza plurale di avere' },
+                        { q: 'Tu (fare) sport?', type: 'mc', options: ['faccio', 'fai', 'fa', 'fanno'], answer: 1, explanation: 'Tu fai: seconda singolare di fare' },
+                        { q: 'Lui (stare) male', type: 'text', answer: 'sta', explanation: 'Lui sta: terza singolare di stare' },
+                        { q: 'Voi (dire) la verità?', type: 'mc', options: ['dico', 'dici', 'diciamo', 'dite'], answer: 3, explanation: 'Voi dite: seconda plurale di dire' }
+                    );
+                }
+            } else if (topic.includes('Passato prossimo')) {
+                if (topic.includes('con essere') || topic.includes('essere')) {
+                    pool.push(
+                        { q: 'Tu (tornare) a casa - maschile', type: 'text', answer: 'sei tornato', explanation: 'Sei tornato: tu (maschile) con essere' },
+                        { q: 'Voi (partire) ieri - femminile', type: 'mc', options: ['siete partiti', 'siete partite', 'sono partiti', 'sono partite'], answer: 1, explanation: 'Siete partite: voi (femminile) con essere' },
+                        { q: 'Loro (scendere) dal treno - maschile', type: 'text', answer: 'sono scesi', explanation: 'Sono scesi: loro (maschile) con essere' },
+                        { q: 'Io (entrare) nel bar - femminile', type: 'mc', options: ['sono entrato', 'sono entrata', 'ho entrato', 'ho entrata'], answer: 1, explanation: 'Sono entrata: io (femminile) con essere' },
+                        { q: 'Lei (diventare) dottoressa', type: 'text', answer: 'è diventata', explanation: 'È diventata: lei (femminile) con essere' }
+                    );
+                } else {
+                    pool.push(
+                        { q: 'Loro (cantare) la canzone', type: 'mc', options: ['ho cantato', 'hai cantato', 'abbiamo cantato', 'hanno cantato'], answer: 3, explanation: 'Hanno cantato: loro con avere' },
+                        { q: 'Tu (chiudere) la porta?', type: 'text', answer: 'hai chiuso', explanation: 'Hai chiuso: tu con avere, participio irregolare' },
+                        { q: 'Io (mettere) i libri sul tavolo', type: 'mc', options: ['ho messo', 'hai messo', 'ha messo', 'hanno messo'], answer: 0, explanation: 'Ho messo: io con avere, participio irregolare' },
+                        { q: 'Voi (rispondere) alla domanda?', type: 'text', answer: 'avete risposto', explanation: 'Avete risposto: voi con avere, participio irregolare' },
+                        { q: 'Lei (chiedere) aiuto', type: 'mc', options: ['ho chiesto', 'hai chiesto', 'ha chiesto', 'hanno chiesto'], answer: 2, explanation: 'Ha chiesto: lei con avere, participio irregolare' }
+                    );
+                }
+            } else if (topic.includes('riflessivo') || topic.includes('Riflessivi')) {
+                pool.push(
+                    { q: 'Io mi sono (pettinare) - maschile', type: 'text', answer: 'pettinato', explanation: 'Pettinato: io (maschile) riflessivo' },
+                    { q: 'Tu ti sei (annoiare) - femminile', type: 'mc', options: ['annoiato', 'annoiata', 'annoiati', 'annoiate'], answer: 1, explanation: 'Annoiata: tu (femminile) riflessivo' },
+                    { q: 'Loro si sono (baciare) - maschile', type: 'text', answer: 'baciati', explanation: 'Baciati: loro (maschile plurale) riflessivo' },
+                    { q: 'Voi vi siete (riposare) - femminile', type: 'mc', options: ['riposato', 'riposata', 'riposati', 'riposate'], answer: 3, explanation: 'Riposate: voi (femminile plurale) riflessivo' },
+                    { q: 'Lei si è (pettinare)', type: 'text', answer: 'pettinata', explanation: 'Pettinata: lei (femminile) riflessivo' }
+                );
+            } else if (topic.includes('Imperfetto')) {
+                pool.push(
+                    { q: 'Io (cantare) sempre da bambino', type: 'text', answer: 'cantavo', explanation: 'Cantavo: io imperfetto -ARE' },
+                    { q: 'Tu (correre) ogni giorno?', type: 'mc', options: ['correvo', 'correvi', 'correva', 'correvano'], answer: 1, explanation: 'Correvi: tu imperfetto -ERE' },
+                    { q: 'Loro (dormire) molto', type: 'text', answer: 'dormivano', explanation: 'Dormivano: loro imperfetto -IRE' },
+                    { q: 'Noi (giocare) a carte', type: 'mc', options: ['giocavo', 'giocavi', 'giocavamo', 'giocavano'], answer: 2, explanation: 'Giocavamo: noi imperfetto -ARE' },
+                    { q: 'Lei (bere) tè ogni mattina', type: 'text', answer: 'beveva', explanation: 'Beveva: lei imperfetto irregolare di bere' }
+                );
+            } else if (topic.includes('Stare + gerundio')) {
+                pool.push(
+                    { q: 'Tu stai (parlare) al telefono?', type: 'text', answer: 'parlando', explanation: 'Parlando: gerundio di parlare' },
+                    { q: 'Loro stanno (correre)', type: 'mc', options: ['corrando', 'correndo', 'corrindo', 'corrano'], answer: 1, explanation: 'Correndo: gerundio di correre' },
+                    { q: 'Voi state (dormire)?', type: 'text', answer: 'dormendo', explanation: 'Dormendo: gerundio di dormire' },
+                    { q: 'Lei sta (scrivere) una lettera', type: 'mc', options: ['scrivando', 'scrivendo', 'scrivindo', 'scriva'], answer: 1, explanation: 'Scrivendo: gerundio di scrivere' },
+                    { q: 'Noi stiamo (fare) i compiti', type: 'text', answer: 'facendo', explanation: 'Facendo: gerundio irregolare di fare' }
+                );
+            } else if (topic.includes('Verbi modali')) {
+                if (topic.includes('passato')) {
+                    pool.push(
+                        { q: 'Tu (dovere) partire - passato', type: 'text', answer: 'hai dovuto', explanation: 'Hai dovuto: passato di dovere' },
+                        { q: 'Loro (potere) venire - passato', type: 'mc', options: ['ho potuto', 'hai potuto', 'abbiamo potuto', 'hanno potuto'], answer: 3, explanation: 'Hanno potuto: passato di potere' },
+                        { q: 'Voi (volere) mangiare - passato', type: 'text', answer: 'avete voluto', explanation: 'Avete voluto: passato di volere' },
+                        { q: 'Lei (dovere) studiare - passato', type: 'mc', options: ['ho dovuto', 'hai dovuto', 'ha dovuto', 'hanno dovuto'], answer: 2, explanation: 'Ha dovuto: passato di dovere' },
+                        { q: 'Io (potere) aiutare - passato', type: 'text', answer: 'ho potuto', explanation: 'Ho potuto: passato di potere' }
+                    );
+                } else {
+                    pool.push(
+                        { q: 'Voi (volere) partire?', type: 'mc', options: ['voglio', 'vuoi', 'vogliamo', 'volete'], answer: 3, explanation: 'Volete: voi presente di volere' },
+                        { q: 'Loro (dovere) studiare', type: 'text', answer: 'devono', explanation: 'Devono: loro presente di dovere' },
+                        { q: 'Tu (potere) uscire?', type: 'mc', options: ['posso', 'puoi', 'può', 'possono'], answer: 1, explanation: 'Puoi: tu presente di potere' },
+                        { q: 'Io (volere) un caffè', type: 'text', answer: 'voglio', explanation: 'Voglio: io presente di volere' },
+                        { q: 'Lei (dovere) lavorare', type: 'mc', options: ['devo', 'devi', 'deve', 'devono'], answer: 2, explanation: 'Deve: lei presente di dovere' }
+                    );
+                }
+            } else if (topic.includes('Futuro')) {
+                pool.push(
+                    { q: 'Tu (parlare) domani? - Futuro', type: 'text', answer: 'parlerai', explanation: 'Parlerai: tu futuro di parlare' },
+                    { q: 'Loro (partire) presto - Futuro', type: 'mc', options: ['partiranno', 'partiremo', 'partirete', 'partirò'], answer: 0, explanation: 'Partiranno: loro futuro di partire' },
+                    { q: 'Noi (vedere) il film - Futuro', type: 'text', answer: 'vedremo', explanation: 'Vedremo: noi futuro di vedere' },
+                    { q: 'Io (essere) là - Futuro', type: 'mc', options: ['sarò', 'sarai', 'sarà', 'saranno'], answer: 0, explanation: 'Sarò: io futuro irregolare di essere' },
+                    { q: 'Lei (avere) tempo - Futuro', type: 'text', answer: 'avrà', explanation: 'Avrà: lei futuro irregolare di avere' }
+                );
+            } else if (topic.includes('Imperativo')) {
+                pool.push(
+                    { q: 'Mangia! è imperativo per:', type: 'mc', options: ['tu', 'noi', 'voi', 'loro'], answer: 0, explanation: 'Mangia: imperativo tu' },
+                    { q: 'Scrivi! (imperativo - scrivere)', type: 'text', answer: 'scrivi', explanation: 'Scrivi: imperativo tu di scrivere' },
+                    { q: 'Corri! è imperativo di quale verbo?', type: 'mc', options: ['correre', 'comprare', 'chiamare', 'cantare'], answer: 0, explanation: 'Corri: imperativo tu di correre' },
+                    { q: 'Parti! (imperativo - partire)', type: 'text', answer: 'parti', explanation: 'Parti: imperativo tu di partire' },
+                    { q: 'Leggi! è imperativo per:', type: 'mc', options: ['tu', 'noi', 'voi', 'Lei'], answer: 0, explanation: 'Leggi: imperativo tu' }
+                );
+            }
+
+            // Return shuffled pool (will be shuffled again and sliced in showVerbsLesson)
+            return pool.length > 0 ? pool : [originalExercise, originalExercise, originalExercise, originalExercise, originalExercise];
+        }
+
+        function startVerbsLessonExercises() {
+            inLesson = true;
+            lessonExerciseCount = 0;
+            practiceQuestionIndex = 0;
+            showVerbsPracticeQuestion();
+        }
+
+        function showVerbsPracticeQuestion() {
+            updateHeader();
+            const content = document.getElementById('content');
+            const practice = practiceDeck[practiceQuestionIndex];
+
+            let html = `
+                <div class="card">
+                    <div style="margin-bottom: 12px; color: var(--color-text-secondary); font-size: 14px;">
+                        <strong>Practice Exercise ${practiceQuestionIndex + 1}/3</strong>
+                    </div>
+                    <div class="question">${practice.q}</div>
+            `;
+
+            if (practice.type === 'mc') {
+                html += '<div class="options">';
+                practice.options.forEach((option, index) => {
+                    html += `<button class="option-btn" onclick="checkPracticeAnswer(${index})">${option}</button>`;
+                });
+                html += '</div>';
+            } else {
+                html += `
+                    <input type="text" class="input-answer" id="practiceAnswerInput" placeholder="Type your answer...">
+                    <button class="btn" onclick="checkPracticeTextAnswer()">Submit</button>
+                `;
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            if (practice.type === 'text') {
+                const input = document.getElementById('practiceAnswerInput');
+                input.focus();
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') checkPracticeTextAnswer();
+                });
+            }
+        }
+
+        function checkPracticeAnswer(selectedIndex) {
+            const practice = practiceDeck[practiceQuestionIndex];
+            const correct = selectedIndex === practice.answer;
+
+            const options = document.querySelectorAll('.option-btn');
+            options.forEach(btn => btn.style.pointerEvents = 'none');
+            options[selectedIndex].classList.add(correct ? 'correct' : 'incorrect');
+            if (!correct) {
+                options[practice.answer].classList.add('correct');
+            }
+
+            showPracticeFeedback(correct, practice.options[practice.answer], practice);
+        }
+
+        function checkPracticeTextAnswer() {
+            const practice = practiceDeck[practiceQuestionIndex];
+            const userAnswer = document.getElementById('practiceAnswerInput').value.trim().toLowerCase();
+            const correctAnswer = practice.answer.toLowerCase();
+            
+            const correct = userAnswer === correctAnswer || 
+                           userAnswer === correctAnswer.replace(/^(io |tu |lui |lei |noi |voi |loro |che |mi |ti |si |ci |vi )/, '');
+
+            document.getElementById('practiceAnswerInput').disabled = true;
+            showPracticeFeedback(correct, practice.answer, practice);
+        }
+
+        function showPracticeFeedback(correct, correctAnswer, practice) {
+            const content = document.getElementById('content');
+            let feedbackHtml = `
+                <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+                    ${correct ? '✓ Correct!' : `✗ Incorrect. The correct answer is: ${correctAnswer}`}
+                    <br><small>${practice.explanation}</small>
+                </div>
+                <button class="btn" onclick="continuePractice(${correct}); return false;">Continue (Press Enter)</button>
+            `;
+
+            content.innerHTML += feedbackHtml;
+            
+            setTimeout(() => {
+                const btn = document.querySelector('.btn');
+                if (btn) btn.focus();
+            }, 100);
+        }
+
+        function continuePractice(correct) {
+            if (correct) {
+                lessonExerciseCount++;
+                practiceQuestionIndex++;
+                
+                if (practiceQuestionIndex >= 3) {
+                    inLesson = false;
+                    lessonExerciseCount = 0;
+                    currentQuestionIndex++;
+                    showVerbsQuestion();
+                } else {
+                    showVerbsPracticeQuestion();
+                }
+            } else {
+                showVerbsPracticeQuestion();
+            }
+        }
+
+        function continueVerbsLesson(correct) {
+            if (correct) {
+                lessonExerciseCount++;
+                if (lessonExerciseCount >= 3) {
+                    inLesson = false;
+                    lessonExerciseCount = 0;
+                    currentQuestionIndex++;
+                }
+                showVerbsQuestion();
+            } else {
+                showVerbsQuestion();
+            }
+        }
+
+        function continueVerbsLesson(correct) {
+            if (correct) {
+                lessonExerciseCount++;
+                if (lessonExerciseCount >= 3) {
+                    inLesson = false;
+                    lessonExerciseCount = 0;
+                    currentQuestionIndex++;
+                }
+                showVerbsQuestion();
+            } else {
+                showVerbsQuestion();
+            }
+        }
+
+        function restartVerbsLevel() {
+            currentQuestionIndex = 0;
+            score = 0;
+            inLesson = false;
+            failedTopic = null;
+            lessonExerciseCount = 0;
+            showVerbsQuestion();
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
