@@ -661,7 +661,11 @@
             if (e.pointerType === 'touch') e.preventDefault();
         });
 
-        window.addEventListener('pointerup', onClick);
+        window.addEventListener('pointerup', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            onClick(e);
+        });
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
