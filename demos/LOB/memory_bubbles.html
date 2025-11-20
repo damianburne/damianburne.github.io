@@ -403,7 +403,7 @@
             minSize: 0.8,
             maxSize: 3.0,
             floatSpeed: 0.005,
-            connectionDistance: 15, // Increased for better connections
+            connectionDistance: 20, // Increased to ensure more connections
             animDuration: 0.6,
             fogColor: 0xffffff, // White fog for light mode
             fogDensity: 0.002 // Increased fog density by 30%
@@ -428,7 +428,7 @@
         scene.fog = new THREE.FogExp2(CONFIG.fogColor, CONFIG.fogDensity);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 0, 20); // Adjusted camera closer for tighter bubble cluster
+        camera.position.set(0, 0, 25); // Moved back for better view of spherical spread
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -444,7 +444,7 @@
         controls.enablePan = true;
         controls.enableZoom = true;
         controls.minDistance = 5;
-        controls.maxDistance = 50; // Adjusted max zoom distance
+        controls.maxDistance = 65; // Increased by 30% for better visibility of spread bubbles
         controls.maxPolarAngle = Math.PI;
 
         // --- Post Processing ---
@@ -509,10 +509,8 @@
             const size = THREE.MathUtils.randFloat(CONFIG.minSize, CONFIG.maxSize);
             group.scale.set(size, size, size);
 
-            // Reduced Random Position for closer spacing
-            const rangeX = 30;
-            const rangeY = 20;
-            const rangeZ = 15;
+            // Spherical distribution for more 3D spread
+            const maxRadius = 15;
 
             // Simple collision check during spawn to avoid initial overlaps
             let pos = new THREE.Vector3();
@@ -520,15 +518,18 @@
             let attempts = 0;
 
             while (tooClose && attempts < 50) {
+                const radius = Math.random() * maxRadius;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1); // Uniform distribution on sphere
                 pos.set(
-                    THREE.MathUtils.randFloat(-rangeX, rangeX),
-                    THREE.MathUtils.randFloat(-rangeY, rangeY),
-                    THREE.MathUtils.randFloat(-20, 5) // Deeper Z range
+                    radius * Math.sin(phi) * Math.cos(theta),
+                    radius * Math.sin(phi) * Math.sin(theta),
+                    radius * Math.cos(phi)
                 );
 
                 tooClose = false;
                 for (let b of bubbles) {
-                    const minDist = (size + b.userData.baseScale) * 1.5; // Reduced spacing multiplier
+                    const minDist = (size + b.userData.baseScale) * 1.5;
                     if (pos.distanceTo(b.position) < minDist) {
                         tooClose = true;
                         break;
@@ -625,7 +626,7 @@
         const linePositions = new Float32Array(CONFIG.bubbleCount * CONFIG.bubbleCount * 6);
         lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
         // Darker lines for visibility on white
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25, blending: THREE.NormalBlending, depthWrite: false });
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x333333, transparent: true, opacity: 0.5, blending: THREE.NormalBlending, depthWrite: false });
         const linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
         scene.add(linesMesh);
 
@@ -703,6 +704,7 @@
             // 1. Fade out others & push back
             bubbles.forEach(b => {
                 if (b !== bubble) {
+                    b.userData.pushedZ = b.position.z; // Store original Z for restoration
                     gsap.to(b.children[0].material, { opacity: 0.05, duration: 0.5 });
                     gsap.to(b.position, { z: b.position.z - 10, duration: 0.8, ease: "power2.out" });
                 }
@@ -853,10 +855,10 @@
                 bubbles.forEach(b => {
                     if (b !== activeBubble) {
                         gsap.to(b.children[0].material, { opacity: 1, duration: 0.8 });
-                        gsap.to(b.position, { z: b.userData.originalPos.z, duration: 0.8 });
+                        gsap.to(b.position, { z: b.userData.pushedZ, duration: 0.8 });
                     }
                 });
-                gsap.to(linesMesh.material, { opacity: 0.25, duration: 0.8 });
+                gsap.to(linesMesh.material, { opacity: 0.5, duration: 0.8 });
 
                 activeBubble = null;
 
@@ -902,11 +904,12 @@
                 // Only apply breathing if not selected/animating
                 if (!isModeActive) bubble.scale.set(s, s, s);
 
-                // Bounds
-                const limitX = 30, limitY = 20; // Updated bounds to match spawn range
-                if (bubble.position.x > limitX || bubble.position.x < -limitX) data.velocity.x *= -1;
-                if (bubble.position.y > limitY || bubble.position.y < -limitY) data.velocity.y *= -1;
-                if (bubble.position.z > 10 || bubble.position.z < -20) data.velocity.z *= -1;
+                // Spherical bounds to match spawn distribution
+                const maxRadius = 15;
+                if (bubble.position.length() > maxRadius) {
+                    const normal = bubble.position.clone().normalize();
+                    data.velocity.reflect(normal);
+                }
 
                 // Simple Repulsion to prevent overlap
                 if (!isModeActive) {
