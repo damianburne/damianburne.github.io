@@ -653,22 +653,15 @@
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
         });
 
-        window.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+        window.addEventListener('pointermove', (e) => {
+            cursorEl.style.left = e.clientX + 'px';
+            cursorEl.style.top = e.clientY + 'px';
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            if (e.pointerType === 'touch') e.preventDefault();
         });
 
-        window.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            cursorEl.style.left = touch.clientX + 'px';
-            cursorEl.style.top = touch.clientY + 'px';
-            mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
-        }, { passive: false });
-
-        window.addEventListener('click', onClick);
+        window.addEventListener('pointerup', onClick);
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
