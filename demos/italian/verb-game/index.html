@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italian Verb Trainer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇮🇹 Italian Verb Trainer</h1>
+            <p class="subtitle">Master Italian verbs one tense at a time</p>
+        </header>
+
+        <div id="levelSelection" class="level-selection">
+            <h2>Select Your Level</h2>
+            <div class="level-buttons">
+                <button class="level-btn" data-level="A1">A1</button>
+                <button class="level-btn" data-level="A2">A2</button>
+                <button class="level-btn" data-level="B1">B1</button>
+                <button class="level-btn" data-level="B2">B2</button>
+            </div>
+
+            <div id="tenseSelection" class="tense-selection hidden">
+                <h3>Select a Tense to Practice</h3>
+                <div id="tenseButtons" class="tense-buttons"></div>
+            </div>
+        </div>
+
+        <div id="exerciseArea" class="exercise-area hidden">
+            <div class="exercise-header">
+                <button id="backBtn" class="back-btn">← Back</button>
+                <div class="progress">
+                    <span id="score">Score: <strong>0</strong></span>
+                    <span id="streak">Streak: <strong>0</strong></span>
+                </div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="tense-badge" id="tenseBadge"></div>
+                <div class="question-text">
+                    <p id="questionPrompt"></p>
+                </div>
+
+                <div id="answerOptions" class="answer-options"></div>
+
+                <div id="feedback" class="feedback hidden">
+                    <div class="feedback-icon"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="lessonModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="lessonTitle"></h3>
+                    <button class="close-btn" id="closeLesson">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="lessonContent"></div>
+                    <div class="conjugation-table" id="conjugationTable"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="continue-btn" id="continueBtn">Continue Practice</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

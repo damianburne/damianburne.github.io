@@ -27,6 +27,9 @@
             --space-20: 20px;
             --space-24: 24px;
             --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --shadow-soft: 0 18px 45px rgba(19, 52, 59, 0.08);
+            --shadow-hover: 0 22px 55px rgba(19, 52, 59, 0.12);
+            --gradient-background: linear-gradient(135deg, #fdfdfb 0%, #eef5f7 50%, #fefdf6 100%);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -44,6 +47,9 @@
                 --color-success: #32b8c6;
                 --color-error: #ff5459;
                 --color-warning: #e68161;
+                --shadow-soft: 0 20px 45px rgba(0, 0, 0, 0.45);
+                --shadow-hover: 0 30px 60px rgba(0, 0, 0, 0.6);
+                --gradient-background: linear-gradient(135deg, #17191a 0%, #1d2022 50%, #101214 100%);
             }
         }
 
@@ -55,15 +61,22 @@
 
         body {
             font-family: var(--font-family-base);
-            background: var(--color-background);
+            background: var(--gradient-background);
             color: var(--color-text);
-            padding: var(--space-20);
+            /* Respect device safe-area insets for notched devices */
+            padding-top: calc(var(--space-20) + env(safe-area-inset-top, 0px));
+            padding-right: calc(var(--space-20) + env(safe-area-inset-right, 0px));
+            padding-bottom: calc(var(--space-20) + env(safe-area-inset-bottom, 0px));
+            padding-left: calc(var(--space-20) + env(safe-area-inset-left, 0px));
             line-height: 1.6;
+            min-height: 100vh;
+            transition: background 0.4s ease;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
+            padding-bottom: 48px;
         }
 
         .header {
@@ -71,7 +84,9 @@
             border-radius: var(--radius-lg);
             padding: var(--space-20);
             margin-bottom: var(--space-24);
-            border: 1px solid var(--color-border);
+            border: 1px solid rgba(19, 52, 59, 0.06);
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(2px);
         }
 
         .header h1 {
@@ -85,10 +100,11 @@
             border-radius: 4px;
             overflow: hidden;
             margin-top: var(--space-12);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
         }
 
         .progress-fill {
-            background: var(--color-primary);
+            background: linear-gradient(90deg, var(--color-primary) 0%, #22a6b3 100%);
             height: 100%;
             transition: width 0.3s ease;
         }
@@ -97,8 +113,66 @@
             background: var(--color-surface);
             border-radius: var(--radius-lg);
             padding: var(--space-24);
-            border: 1px solid var(--color-border);
+            border: 1px solid rgba(19, 52, 59, 0.05);
             margin-bottom: var(--space-16);
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Mobile / touch-friendly adjustments */
+        .btn,
+        .option-btn,
+        .level-btn {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            font-size: 16px;
+            min-height: 44px; /* recommended minimum touch target */
+            min-width: 44px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            line-height: 1;
+            transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+
+        .option-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 6px 4px;
+        }
+
+        input.input-answer,
+        input#assessmentInput {
+            font-size: 18px;
+            padding: 12px 10px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Better focus styles for keyboard navigation */
+        .btn:focus,
+        .option-btn:focus,
+        .level-btn:focus,
+        input:focus {
+            outline: 3px solid rgba(33, 128, 141, 0.25);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .header h1 { font-size: 20px; }
+            .card { padding: 16px; }
+            .progress-bar { height: 10px; }
+            .option-btn { font-size: 16px; padding: 12px; display: block; width: 100%; }
         }
 
         .question {
@@ -114,8 +188,8 @@
         }
 
         .option-btn {
-            background: var(--color-surface);
-            border: 2px solid var(--color-border);
+            background: rgba(33, 128, 141, 0.04);
+            border: 2px solid rgba(33, 128, 141, 0.2);
             border-radius: var(--radius-base);
             padding: var(--space-16);
             font-size: 16px;
@@ -126,8 +200,9 @@
         }
 
         .option-btn:hover {
-            background: var(--color-secondary-hover);
+            background: rgba(33, 128, 141, 0.12);
             border-color: var(--color-primary);
+            box-shadow: 0 8px 18px rgba(33, 128, 141, 0.15);
         }
 
         .option-btn.correct {
@@ -158,12 +233,20 @@
             padding: var(--space-12) var(--space-24);
             font-size: 16px;
             cursor: pointer;
-            transition: background 0.2s ease;
             margin-top: var(--space-16);
+            box-shadow: 0 12px 25px rgba(33, 128, 141, 0.25);
         }
 
         .btn:hover {
             background: var(--color-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 16px 32px rgba(33, 128, 141, 0.3);
+        }
+
+        .btn:active {
+            background: var(--color-primary-active);
+            transform: translateY(0);
+            box-shadow: 0 8px 18px rgba(33, 128, 141, 0.22);
         }
 
         .btn-secondary {
@@ -179,7 +262,8 @@
             background: var(--color-surface);
             border-radius: var(--radius-lg);
             padding: var(--space-24);
-            border: 1px solid var(--color-border);
+            border: 1px solid rgba(19, 52, 59, 0.06);
+            box-shadow: var(--shadow-soft);
         }
 
         .lesson h2 {
@@ -249,7 +333,7 @@
 
         .level-nav {
             display: flex;
-            gap: var(--space-8);
+            gap: var(--space-12);
             margin-top: var(--space-16);
             justify-content: center;
             flex-wrap: wrap;
@@ -257,25 +341,27 @@
 
         .level-btn {
             padding: var(--space-8) var(--space-16);
-            border: 2px solid var(--color-border);
-            background: var(--color-surface);
+            border: 2px solid rgba(33, 128, 141, 0.2);
+            background: rgba(255, 255, 255, 0.85);
             color: var(--color-text);
-            border-radius: var(--radius-base);
+            border-radius: 999px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: all 0.2s ease;
+            letter-spacing: 0.05em;
         }
 
         .level-btn:hover {
-            background: var(--color-secondary-hover);
+            background: rgba(33, 128, 141, 0.08);
             border-color: var(--color-primary);
+            box-shadow: 0 10px 24px rgba(33, 128, 141, 0.18);
         }
 
         .level-btn.active {
             background: var(--color-primary);
             color: white;
             border-color: var(--color-primary);
+            box-shadow: 0 12px 30px rgba(33, 128, 141, 0.35);
         }
 
         .hidden {
@@ -293,11 +379,11 @@
         }
 
         .assessment-info {
-            background: rgba(33, 128, 141, 0.1);
+            background: linear-gradient(135deg, rgba(33, 128, 141, 0.12), rgba(33, 128, 141, 0.05));
             padding: var(--space-16);
             border-radius: var(--radius-base);
             margin-bottom: var(--space-20);
-            border: 1px solid var(--color-primary);
+            border: 1px solid rgba(33, 128, 141, 0.3);
         }
 
         .loading-spinner {
@@ -363,6 +449,7 @@
             PRACTICE_EXERCISES: 3,
             STORAGE_KEY: 'italianQuizState',
             UI_TRANSITION_DELAY: 100, // milliseconds for loading transitions
+            ANSWER_FEEDBACK_DELAY: 1500, // ms delay after answers before advancing
             MILLISECONDS_PER_DAY: 24 * 60 * 60 * 1000
         };
 
@@ -1466,7 +1553,8 @@
         let practiceDeck, practiceQuestionIndex;
         
         /**
-         * Sync exposed variables with state object
+         * Sync exposed compatibility-layer variables with the central state object.
+         * @returns {void}
          */
         function syncStateToVars() {
             currentLevel = state.currentLevel;
@@ -1487,7 +1575,8 @@
         }
         
         /**
-         * Sync exposed variables back to state object
+         * Push current compatibility-layer variable values back into the state object.
+         * @returns {void}
          */
         function syncVarsToState() {
             state.currentLevel = currentLevel;
@@ -1514,6 +1603,12 @@
         // UTILITY FUNCTIONS
         // ═══════════════════════════════════════════════════════════════════════════
         
+        /**
+         * Create a shuffled copy of an array without mutating the source.
+         * @template T
+         * @param {T[]} array - Array to shuffle
+         * @returns {T[]} Shuffled copy of the provided array
+         */
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1541,7 +1636,7 @@
 
         /**
          * Load quiz state from localStorage
-         * @returns {Object|null} Saved state or null if not found/expired
+         * @returns {Object|null} Saved state object or null if none/expired
          */
         function loadState() {
             try {
@@ -1561,6 +1656,8 @@
             }
         }
 
+        
+
         /**
          * Clear saved state from localStorage
          */
@@ -1573,8 +1670,10 @@
         }
 
         /**
-         * Restore state from saved data
-         * @param {Object} data - Saved state data
+         * Restore state from saved data into the `state` object and sync
+         * the compatibility layer variables.
+         * @param {Object} data - Saved state data previously produced by `saveState()`
+         * @returns {void}
          */
         function restoreState(data) {
             state.restore(data);
@@ -1585,6 +1684,12 @@
         // INITIALIZATION & CONTROL FLOW
         // ═══════════════════════════════════════════════════════════════════════════
         
+        /**
+         * Initialize the application.
+         * If there is saved state it will offer the user to continue
+         * or start fresh. Otherwise starts a fresh session.
+         * @returns {void}
+         */
         function init() {
             // Check for saved state
             const savedState = loadState();
@@ -1610,6 +1715,11 @@
             }
         }
 
+        /**
+         * Continue the session from saved state in localStorage.
+         * Restores state and navigates to the appropriate view.
+         * @returns {void}
+         */
         function continueFromSaved() {
             const savedState = loadState();
             if (savedState) {
@@ -1623,6 +1733,11 @@
             }
         }
 
+        /**
+         * Clear persisted state and start a fresh session at the
+         * current mode (verbs or regular topics).
+         * @returns {void}
+         */
         function startFresh() {
             clearState();
             updateLevelNavigation();
@@ -1633,6 +1748,11 @@
             }
         }
 
+        /**
+         * Toggle between regular topic mode and verbs practice mode.
+         * This updates navigation and triggers the appropriate view.
+         * @returns {void}
+         */
         function toggleVerbsMode() {
             verbsMode = !verbsMode;
             if (verbsMode) {
@@ -1659,6 +1779,11 @@
             }
         }
 
+        /**
+         * Update the level navigation UI to reflect the active
+         * level or the verbs button when in verbs mode.
+         * @returns {void}
+         */
         function updateLevelNavigation() {
             const buttons = document.querySelectorAll('.level-btn');
             buttons.forEach(btn => {
@@ -1672,6 +1797,12 @@
             });
         }
 
+        /**
+         * Jump the user to a different course level. Prompts for
+         * confirmation when leaving progress in regular topic mode.
+         * @param {string} level - Level to jump to (e.g. 'A1','A2','B1')
+         * @returns {void}
+         */
         function jumpToLevel(level) {
             if (verbsMode) {
                 verbsLevel = level;
@@ -1714,6 +1845,10 @@
             }
         }
 
+        /**
+         * Render a transient loading card while transitions happen.
+         * @returns {void}
+         */
         function showLoading() {
             const content = document.getElementById('content');
             content.innerHTML = `
@@ -1724,6 +1859,10 @@
             `;
         }
 
+        /**
+         * Placeholder hook to clear loading UI (content replaced elsewhere).
+         * @returns {void}
+         */
         function hideLoading() {
             // Loading will be replaced by showQuestion()
         }
@@ -1732,6 +1871,11 @@
         // UI UPDATE FUNCTIONS
         // ═══════════════════════════════════════════════════════════════════════════
         
+        /**
+         * Update header information (level, score, topic/progress)
+         * and update the progress bar ARIA attributes.
+         * @returns {void}
+         */
         function updateHeader() {
             if (verbsMode) {
                 document.getElementById('levelDisplay').textContent = `${verbsLevel} VERBS`;
@@ -1758,6 +1902,11 @@
         // CORE QUIZ LOGIC (Main Questions)
         // ═══════════════════════════════════════════════════════════════════════════
         
+        /**
+         * Render the current question card for the active topic.
+         * Supports multiple choice and text entry questions.
+         * @returns {void}
+         */
         function showQuestion() {
             updateHeader();
             const content = document.getElementById('content');
@@ -1807,6 +1956,12 @@
             document.addEventListener('keypress', handleGlobalEnter);
         }
 
+        /**
+         * Global Enter key handler used to activate visible
+         * next/continue buttons for keyboard users.
+         * @param {KeyboardEvent} e
+         * @returns {void}
+         */
         function handleGlobalEnter(e) {
             if (e.key === 'Enter') {
                 // Check if there's a visible Next/Continue button
@@ -1819,6 +1974,12 @@
             }
         }
 
+        /**
+         * Handle selection of a multiple-choice option for the
+         * currently rendered question.
+         * @param {number} selectedIndex - Index of selected option
+         * @returns {void}
+         */
         function checkAnswer(selectedIndex) {
             const topic = curriculum[currentLevel][currentTopicIndex];
             const question = topic.questions[currentQuestionIndex];
@@ -1834,6 +1995,12 @@
             showFeedback(correct, question.options[question.answer]);
         }
 
+        /**
+         * Handle submission of a text answer for the currently
+         * rendered question. Normalizes input and compares to
+         * the expected answer.
+         * @returns {void}
+         */
         function checkTextAnswer() {
             const topic = curriculum[currentLevel][currentTopicIndex];
             const question = topic.questions[currentQuestionIndex];
@@ -1847,6 +2014,13 @@
             showFeedback(correct, question.answer);
         }
 
+        /**
+         * Show feedback UI after an answer is submitted.
+         * Focuses the next button to allow keyboard 'Enter'.
+         * @param {boolean} correct - whether the answer was correct
+         * @param {string} correctAnswer - correct answer text to display
+         * @returns {void}
+         */
         function showFeedback(correct, correctAnswer) {
             const content = document.getElementById('content');
             let feedbackHtml = `
@@ -1870,12 +2044,19 @@
             }, CONFIG.UI_TRANSITION_DELAY);
         }
 
+        /**
+         * Advance to the next question or topic based on whether
+         * the answer was correct. Handles score increment and
+         * transitions to lessons/assessments as needed.
+         * @param {boolean} correct - whether the previous answer was correct
+         * @returns {void}
+         */
         function nextQuestion(correct) {
             if (correct) {
                 score++;
                 currentQuestionIndex++;
 
-                if (currentQuestionIndex >= 3) {
+                if (currentQuestionIndex >= CONFIG.QUESTIONS_PER_TOPIC) {
                     currentQuestionIndex = 0;
                     currentTopicIndex++;
 
@@ -1897,6 +2078,11 @@
             }
         }
 
+        /**
+         * Render the lesson view for the failed topic so the user can
+         * review material before attempting lesson exercises.
+         * @returns {void}
+         */
         function showLesson() {
             const content = document.getElementById('content');
             const lesson = failedTopic.lesson;
@@ -1910,6 +2096,11 @@
             `;
         }
 
+        /**
+         * Start the lesson exercises for the currently shown lesson.
+         * Resets counters and enters lesson mode.
+         * @returns {void}
+         */
         function startLessonExercises() {
             inLesson = true;
             lessonExerciseCount = 0;
@@ -1917,12 +2108,19 @@
             showQuestion();
         }
 
+        /**
+         * Continue the in-lesson exercise flow after feedback.
+         * Tracks lesson exercise progress and exits back to
+         * the normal flow when complete.
+         * @param {boolean} correct - whether the last answer was correct
+         * @returns {void}
+         */
         function continueLesson(correct) {
             if (correct) {
                 lessonExerciseCount++;
                 currentQuestionIndex++;
 
-                if (lessonExerciseCount >= 3 || currentQuestionIndex >= 3) {
+                if (lessonExerciseCount >= CONFIG.PRACTICE_EXERCISES || currentQuestionIndex >= CONFIG.QUESTIONS_PER_TOPIC) {
                     inLesson = false;
                     lessonExerciseCount = 0;
                     currentQuestionIndex = 0;
@@ -1946,6 +2144,12 @@
         // ASSESSMENT LOGIC
         // ═══════════════════════════════════════════════════════════════════════════
         
+        /**
+         * Begin the assessment sequence for the current level.
+         * Selects a number of topics at random and prepares
+         * assessment questions.
+         * @returns {void}
+         */
         function startAssessment() {
             assessmentMode = true;
             assessmentPart = 1;
@@ -1955,7 +2159,7 @@
             const allTopics = curriculum[currentLevel];
             const selectedIndices = new Set();
             
-            while (selectedIndices.size < 5) {
+            while (selectedIndices.size < CONFIG.ASSESSMENT_QUESTIONS) {
                 selectedIndices.add(Math.floor(Math.random() * allTopics.length));
             }
 
@@ -1971,17 +2175,25 @@
             showAssessmentQuestion(0);
         }
 
+        /**
+         * Render a single assessment question by index.
+         * Displays question metadata (part, index, pass requirement).
+         * @param {number} qIndex - Index of the assessment question to show
+         * @returns {void}
+         */
         function showAssessmentQuestion(qIndex) {
             updateHeader();
             const content = document.getElementById('content');
             const assessmentQ = assessmentQuestions[qIndex];
             const question = assessmentQ.question;
 
+            const passNeeded = Math.ceil(CONFIG.ASSESSMENT_QUESTIONS * CONFIG.MIN_PASS_PERCENTAGE / 100);
+
             let html = `
                 <div class="assessment-info">
                     <strong>Assessment - Part ${assessmentPart}/2</strong><br>
-                    Question ${qIndex + 1} of 5 (Topic: ${assessmentQ.topic})<br>
-                    Pass requirement: 75% (4 out of 5 correct)
+                    Question ${qIndex + 1} of ${CONFIG.ASSESSMENT_QUESTIONS} (Topic: ${assessmentQ.topic})<br>
+                    Pass requirement: ${CONFIG.MIN_PASS_PERCENTAGE}% (${passNeeded} out of ${CONFIG.ASSESSMENT_QUESTIONS} correct)
                 </div>
                 <div class="card">
                     <div class="question">${question.q}</div>
@@ -2015,6 +2227,14 @@
             }
         }
 
+        /**
+         * Handle submission of a multiple-choice assessment answer.
+         * Records correctness and advances after a feedback delay.
+         * @param {number} qIndex - assessment question index
+         * @param {number} selectedIndex - chosen option index
+         * @param {string|number} correctAnswer - expected answer
+         * @returns {void}
+         */
         function submitAssessmentAnswer(qIndex, selectedIndex, correctAnswer) {
             const correct = selectedIndex == correctAnswer;
             assessmentAnswers.push(correct);
@@ -2027,14 +2247,21 @@
             }
 
             setTimeout(() => {
-                if (qIndex < 4) {
+                if (qIndex < CONFIG.ASSESSMENT_QUESTIONS - 1) {
                     showAssessmentQuestion(qIndex + 1);
                 } else {
                     evaluateAssessment();
                 }
-            }, 1500);
+            }, CONFIG.ANSWER_FEEDBACK_DELAY);
         }
 
+        /**
+         * Handle submission of a text answer during an assessment.
+         * Normalizes user input and records correctness.
+         * @param {number} qIndex - assessment question index
+         * @param {string} correctAnswer - expected answer text
+         * @returns {void}
+         */
         function submitAssessmentTextAnswer(qIndex, correctAnswer) {
             const userAnswer = document.getElementById('assessmentInput').value.trim().toLowerCase();
             const correct = userAnswer === correctAnswer.toLowerCase() || 
@@ -2044,18 +2271,24 @@
             document.getElementById('assessmentInput').disabled = true;
 
             setTimeout(() => {
-                if (qIndex < 4) {
+                if (qIndex < CONFIG.ASSESSMENT_QUESTIONS - 1) {
                     showAssessmentQuestion(qIndex + 1);
                 } else {
                     evaluateAssessment();
                 }
-            }, 1500);
+            }, CONFIG.ANSWER_FEEDBACK_DELAY);
         }
 
+        /**
+         * Evaluate the collected assessment answers and display
+         * results. Handles advancement or restart paths.
+         * @returns {void}
+         */
         function evaluateAssessment() {
             const correctCount = assessmentAnswers.filter(a => a).length;
-            const percentage = (correctCount / 5) * 100;
-            const passed = percentage >= 75;
+            const percentage = (correctCount / CONFIG.ASSESSMENT_QUESTIONS) * 100;
+            const passed = percentage >= CONFIG.MIN_PASS_PERCENTAGE;
+            const scoreSummary = `${correctCount}/${CONFIG.ASSESSMENT_QUESTIONS}`;
 
             const content = document.getElementById('content');
 
@@ -2064,7 +2297,7 @@
                     content.innerHTML = `
                         <div class="completion-message">
                             <h2>Part 1 Passed! ✓</h2>
-                            <p>You scored ${correctCount}/5 (${percentage}%)</p>
+                            <p>You scored ${scoreSummary} (${percentage}%)</p>
                             <p>Ready for Part 2?</p>
                             <button class="btn" onclick="startAssessmentPart2()">Start Part 2</button>
                         </div>
@@ -2091,7 +2324,7 @@
                         content.innerHTML = `
                             <div class="completion-message">
                                 <h2>Level ${currentLevel} Complete! 🎉</h2>
-                                <p>You scored ${correctCount}/5 (${percentage}%) on Part 2</p>
+                                <p>You scored ${scoreSummary} (${percentage}%) on Part 2</p>
                                 <p>You're ready to advance to <strong>${nextLevel}</strong>!</p>
                                 <button class="btn" onclick="advanceLevel('${nextLevel}')">Start ${nextLevel}</button>
                             </div>
@@ -2102,14 +2335,19 @@
                 content.innerHTML = `
                     <div class="completion-message">
                         <h2>Assessment Not Passed</h2>
-                        <p>You scored ${correctCount}/5 (${percentage}%)</p>
-                        <p>You need at least 75% to advance. Let's review and try again!</p>
+                        <p>You scored ${scoreSummary} (${percentage}%)</p>
+                        <p>You need at least ${CONFIG.MIN_PASS_PERCENTAGE}% to advance. Let's review and try again!</p>
                         <button class="btn" onclick="restartLevel()">Restart Level</button>
                     </div>
                 `;
             }
         }
 
+        /**
+         * Prepare and start assessment part 2 for the current level.
+         * This resets assessment arrays and selects a fresh set of questions.
+         * @returns {void}
+         */
         function startAssessmentPart2() {
             assessmentPart = 2;
             assessmentQuestions = [];
@@ -2118,7 +2356,7 @@
             const allTopics = curriculum[currentLevel];
             const selectedIndices = new Set();
             
-            while (selectedIndices.size < 5) {
+            while (selectedIndices.size < CONFIG.ASSESSMENT_QUESTIONS) {
                 selectedIndices.add(Math.floor(Math.random() * allTopics.length));
             }
 
@@ -2134,6 +2372,11 @@
             showAssessmentQuestion(0);
         }
 
+        /**
+         * Move the user to the given next level and reset topic progress.
+         * @param {string} nextLevel - Level to advance to
+         * @returns {void}
+         */
         function advanceLevel(nextLevel) {
             currentLevel = nextLevel;
             currentTopicIndex = 0;
@@ -2142,6 +2385,10 @@
             showQuestion();
         }
 
+        /**
+         * Restart the current level from the beginning.
+         * @returns {void}
+         */
         function restartLevel() {
             currentTopicIndex = 0;
             currentQuestionIndex = 0;
@@ -2153,6 +2400,11 @@
         // VERBS MODE LOGIC
         // ═══════════════════════════════════════════════════════════════════════════
         
+        /**
+         * Render the current verbs practice exercise.
+         * Works similarly to `showQuestion()` but using the verbs curriculum.
+         * @returns {void}
+         */
         function showVerbsQuestion() {
             updateHeader();
             const content = document.getElementById('content');
@@ -2206,6 +2458,11 @@
             }
         }
 
+        /**
+         * Handle multiple choice answers in verbs mode.
+         * @param {number} selectedIndex - Index of the selected verbs option
+         * @returns {void}
+         */
         function checkVerbsAnswer(selectedIndex) {
             const exercise = verbsCurriculum[verbsLevel][currentQuestionIndex];
             const correct = selectedIndex === exercise.answer;
@@ -2220,6 +2477,10 @@
             showVerbsFeedback(correct, exercise.options[exercise.answer], exercise);
         }
 
+        /**
+         * Handle free-text answers in verbs mode, with article/pronoun stripping.
+         * @returns {void}
+         */
         function checkVerbsTextAnswer() {
             const exercise = verbsCurriculum[verbsLevel][currentQuestionIndex];
             const userAnswer = document.getElementById('verbsAnswerInput').value.trim().toLowerCase();
@@ -2232,6 +2493,13 @@
             showVerbsFeedback(correct, exercise.answer, exercise);
         }
 
+        /**
+         * Show feedback UI for verbs mode and optionally surface a mini lesson.
+         * @param {boolean} correct - Whether the answer was correct
+         * @param {string} correctAnswer - Text of the correct answer
+         * @param {Object} exercise - Current exercise metadata
+         * @returns {void}
+         */
         function showVerbsFeedback(correct, correctAnswer, exercise) {
             const content = document.getElementById('content');
             let feedbackHtml = `
@@ -2261,9 +2529,14 @@
             setTimeout(() => {
                 const btn = document.querySelector('.btn');
                 if (btn) btn.focus();
-            }, 100);
+            }, CONFIG.UI_TRANSITION_DELAY);
         }
 
+        /**
+         * Advance verbs mode flow depending on correctness.
+         * @param {boolean} correct - Whether the previous answer was correct
+         * @returns {void}
+         */
         function nextVerbsQuestion(correct) {
             if (correct) {
                 score++;
@@ -2275,26 +2548,35 @@
             }
         }
 
+        /**
+         * Display an explanatory lesson for verbs mode along with practice CTA.
+         * @returns {void}
+         */
         function showVerbsLesson() {
             const content = document.getElementById('content');
             const exercise = failedTopic;
 
-            // Generate 5 related practice questions
+            // Generate related practice questions
             practiceDeck = generatePracticeQuestions(exercise);
             
-            // Shuffle and take first 3
-            practiceDeck = shuffleArray(practiceDeck).slice(0, 3);
+            // Shuffle and take configured count
+            practiceDeck = shuffleArray(practiceDeck).slice(0, CONFIG.PRACTICE_EXERCISES);
 
             content.innerHTML = `
                 <div class="lesson">
                     <h2>${exercise.topic} - Practice Exercises</h2>
                     <p><strong>Explanation:</strong> ${exercise.explanation}</p>
                     <p>${exercise.lesson}</p>
-                    <button class="btn" onclick="startVerbsLessonExercises()">Start Practice (3 different exercises)</button>
+                    <button class="btn" onclick="startVerbsLessonExercises()">Start Practice (${CONFIG.PRACTICE_EXERCISES} different exercises)</button>
                 </div>
             `;
         }
 
+        /**
+         * Build a pool of related practice questions for the failed exercise topic.
+         * @param {Object} originalExercise - Exercise that triggered the lesson
+         * @returns {Array<Object>} Array of generated practice questions
+         */
         function generatePracticeQuestions(originalExercise) {
             const topic = originalExercise.topic;
             const pool = [];
@@ -2399,6 +2681,10 @@
             return pool.length > 0 ? pool : [originalExercise, originalExercise, originalExercise, originalExercise, originalExercise];
         }
 
+        /**
+         * Begin the verbs practice deck flow after showing a verbs lesson.
+         * @returns {void}
+         */
         function startVerbsLessonExercises() {
             inLesson = true;
             lessonExerciseCount = 0;
@@ -2406,6 +2692,10 @@
             showVerbsPracticeQuestion();
         }
 
+        /**
+         * Render the current practice question in verbs lesson mode.
+         * @returns {void}
+         */
         function showVerbsPracticeQuestion() {
             updateHeader();
             const content = document.getElementById('content');
@@ -2414,7 +2704,7 @@
             let html = `
                 <div class="card">
                     <div style="margin-bottom: 12px; color: var(--color-text-secondary); font-size: 14px;">
-                        <strong>Practice Exercise ${practiceQuestionIndex + 1}/3</strong>
+                        <strong>Practice Exercise ${practiceQuestionIndex + 1}/${CONFIG.PRACTICE_EXERCISES}</strong>
                     </div>
                     <div class="question">${practice.q}</div>
             `;
@@ -2444,6 +2734,11 @@
             }
         }
 
+        /**
+         * Handle multiple-choice practice answers during verbs lessons.
+         * @param {number} selectedIndex - Index chosen by the learner
+         * @returns {void}
+         */
         function checkPracticeAnswer(selectedIndex) {
             const practice = practiceDeck[practiceQuestionIndex];
             const correct = selectedIndex === practice.answer;
@@ -2458,6 +2753,10 @@
             showPracticeFeedback(correct, practice.options[practice.answer], practice);
         }
 
+        /**
+         * Handle text-based practice answers during verbs lessons.
+         * @returns {void}
+         */
         function checkPracticeTextAnswer() {
             const practice = practiceDeck[practiceQuestionIndex];
             const userAnswer = document.getElementById('practiceAnswerInput').value.trim().toLowerCase();
@@ -2470,6 +2769,13 @@
             showPracticeFeedback(correct, practice.answer, practice);
         }
 
+        /**
+         * Show feedback for verbs practice questions including explanations.
+         * @param {boolean} correct - Whether the answer was correct
+         * @param {string} correctAnswer - Text of the correct answer
+         * @param {Object} practice - Practice question metadata
+         * @returns {void}
+         */
         function showPracticeFeedback(correct, correctAnswer, practice) {
             const content = document.getElementById('content');
             let feedbackHtml = `
@@ -2485,15 +2791,20 @@
             setTimeout(() => {
                 const btn = document.querySelector('.btn');
                 if (btn) btn.focus();
-            }, 100);
+            }, CONFIG.UI_TRANSITION_DELAY);
         }
 
+        /**
+         * Continue through the verbs practice deck until the quota is met.
+         * @param {boolean} correct - Whether the previous answer was correct
+         * @returns {void}
+         */
         function continuePractice(correct) {
             if (correct) {
                 lessonExerciseCount++;
                 practiceQuestionIndex++;
                 
-                if (practiceQuestionIndex >= 3) {
+                if (practiceQuestionIndex >= CONFIG.PRACTICE_EXERCISES) {
                     inLesson = false;
                     lessonExerciseCount = 0;
                     currentQuestionIndex++;
@@ -2506,10 +2817,15 @@
             }
         }
 
+        /**
+         * Continue verbs lesson exercises triggered from main verbs flow.
+         * @param {boolean} correct - Whether the learner answered correctly
+         * @returns {void}
+         */
         function continueVerbsLesson(correct) {
             if (correct) {
                 lessonExerciseCount++;
-                if (lessonExerciseCount >= 3) {
+                if (lessonExerciseCount >= CONFIG.PRACTICE_EXERCISES) {
                     inLesson = false;
                     lessonExerciseCount = 0;
                     currentQuestionIndex++;
@@ -2520,6 +2836,10 @@
             }
         }
 
+        /**
+         * Restart verbs mode progression for the current verbs level.
+         * @returns {void}
+         */
         function restartVerbsLevel() {
             currentQuestionIndex = 0;
             score = 0;
@@ -2529,6 +2849,10 @@
             showVerbsQuestion();
         }
 
+        /**
+         * Reset the entire course state (regular + verbs) after confirmation.
+         * @returns {void}
+         */
         function resetProgress() {
             if (confirm('Are you sure you want to reset all progress? This will clear your saved state and start over from the beginning.')) {
                 clearState();
