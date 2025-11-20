@@ -350,6 +350,25 @@
     </div>
 
     <script>
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════════════════
+        
+        const CONFIG = {
+            MIN_PASS_PERCENTAGE: 75,
+            QUESTIONS_PER_TOPIC: 3,
+            ASSESSMENT_QUESTIONS: 5,
+            ASSESSMENT_PARTS: 2,
+            STATE_EXPIRY_DAYS: 7,
+            PRACTICE_EXERCISES: 3,
+            STORAGE_KEY: 'italianQuizState',
+            UI_TRANSITION_DELAY: 100, // milliseconds for loading transitions
+            MILLISECONDS_PER_DAY: 24 * 60 * 60 * 1000
+        };
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CURRICULUM DATA
+        // ═══════════════════════════════════════════════════════════════════════════
         const verbsCurriculum = {
             A1: [
                 { q: 'Io (parlare) italiano', type: 'mc', options: ['parlo', 'parli', 'parla', 'parliamo'], answer: 0, topic: 'Presente indicativo', explanation: 'Prima persona singolare di "parlare" termina in -o', lesson: 'Il presente indicativo dei verbi regolari -ARE: io -o, tu -i, lui/lei -a, noi -iamo, voi -ate, loro -ano' },
@@ -1354,24 +1373,147 @@
             ]
         };
 
-        // Deep clone curriculum data to prevent state mutation
-        const originalCurriculum = curriculum;
-        const originalVerbsCurriculum = verbsCurriculum;
-        
-        let currentLevel = 'A1';
-        let currentTopicIndex = 0;
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let failedTopic = null;
-        let inLesson = false;
-        let lessonExerciseCount = 0;
-        let assessmentMode = false;
-        let assessmentPart = 1;
-        let assessmentQuestions = [];
-        let assessmentAnswers = [];
-        let verbsMode = false;
-        let verbsLevel = 'A1';
+        // ═══════════════════════════════════════════════════════════════════════════
+        // STATE MANAGEMENT
+        // ═══════════════════════════════════════════════════════════════════════════
+        /**
+         * Centralized state management class for the quiz application
+         */
+        class QuizState {
+            constructor() {
+                this.currentLevel = 'A1';
+                this.currentTopicIndex = 0;
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.failedTopic = null;
+                this.inLesson = false;
+                this.lessonExerciseCount = 0;
+                this.assessmentMode = false;
+                this.assessmentPart = 1;
+                this.assessmentQuestions = [];
+                this.assessmentAnswers = [];
+                this.verbsMode = false;
+                this.verbsLevel = 'A1';
+                this.practiceDeck = [];
+                this.practiceQuestionIndex = 0;
+            }
 
+            /**
+             * Serialize state for localStorage
+             */
+            serialize() {
+                return {
+                    currentLevel: this.currentLevel,
+                    currentTopicIndex: this.currentTopicIndex,
+                    currentQuestionIndex: this.currentQuestionIndex,
+                    score: this.score,
+                    inLesson: this.inLesson,
+                    lessonExerciseCount: this.lessonExerciseCount,
+                    assessmentMode: this.assessmentMode,
+                    assessmentPart: this.assessmentPart,
+                    verbsMode: this.verbsMode,
+                    verbsLevel: this.verbsLevel,
+                    timestamp: Date.now()
+                };
+            }
+
+            /**
+             * Restore state from saved data
+             */
+            restore(data) {
+                this.currentLevel = data.currentLevel || 'A1';
+                this.currentTopicIndex = data.currentTopicIndex || 0;
+                this.currentQuestionIndex = data.currentQuestionIndex || 0;
+                this.score = data.score || 0;
+                this.inLesson = data.inLesson || false;
+                this.lessonExerciseCount = data.lessonExerciseCount || 0;
+                this.assessmentMode = data.assessmentMode || false;
+                this.assessmentPart = data.assessmentPart || 1;
+                this.verbsMode = data.verbsMode || false;
+                this.verbsLevel = data.verbsLevel || 'A1';
+            }
+
+            /**
+             * Reset state to initial values
+             */
+            reset() {
+                this.currentLevel = 'A1';
+                this.currentTopicIndex = 0;
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.failedTopic = null;
+                this.inLesson = false;
+                this.lessonExerciseCount = 0;
+                this.assessmentMode = false;
+                this.assessmentPart = 1;
+                this.assessmentQuestions = [];
+                this.assessmentAnswers = [];
+                this.verbsMode = false;
+                this.verbsLevel = 'A1';
+                this.practiceDeck = [];
+                this.practiceQuestionIndex = 0;
+            }
+        }
+
+        // Initialize global state
+        const state = new QuizState();
+        
+        // Compatibility layer: expose state properties for easier migration
+        // This allows gradual refactoring while keeping code functional
+        let currentLevel, currentTopicIndex, currentQuestionIndex, score, failedTopic;
+        let inLesson, lessonExerciseCount, assessmentMode, assessmentPart;
+        let assessmentQuestions, assessmentAnswers, verbsMode, verbsLevel;
+        let practiceDeck, practiceQuestionIndex;
+        
+        /**
+         * Sync exposed variables with state object
+         */
+        function syncStateToVars() {
+            currentLevel = state.currentLevel;
+            currentTopicIndex = state.currentTopicIndex;
+            currentQuestionIndex = state.currentQuestionIndex;
+            score = state.score;
+            failedTopic = state.failedTopic;
+            inLesson = state.inLesson;
+            lessonExerciseCount = state.lessonExerciseCount;
+            assessmentMode = state.assessmentMode;
+            assessmentPart = state.assessmentPart;
+            assessmentQuestions = state.assessmentQuestions;
+            assessmentAnswers = state.assessmentAnswers;
+            verbsMode = state.verbsMode;
+            verbsLevel = state.verbsLevel;
+            practiceDeck = state.practiceDeck;
+            practiceQuestionIndex = state.practiceQuestionIndex;
+        }
+        
+        /**
+         * Sync exposed variables back to state object
+         */
+        function syncVarsToState() {
+            state.currentLevel = currentLevel;
+            state.currentTopicIndex = currentTopicIndex;
+            state.currentQuestionIndex = currentQuestionIndex;
+            state.score = score;
+            state.failedTopic = failedTopic;
+            state.inLesson = inLesson;
+            state.lessonExerciseCount = lessonExerciseCount;
+            state.assessmentMode = assessmentMode;
+            state.assessmentPart = assessmentPart;
+            state.assessmentQuestions = assessmentQuestions;
+            state.assessmentAnswers = assessmentAnswers;
+            state.verbsMode = verbsMode;
+            state.verbsLevel = verbsLevel;
+            state.practiceDeck = practiceDeck;
+            state.practiceQuestionIndex = practiceQuestionIndex;
+        }
+        
+        // Initialize compatibility layer
+        syncStateToVars();
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // UTILITY FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════════════
+        
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1381,66 +1523,68 @@
             return shuffled;
         }
 
-        // ========== LOCALSTORAGE PERSISTENCE ==========
+        // ═══════════════════════════════════════════════════════════════════════════
+        // PERSISTENCE LAYER (localStorage)
+        // ═══════════════════════════════════════════════════════════════════════════
+        /**
+         * Save current quiz state to localStorage
+         */
         function saveState() {
             try {
-                const state = {
-                    currentLevel,
-                    currentTopicIndex,
-                    currentQuestionIndex,
-                    score,
-                    inLesson,
-                    lessonExerciseCount,
-                    assessmentMode,
-                    assessmentPart,
-                    verbsMode,
-                    verbsLevel,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem('italianQuizState', JSON.stringify(state));
+                syncVarsToState();
+                const serialized = state.serialize();
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(serialized));
             } catch (e) {
                 console.warn('Failed to save state:', e);
             }
         }
 
+        /**
+         * Load quiz state from localStorage
+         * @returns {Object|null} Saved state or null if not found/expired
+         */
         function loadState() {
             try {
-                const saved = localStorage.getItem('italianQuizState');
+                const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
                 if (!saved) return null;
-                const state = JSON.parse(saved);
-                // Only restore if less than 7 days old
-                if (Date.now() - state.timestamp > 7 * 24 * 60 * 60 * 1000) {
-                    localStorage.removeItem('italianQuizState');
+                const data = JSON.parse(saved);
+                // Only restore if less than configured days old
+                const maxAge = CONFIG.STATE_EXPIRY_DAYS * CONFIG.MILLISECONDS_PER_DAY;
+                if (Date.now() - data.timestamp > maxAge) {
+                    localStorage.removeItem(CONFIG.STORAGE_KEY);
                     return null;
                 }
-                return state;
+                return data;
             } catch (e) {
                 console.warn('Failed to load state:', e);
                 return null;
             }
         }
 
+        /**
+         * Clear saved state from localStorage
+         */
         function clearState() {
             try {
-                localStorage.removeItem('italianQuizState');
+                localStorage.removeItem(CONFIG.STORAGE_KEY);
             } catch (e) {
                 console.warn('Failed to clear state:', e);
             }
         }
 
-        function restoreState(state) {
-            currentLevel = state.currentLevel || 'A1';
-            currentTopicIndex = state.currentTopicIndex || 0;
-            currentQuestionIndex = state.currentQuestionIndex || 0;
-            score = state.score || 0;
-            inLesson = state.inLesson || false;
-            lessonExerciseCount = state.lessonExerciseCount || 0;
-            assessmentMode = state.assessmentMode || false;
-            assessmentPart = state.assessmentPart || 1;
-            verbsMode = state.verbsMode || false;
-            verbsLevel = state.verbsLevel || 'A1';
+        /**
+         * Restore state from saved data
+         * @param {Object} data - Saved state data
+         */
+        function restoreState(data) {
+            state.restore(data);
+            syncStateToVars();
         }
 
+        // ═══════════════════════════════════════════════════════════════════════════
+        // INITIALIZATION & CONTROL FLOW
+        // ═══════════════════════════════════════════════════════════════════════════
+        
         function init() {
             // Check for saved state
             const savedState = loadState();
@@ -1565,7 +1709,7 @@
                         hideLoading();
                         saveState();
                         showQuestion();
-                    }, 100);
+                    }, CONFIG.UI_TRANSITION_DELAY);
                 }
             }
         }
@@ -1584,6 +1728,10 @@
             // Loading will be replaced by showQuestion()
         }
 
+        // ═══════════════════════════════════════════════════════════════════════════
+        // UI UPDATE FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════════════
+        
         function updateHeader() {
             if (verbsMode) {
                 document.getElementById('levelDisplay').textContent = `${verbsLevel} VERBS`;
@@ -1599,13 +1747,17 @@
                 document.getElementById('scoreDisplay').textContent = score;
                 document.getElementById('topicDisplay').textContent = `${currentTopicIndex + 1}/${curriculum[currentLevel].length}`;
                 const totalTopics = curriculum[currentLevel].length;
-                const progress = ((currentTopicIndex + currentQuestionIndex / 3) / totalTopics) * 100;
+                const progress = ((currentTopicIndex + currentQuestionIndex / CONFIG.QUESTIONS_PER_TOPIC) / totalTopics) * 100;
                 const progressBar = document.getElementById('progressBar');
                 progressBar.style.width = `${progress}%`;
                 progressBar.parentElement.setAttribute('aria-valuenow', Math.round(progress));
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CORE QUIZ LOGIC (Main Questions)
+        // ═══════════════════════════════════════════════════════════════════════════
+        
         function showQuestion() {
             updateHeader();
             const content = document.getElementById('content');
@@ -1715,7 +1867,7 @@
             setTimeout(() => {
                 const btn = document.querySelector('.btn');
                 if (btn) btn.focus();
-            }, 100);
+            }, CONFIG.UI_TRANSITION_DELAY);
         }
 
         function nextQuestion(correct) {
@@ -1790,6 +1942,10 @@
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════════════════
+        // ASSESSMENT LOGIC
+        // ═══════════════════════════════════════════════════════════════════════════
+        
         function startAssessment() {
             assessmentMode = true;
             assessmentPart = 1;
@@ -1993,6 +2149,10 @@
             showQuestion();
         }
 
+        // ═══════════════════════════════════════════════════════════════════════════
+        // VERBS MODE LOGIC
+        // ═══════════════════════════════════════════════════════════════════════════
+        
         function showVerbsQuestion() {
             updateHeader();
             const content = document.getElementById('content');
@@ -2114,9 +2274,6 @@
                 showVerbsLesson();
             }
         }
-
-        let practiceDeck = [];
-        let practiceQuestionIndex = 0;
 
         function showVerbsLesson() {
             const content = document.getElementById('content');
@@ -2402,6 +2559,10 @@
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════════════════
+        // START APPLICATION
+        // ═══════════════════════════════════════════════════════════════════════════
+        
         init();
     </script>
 </body>
