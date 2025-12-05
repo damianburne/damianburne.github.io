@@ -1,0 +1,1229 @@
+<!--
+=============================================================================
+DEMO 9 - FILE 7: FINAL ASSEMBLY & POLISH (COMPLETE VERSION)
+=============================================================================
+
+This is the complete, production-ready Capital Sphere experience.
+All features are integrated and polished for optimal UX.
+
+FEATURES:
+✓ Futuristic 3D sphere with 8 Capital bubbles
+✓ Score-based color coding (Red/Yellow/Green)
+✓ Glass orb shader with fresnel glow
+✓ Animated particle systems per capital
+✓ Curved connection lines with flow animation
+✓ MediaPipe hand gesture recognition
+✓ Momentum-based rotation with friction
+✓ Hand distance = zoom level
+✓ Focus mode (point finger) - bubbles only
+✓ Detail panel (fist) - sub-scores, influences, chains
+✓ UnrealBloom post-processing
+✓ 60fps optimized rendering
+
+GESTURES:
+👋 Open Hand - Explore (sphere flows freely with momentum)
+✊ Fist - Grip (sphere locked to hand, precise control)
+☝️ Point - Details (opens info panel for focused capital)
+📏 Distance - Zoom control
+
+=============================================================================
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Capital Sphere | 8 Dimensions of Value</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --accent: rgba(100, 200, 255, 1);
+            --accent-dim: rgba(100, 200, 255, 0.5);
+            --bg-dark: #030308;
+            --panel-bg: rgba(10, 15, 30, 0.7);
+            --green: #00ff88;
+            --yellow: #ffcc00;
+            --red: #ff4444;
+        }
+        
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0a0a15 50%, #050510 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: white;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0a0a15 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+        #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        .loader-content { text-align: center; }
+        
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(100, 200, 255, 0.1);
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .loader-text {
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .loader-subtext {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
+
+        /* Canvas */
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            transition: filter 0.5s ease;
+        }
+        #canvas-container.dimmed { filter: blur(12px) brightness(0.25); }
+
+        /* Ambient background glows */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-1 { top: -25%; right: -15%; width: 700px; height: 700px; background: radial-gradient(circle, rgba(80, 140, 255, 0.5) 0%, transparent 70%); }
+        .glow-2 { bottom: -35%; left: -20%; width: 900px; height: 900px; background: radial-gradient(circle, rgba(140, 80, 255, 0.4) 0%, transparent 70%); }
+        .glow-3 { top: 40%; left: 30%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(100, 200, 255, 0.2) 0%, transparent 70%); animation: drift 20s ease-in-out infinite; }
+        @keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(50px, -30px); } }
+
+        /* UI Panels */
+        .ui-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(100, 200, 255, 0.12);
+            border-radius: 16px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .ui-panel.hidden { opacity: 0; transform: translateY(10px); pointer-events: none; }
+
+        /* Title */
+        #title-overlay {
+            position: fixed;
+            top: 28px;
+            right: 28px;
+            text-align: right;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .main-title {
+            font-size: 26px;
+            font-weight: 200;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #fff 20%, var(--accent-dim) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .sub-title {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(100, 200, 255, 0.4);
+            margin-top: 6px;
+        }
+
+        /* Legend */
+        #score-legend {
+            position: fixed;
+            top: 28px;
+            left: 28px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .legend-panel { padding: 18px 22px; }
+        .legend-title {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 14px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.55);
+        }
+        .legend-item:last-child { margin-bottom: 0; }
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+        }
+        .dot-green { background: var(--green); color: var(--green); }
+        .dot-yellow { background: var(--yellow); color: var(--yellow); }
+        .dot-red { background: var(--red); color: var(--red); }
+
+        /* HUD */
+        #hud {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .hud-panel { padding: 20px 24px; min-width: 200px; }
+        .hud-title {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-dim);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hud-title::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        .hud-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .hud-row:last-child { margin-bottom: 0; }
+        .hud-icon { width: 22px; text-align: center; font-size: 14px; opacity: 0.7; }
+        .hud-key { color: var(--accent); font-weight: 500; }
+
+        /* Gesture State */
+        #gesture-state {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .gesture-panel {
+            padding: 18px 28px;
+            text-align: center;
+            min-width: 120px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .gesture-icon { font-size: 28px; margin-bottom: 6px; }
+        .gesture-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .gesture-panel.focus { border-color: var(--accent-dim); box-shadow: 0 0 30px rgba(100, 200, 255, 0.15); }
+        .gesture-panel.fist { border-color: rgba(255, 180, 100, 0.5); box-shadow: 0 0 30px rgba(255, 180, 100, 0.15); }
+
+        /* Hand Indicator */
+        #hand-indicator {
+            position: fixed;
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--accent-dim);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            transform: translate(-50%, -50%);
+        }
+        #hand-indicator.visible { opacity: 0.8; }
+        #hand-indicator::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* FPS */
+        #fps {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-family: 'SF Mono', monospace;
+            color: rgba(100, 200, 255, 0.3);
+            z-index: 100;
+            letter-spacing: 1px;
+        }
+
+        /* =============================================
+           DETAIL PANEL
+           ============================================= */
+        #detail-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            overflow-y: auto;
+            padding: 50px 40px;
+            background: rgba(3, 3, 8, 0.4);
+        }
+        #detail-panel.visible { opacity: 1; visibility: visible; }
+        #detail-panel::-webkit-scrollbar { width: 6px; }
+        #detail-panel::-webkit-scrollbar-track { background: transparent; }
+        #detail-panel::-webkit-scrollbar-thumb { background: rgba(100, 200, 255, 0.2); border-radius: 3px; }
+
+        .detail-container { max-width: 1100px; margin: 0 auto; }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 36px;
+            margin-bottom: 44px;
+            padding-bottom: 36px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .detail-score-orb {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+            animation: orbPulse 3s ease-in-out infinite;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            position: relative;
+        }
+        .detail-score-orb::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+
+        .detail-title-section { flex: 1; }
+        .detail-capital-name {
+            font-size: 42px;
+            font-weight: 200;
+            letter-spacing: 5px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-dim) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .detail-subtitle {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+        }
+        @media (max-width: 900px) { .detail-grid { grid-template-columns: 1fr; } }
+
+        .detail-section {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 20px;
+            padding: 26px 28px;
+        }
+
+        .section-title {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--accent-dim);
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: linear-gradient(180deg, var(--accent) 0%, transparent 100%);
+            border-radius: 2px;
+        }
+
+        .subscore-item {
+            margin-bottom: 18px;
+            opacity: 0;
+            transform: translateX(-15px);
+            animation: slideIn 0.4s ease forwards;
+        }
+        .subscore-item:last-child { margin-bottom: 0; }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+
+        .subscore-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .subscore-name { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
+        .subscore-value { font-size: 13px; font-weight: 600; }
+        .subscore-value.green { color: var(--green); }
+        .subscore-value.yellow { color: var(--yellow); }
+        .subscore-value.red { color: var(--red); }
+
+        .subscore-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .subscore-fill {
+            height: 100%;
+            border-radius: 3px;
+            width: 0;
+            transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .subscore-fill.green { background: linear-gradient(90deg, var(--green), #00cc66); }
+        .subscore-fill.yellow { background: linear-gradient(90deg, var(--yellow), #ff9900); }
+        .subscore-fill.red { background: linear-gradient(90deg, var(--red), #cc2222); }
+
+        .connection-item {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.025);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            transform: translateY(8px);
+            animation: fadeUp 0.35s ease forwards;
+        }
+        .connection-item:last-child { margin-bottom: 0; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        .connection-name { font-size: 14px; font-weight: 500; color: rgba(255, 255, 255, 0.85); }
+        .connection-arrow { font-size: 16px; margin: 0 14px; color: var(--accent-dim); }
+        .connection-strength {
+            margin-left: auto;
+            padding: 3px 12px;
+            background: rgba(100, 200, 255, 0.12);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--accent);
+        }
+        .connection-desc {
+            width: 100%;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 10px;
+            padding-left: 2px;
+            line-height: 1.5;
+        }
+
+        .impact-chain {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 18px;
+            background: rgba(255, 100, 100, 0.04);
+            border: 1px solid rgba(255, 100, 100, 0.15);
+            border-radius: 12px;
+        }
+        .chain-node {
+            padding: 7px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .chain-node.critical { background: rgba(255, 68, 68, 0.25); border: 1px solid rgba(255, 68, 68, 0.4); color: #ff8888; }
+        .chain-node.warning { background: rgba(255, 204, 0, 0.2); border: 1px solid rgba(255, 204, 0, 0.4); color: #ffdd66; }
+        .chain-node.healthy { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.3); color: #66ffaa; }
+        .chain-arrow { color: rgba(255, 255, 255, 0.3); font-size: 14px; }
+
+        .close-hint {
+            position: fixed;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 101;
+        }
+        .close-hint span { font-size: 20px; }
+
+        #video-input { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-content">
+            <div class="loader-ring"></div>
+            <div class="loader-text">Initializing</div>
+            <div class="loader-subtext">Capital Analytics System</div>
+        </div>
+    </div>
+
+    <!-- Background Glows -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <!-- Title -->
+    <div id="title-overlay" class="ui-panel-parent">
+        <div class="main-title">CAPITAL SPHERE</div>
+        <div class="sub-title">8 Dimensions of Value</div>
+    </div>
+
+    <!-- Legend -->
+    <div id="score-legend">
+        <div class="ui-panel legend-panel">
+            <div class="legend-title">Health Index</div>
+            <div class="legend-item"><div class="legend-dot dot-green"></div><span>70-100 Thriving</span></div>
+            <div class="legend-item"><div class="legend-dot dot-yellow"></div><span>40-69 Moderate</span></div>
+            <div class="legend-item"><div class="legend-dot dot-red"></div><span>0-39 Critical</span></div>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud">
+        <div class="ui-panel hud-panel">
+            <div class="hud-title">Controls</div>
+            <div class="hud-row"><span class="hud-icon">👋</span><span>Open hand <span class="hud-key">explore</span></span></div>
+            <div class="hud-row"><span class="hud-icon">✊</span><span>Fist to <span class="hud-key">grip</span></span></div>
+            <div class="hud-row"><span class="hud-icon">☝️</span><span>Point for <span class="hud-key">details</span></span></div>
+            <div class="hud-row"><span class="hud-icon">📏</span><span>Distance = <span class="hud-key">zoom</span></span></div>
+        </div>
+    </div>
+
+    <!-- Gesture State -->
+    <div id="gesture-state">
+        <div class="ui-panel gesture-panel" id="gesture-panel">
+            <div class="gesture-icon" id="gesture-icon">👋</div>
+            <div class="gesture-label" id="gesture-label">Ready</div>
+        </div>
+    </div>
+
+    <!-- Hand Indicator -->
+    <div id="hand-indicator"></div>
+
+    <!-- FPS -->
+    <div id="fps">--</div>
+
+    <!-- Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Detail Panel -->
+    <div id="detail-panel">
+        <div class="detail-container">
+            <div class="detail-header">
+                <div class="detail-score-orb" id="detail-orb">72</div>
+                <div class="detail-title-section">
+                    <div class="detail-capital-name" id="detail-name">Capital</div>
+                    <div class="detail-subtitle">Performance Analysis</div>
+                </div>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-section">
+                    <div class="section-title">Sub-Score Breakdown</div>
+                    <div id="subscores-list"></div>
+                </div>
+                <div class="detail-section">
+                    <div class="section-title">Influences (Outbound)</div>
+                    <div id="influences-list"></div>
+                </div>
+                <div class="detail-section">
+                    <div class="section-title">Dependencies (Inbound)</div>
+                    <div id="dependencies-list"></div>
+                </div>
+                <div class="detail-section">
+                    <div class="section-title">Impact Chain</div>
+                    <div id="chain-display"></div>
+                </div>
+            </div>
+        </div>
+        <div class="close-hint"><span>✊</span> Make a fist to return</div>
+    </div>
+
+    <video id="video-input" playsinline></video>
+
+    <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        // ============================================================
+        // DATA MODEL - Future: Replace with API calls
+        // ============================================================
+        const capitalData = {
+            Natural: { score: 72, color: 0x6B8E6B, subs: { Biodiversity: 68, 'Air Quality': 85, 'Water Resources': 74, 'Soil Health': 61, 'Climate Resilience': 72 }, influences: ['Cultural', 'Human', 'Spiritual'], dependencies: ['Political', 'Built'] },
+            Cultural: { score: 84, color: 0x7A9AB8, subs: { 'Heritage Preservation': 88, 'Arts & Expression': 82, 'Community Identity': 79, 'Knowledge Transfer': 87, 'Diversity': 84 }, influences: ['Human', 'Social', 'Spiritual'], dependencies: ['Financial', 'Political'] },
+            Human: { score: 65, color: 0xC49A9A, subs: { 'Health & Wellbeing': 71, 'Education Access': 68, 'Skills Development': 58, 'Life Satisfaction': 62, 'Opportunity Equity': 66 }, influences: ['Social', 'Financial'], dependencies: ['Natural', 'Cultural', 'Political'] },
+            Social: { score: 58, color: 0xB8A0C4, subs: { 'Community Trust': 52, 'Network Strength': 61, 'Civic Engagement': 55, 'Social Support': 64, 'Inclusion': 58 }, influences: ['Political', 'Human'], dependencies: ['Cultural', 'Spiritual'] },
+            Political: { score: 45, color: 0xC49070, subs: { 'Governance Quality': 42, Transparency: 38, 'Policy Effectiveness': 51, 'Civic Rights': 48, Stability: 46 }, influences: ['Financial', 'Built', 'Natural'], dependencies: ['Social', 'Human'] },
+            Financial: { score: 35, color: 0xC4A870, subs: { 'Economic Health': 32, 'Investment Flow': 28, 'Resource Allocation': 41, 'Fiscal Stability': 38, 'Growth Potential': 36 }, influences: ['Built', 'Human'], dependencies: ['Political', 'Natural'] },
+            Built: { score: 28, color: 0xC49040, subs: { 'Infrastructure Quality': 25, 'Housing Adequacy': 31, 'Transport Networks': 22, 'Digital Access': 35, Maintenance: 27 }, influences: ['Financial', 'Human', 'Natural'], dependencies: ['Financial', 'Political'] },
+            Spiritual: { score: 88, color: 0xC0C0C0, subs: { 'Purpose & Meaning': 91, 'Community Harmony': 85, 'Values Alignment': 88, 'Inner Peace': 89, Transcendence: 87 }, influences: ['Human', 'Social', 'Cultural'], dependencies: ['Natural', 'Cultural'] }
+        };
+
+        const connections = [
+            { from: 'Built', to: 'Financial', strength: 0.85, desc: 'Infrastructure quality directly impacts economic investment and growth.' },
+            { from: 'Political', to: 'Financial', strength: 0.75, desc: 'Policy stability enables financial confidence and investment.' },
+            { from: 'Natural', to: 'Human', strength: 0.65, desc: 'Environmental health affects population wellbeing.' },
+            { from: 'Cultural', to: 'Social', strength: 0.70, desc: 'Cultural identity strengthens social bonds.' },
+            { from: 'Social', to: 'Political', strength: 0.60, desc: 'Social cohesion influences political stability.' },
+            { from: 'Spiritual', to: 'Human', strength: 0.55, desc: 'Sense of purpose enhances life satisfaction.' },
+            { from: 'Financial', to: 'Built', strength: 0.80, desc: 'Economic resources fund infrastructure.' },
+            { from: 'Human', to: 'Social', strength: 0.72, desc: 'Healthy individuals build stronger communities.' }
+        ];
+
+        const capitals = Object.entries(capitalData).map(([name, d], i) => ({ name, ...d, index: i }));
+        const capMap = Object.fromEntries(capitals.map((c, i) => [c.name, i]));
+
+        // ============================================================
+        // CONFIG
+        // ============================================================
+        const CFG = {
+            fogDensity: 0.008, bgColor: 0x030308, camFOV: 60, camZ: 18,
+            bloom: { str: 0.35, rad: 0.2, thresh: 0.5 },
+            bubble: { radius: 5.5, size: 0.85 },
+            stars: 1200, particles: 80
+        };
+
+        const state = {
+            gesture: 'none', grip: false, pointing: false,
+            scale: 1.3, spinX: 0, spinY: 0.003,
+            friction: 0.985, lastX: 0.5, lastY: 0.5,
+            handOn: false, panelOpen: false, locked: -1,
+            // Grip mode: arcball-style rotation for natural feel
+            gripQuat: new THREE.Quaternion(),
+            gripStartQuat: new THREE.Quaternion(),
+            gripStartPos: new THREE.Vector2(),
+            // Animation states
+            entryComplete: false,
+            gripFlashTime: 0
+        };
+
+        // ============================================================
+        // THREE SETUP
+        // ============================================================
+        const box = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(CFG.bgColor);
+        scene.fog = new THREE.FogExp2(CFG.bgColor, CFG.fogDensity);
+
+        const cam = new THREE.PerspectiveCamera(CFG.camFOV, innerWidth / innerHeight, 0.1, 500);
+        cam.position.z = CFG.camZ;
+
+        const rend = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+        rend.setSize(innerWidth, innerHeight);
+        rend.setPixelRatio(Math.min(devicePixelRatio, 2));
+        rend.toneMapping = THREE.ACESFilmicToneMapping;
+        box.appendChild(rend.domElement);
+
+        const comp = new EffectComposer(rend);
+        comp.addPass(new RenderPass(scene, cam));
+        comp.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), CFG.bloom.str, CFG.bloom.rad, CFG.bloom.thresh));
+        comp.addPass(new OutputPass());
+
+        scene.add(new THREE.AmbientLight(0x404060, 0.4));
+        const kl = new THREE.PointLight(0x5577ff, 1, 50); kl.position.set(-10, 10, -10); scene.add(kl);
+
+        const world = new THREE.Group();
+        scene.add(world);
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        const scoreCol = s => s >= 70 ? { h: 0x00ff88, r: [0, 1, 0.53], c: 'green' } : s >= 40 ? { h: 0xffcc00, r: [1, 0.8, 0], c: 'yellow' } : { h: 0xff4444, r: [1, 0.27, 0.27], c: 'red' };
+        const octPos = (i, rad) => { const f = 0.577; let x = f * rad, y = f * rad, z = f * rad; if (i & 4) x = -x; if (i & 2) y = -y; if (i & 1) z = -z; return new THREE.Vector3(x, y, z); };
+        const hex2rgb = h => [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255];
+        const bezier = (a, b, n = 40) => { const m = a.clone().add(b).multiplyScalar(0.5), o = m.clone().normalize(); return new THREE.QuadraticBezierCurve3(a, m.clone().add(o.multiplyScalar(1.8)), b).getPoints(n); };
+
+        // Glass shader - minimal glow, clear colors
+        const glassMat = (col, s) => new THREE.ShaderMaterial({
+            uniforms: { t: { value: 0 }, col: { value: new THREE.Vector3(...col.r) }, spd: { value: s < 40 ? 3 : s < 70 ? 1.5 : 0.8 }, critical: { value: s < 40 ? 1.0 : 0.0 } },
+            vertexShader: `varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=-mv.xyz;gl_Position=projectionMatrix*mv;}`,
+            fragmentShader: `uniform float t;uniform vec3 col;uniform float spd;uniform float critical;varying vec3 vN,vV;void main(){vec3 v=normalize(vV);float f=pow(1.-abs(dot(v,vN)),2.0);float p=sin(t*spd)*.05+.95;float pulse=critical>0.5?sin(t*4.)*.15+.85:1.;vec3 c=(col*f*0.7+col*pow(1.-f,2.)*.15)*p*pulse;c+=smoothstep(.75,1.,vN.y)*.1;gl_FragColor=vec4(c,f*.4+.2);}`,
+            transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+        });
+
+        // ============================================================
+        // BUILD SCENE
+        // ============================================================
+        const bubbles = [], labels = [], scores = [], halos = [], lines = [], ripples = [];
+
+        // Stars
+        const starG = new THREE.BufferGeometry(), starP = new Float32Array(CFG.stars * 3);
+        for (let i = 0; i < CFG.stars; i++) { const t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1), r = 80 + Math.random() * 20; starP[i * 3] = r * Math.sin(p) * Math.cos(t); starP[i * 3 + 1] = r * Math.sin(p) * Math.sin(t); starP[i * 3 + 2] = r * Math.cos(p); }
+        starG.setAttribute('position', new THREE.BufferAttribute(starP, 3));
+        const stars = new THREE.Points(starG, new THREE.PointsMaterial({ size: 0.4, color: 0x99bbff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending }));
+        scene.add(stars);
+
+        // Halo texture - softer glow
+        const haloC = document.createElement('canvas'); haloC.width = haloC.height = 256;
+        const hCtx = haloC.getContext('2d'), hGr = hCtx.createRadialGradient(128, 128, 40, 128, 128, 128);
+        hGr.addColorStop(0, 'rgba(255,255,255,0)'); hGr.addColorStop(0.5, 'rgba(100,200,255,0.15)'); hGr.addColorStop(1, 'rgba(100,200,255,0)');
+        hCtx.fillStyle = hGr; hCtx.fillRect(0, 0, 256, 256);
+        const haloTex = new THREE.CanvasTexture(haloC);
+
+        // Create sprite - LARGER text, strong contrast
+        const mkSprite = (txt, sz, bold) => {
+            const c = document.createElement('canvas');
+            c.width = bold ? 160 : 400;  // Larger canvas for labels
+            c.height = 160;
+            const x = c.getContext('2d');
+            x.font = `${bold ? 'bold ' : '600 '}${sz}px Inter,sans-serif`;
+            x.textAlign = 'center';
+            x.textBaseline = 'middle';
+            // Strong dark outline for maximum contrast
+            x.strokeStyle = 'rgba(0,0,0,0.9)';
+            x.lineWidth = bold ? 5 : 4;
+            x.strokeText(txt, c.width / 2, 80);
+            // Crisp white fill
+            x.fillStyle = '#ffffff';
+            x.fillText(txt, c.width / 2, 80);
+            return new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: false }));
+        };
+
+        // Build bubbles with staggered entry animation
+        capitals.forEach((cap, i) => {
+            const pos = octPos(i, CFG.bubble.radius), col = scoreCol(cap.score);
+            const bub = new THREE.Mesh(new THREE.SphereGeometry(CFG.bubble.size, 48, 48), glassMat(col, cap.score));
+            bub.position.set(0, 0, 0);  // Start at center for entry animation
+            bub.scale.setScalar(0);     // Start invisible
+            bub.userData = { name: cap.name, idx: i, base: pos.clone(), score: cap.score, col, entryDelay: i * 0.12 };
+            world.add(bub);
+            bubbles.push(bub);
+
+            bub.add(new THREE.Mesh(new THREE.SphereGeometry(CFG.bubble.size * 0.55, 24, 24), new THREE.MeshBasicMaterial({ color: col.h, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending })));
+
+            // Larger score text
+            const sc = mkSprite(String(cap.score), 56, true); sc.position.set(0, 0, 0); sc.scale.set(1.3, 1.3, 1); sc.material.opacity = 0; world.add(sc); scores.push(sc);
+            // MUCH larger label text
+            const lb = mkSprite(cap.name, 36); lb.position.set(0, -1.5, 0); lb.scale.set(3.2, 1.6, 1); lb.material.opacity = 0; world.add(lb); labels.push(lb);
+            const hl = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthTest: false })); hl.position.copy(pos); hl.scale.set(3.2, 3.2, 1); world.add(hl); halos.push(hl);
+            
+            // Ripple rings for focus effect (3 rings per bubble)
+            const bubbleRipples = [];
+            for (let r = 0; r < 3; r++) {
+                const rippleC = document.createElement('canvas'); rippleC.width = rippleC.height = 128;
+                const rCtx = rippleC.getContext('2d');
+                rCtx.strokeStyle = 'rgba(100, 200, 255, 0.8)';
+                rCtx.lineWidth = 2;
+                rCtx.beginPath();
+                rCtx.arc(64, 64, 50, 0, Math.PI * 2);
+                rCtx.stroke();
+                const ripple = new THREE.Sprite(new THREE.SpriteMaterial({ 
+                    map: new THREE.CanvasTexture(rippleC), 
+                    transparent: true, 
+                    opacity: 0, 
+                    blending: THREE.AdditiveBlending, 
+                    depthTest: false 
+                }));
+                ripple.position.copy(pos);
+                ripple.scale.set(1.5, 1.5, 1);
+                ripple.userData = { ring: r, baseScale: 1.5 };
+                world.add(ripple);
+                bubbleRipples.push(ripple);
+            }
+            ripples.push(bubbleRipples);
+        });
+
+        // Connections with energy flow particles and variable thickness
+        const flowParticles = [];
+        connections.forEach(cn => {
+            const fi = capMap[cn.from], ti = capMap[cn.to];
+            if (fi === undefined || ti === undefined) return;
+            const pts = bezier(octPos(fi, CFG.bubble.radius), octPos(ti, CFG.bubble.radius));
+            
+            // Create tube geometry for variable thickness based on strength
+            const curve = new THREE.CatmullRomCurve3(pts);
+            const tubeRadius = 0.02 + cn.strength * 0.04;  // Thicker = stronger relationship
+            const tubeGeo = new THREE.TubeGeometry(curve, 40, tubeRadius, 6, false);
+            const tubeMat = new THREE.MeshBasicMaterial({ 
+                color: 0x4488ff, 
+                transparent: true, 
+                opacity: 0.15, 
+                blending: THREE.AdditiveBlending 
+            });
+            const tube = new THREE.Mesh(tubeGeo, tubeMat);
+            tube.userData = { fi, ti, str: cn.strength, cn, baseRadius: tubeRadius };
+            world.add(tube);
+            lines.push(tube);
+            
+            // Energy flow particles along this connection
+            for (let p = 0; p < 3; p++) {
+                const particle = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.06, 8, 8),
+                    new THREE.MeshBasicMaterial({ color: 0x66aaff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending })
+                );
+                particle.userData = { fi, ti, offset: p / 3, speed: 0.3 + cn.strength * 0.2 };
+                world.add(particle);
+                flowParticles.push(particle);
+            }
+        });
+
+        // ============================================================
+        // DETAIL PANEL
+        // ============================================================
+        const panel = document.getElementById('detail-panel');
+        const orbEl = document.getElementById('detail-orb');
+        const nameEl = document.getElementById('detail-name');
+        const subsList = document.getElementById('subscores-list');
+        const infList = document.getElementById('influences-list');
+        const depList = document.getElementById('dependencies-list');
+        const chainEl = document.getElementById('chain-display');
+
+        function openPanel(idx) {
+            if (idx < 0) return;
+            const cap = capitals[idx], col = scoreCol(cap.score);
+            orbEl.textContent = cap.score;
+            orbEl.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(${col.r.map(v => Math.round(v * 200)).join(',')},0.5))`;
+            orbEl.style.boxShadow = `0 0 40px rgba(${col.r.map(v => Math.round(v * 200)).join(',')},0.4), inset 0 0 20px rgba(255,255,255,0.1)`;
+            nameEl.textContent = cap.name;
+
+            subsList.innerHTML = '';
+            let d = 0;
+            Object.entries(cap.subs).forEach(([n, v]) => {
+                const c = scoreCol(v);
+                const el = document.createElement('div'); el.className = 'subscore-item'; el.style.animationDelay = `${d}s`;
+                el.innerHTML = `<div class="subscore-header"><span class="subscore-name">${n}</span><span class="subscore-value ${c.c}">${v}</span></div><div class="subscore-bar"><div class="subscore-fill ${c.c}"></div></div>`;
+                subsList.appendChild(el);
+                setTimeout(() => el.querySelector('.subscore-fill').style.width = `${v}%`, 80 + d * 800);
+                d += 0.08;
+            });
+
+            infList.innerHTML = '';
+            d = 0;
+            cap.influences.forEach(inf => {
+                const cn = connections.find(c => c.from === cap.name && c.to === inf);
+                const el = document.createElement('div'); el.className = 'connection-item'; el.style.animationDelay = `${d}s`;
+                el.innerHTML = `<span class="connection-name">${cap.name}</span><span class="connection-arrow">→</span><span class="connection-name">${inf}</span>${cn ? `<span class="connection-strength">${Math.round(cn.strength * 100)}%</span><div class="connection-desc">${cn.desc}</div>` : ''}`;
+                infList.appendChild(el);
+                d += 0.06;
+            });
+
+            depList.innerHTML = '';
+            d = 0;
+            cap.dependencies.forEach(dep => {
+                const cn = connections.find(c => c.from === dep && c.to === cap.name);
+                const el = document.createElement('div'); el.className = 'connection-item'; el.style.animationDelay = `${d}s`;
+                el.innerHTML = `<span class="connection-name">${dep}</span><span class="connection-arrow">→</span><span class="connection-name">${cap.name}</span>${cn ? `<span class="connection-strength">${Math.round(cn.strength * 100)}%</span>` : ''}`;
+                depList.appendChild(el);
+                d += 0.06;
+            });
+
+            // Chain
+            chainEl.innerHTML = '';
+            const chain = document.createElement('div'); chain.className = 'impact-chain';
+            const path = findChain(cap.name);
+            path.forEach((n, i) => {
+                const s = capitalData[n].score, c = scoreCol(s);
+                const nd = document.createElement('span'); nd.className = `chain-node ${c.c === 'red' ? 'critical' : c.c === 'yellow' ? 'warning' : 'healthy'}`;
+                nd.textContent = `${n} (${s})`; chain.appendChild(nd);
+                if (i < path.length - 1) { const a = document.createElement('span'); a.className = 'chain-arrow'; a.textContent = '→'; chain.appendChild(a); }
+            });
+            chainEl.appendChild(chain);
+
+            panel.classList.add('visible');
+            box.classList.add('dimmed');
+            ['hud', 'title-overlay', 'score-legend', 'gesture-state'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+            state.panelOpen = true;
+            state.locked = idx;
+        }
+
+        function closePanel() {
+            panel.classList.remove('visible');
+            box.classList.remove('dimmed');
+            ['hud', 'title-overlay', 'score-legend', 'gesture-state'].forEach(id => document.getElementById(id)?.classList.remove('hidden'));
+            state.panelOpen = false;
+            state.locked = -1;
+        }
+
+        function findChain(start, depth = 0, seen = new Set()) {
+            if (depth > 3 || seen.has(start)) return [start];
+            seen.add(start);
+            const cap = capitalData[start];
+            let best = [start];
+            (cap.dependencies || []).forEach(dep => {
+                if (capitalData[dep] && capitalData[dep].score < 50) {
+                    const sub = findChain(dep, depth + 1, new Set(seen));
+                    if (sub.length >= best.length) best = [...sub, start];
+                }
+            });
+            return best;
+        }
+
+        // ============================================================
+        // HAND TRACKING
+        // ============================================================
+        const vid = document.getElementById('video-input');
+        const hInd = document.getElementById('hand-indicator');
+        const gPanel = document.getElementById('gesture-panel');
+        const gIcon = document.getElementById('gesture-icon');
+        const gLabel = document.getElementById('gesture-label');
+
+        const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.5 });
+        hands.onResults(onHands);
+        new Camera(vid, { onFrame: async () => { await hands.send({ image: vid }); }, width: 640, height: 480 }).start();
+
+        // Arcball rotation: maps 2D screen position to 3D sphere for natural rotation
+        const getArcballVector = (x, y) => {
+            // Map to [-1, 1] range, Y inverted
+            const nx = (x - 0.5) * 2;
+            const ny = -(y - 0.5) * 2;
+            let z = 1 - nx * nx - ny * ny;
+            if (z > 0) z = Math.sqrt(z);
+            else z = 0;
+            return new THREE.Vector3(nx, ny, z).normalize();
+        };
+
+        const raised = (lm, tip, pip) => lm[tip].y < lm[pip].y;
+        const gesture = lm => {
+            const i = raised(lm, 8, 6), m = raised(lm, 12, 10), r = raised(lm, 16, 14), p = raised(lm, 20, 18);
+            if (!i && !m && !r && !p) return 'fist';  // All fingers down = grip mode
+            if (i && m && r && p) return 'open';      // All fingers up = explore mode
+            if (i && !m && !r && !p) return 'point';  // Only index up = details
+            return 'open';
+        };
+        const handSize = lm => Math.hypot(lm[0].x - lm[9].x, lm[0].y - lm[9].y);
+
+        let focus = -1;
+
+        function onHands(res) {
+            document.getElementById('loader').classList.add('hidden');
+            if (res.multiHandLandmarks?.length) {
+                const lm = res.multiHandLandmarks[0];
+                state.handOn = true;
+                const handX = 1 - lm[9].x;  // Mirror for natural feel
+                const handY = lm[9].y;
+                hInd.style.left = `${handX * innerWidth}px`;
+                hInd.style.top = `${handY * innerHeight}px`;
+                hInd.classList.add('visible');
+
+                const g = gesture(lm), prev = state.gesture;
+                state.gesture = g;
+
+                // POINT = open detail panel (was fist)
+                if (g === 'point' && prev !== 'point' && !state.panelOpen && focus >= 0) {
+                    openPanel(focus);
+                }
+                // FIST = close panel and enter grip mode (was open)
+                else if (g === 'fist' && state.panelOpen) {
+                    closePanel();
+                }
+
+                state.grip = g === 'fist';
+                state.pointing = g === 'point';
+                updateGesture(g);
+
+                // Zoom control (works in all modes except panel open)
+                if (!state.panelOpen) {
+                    const sz = handSize(lm);
+                    let tgt = THREE.MathUtils.mapLinear(sz, 0.05, 0.25, 2.8, 0.8);
+                    tgt = THREE.MathUtils.clamp(tgt, 0.8, 2.8);
+                    state.scale = THREE.MathUtils.lerp(state.scale, tgt, 0.07);
+                }
+
+                // GRIP MODE (fist): Arcball rotation - sphere moves naturally like a real ball
+                if (state.grip && !state.panelOpen) {
+                    if (prev !== 'fist') {
+                        // Just entered grip mode - record starting quaternion and position
+                        state.gripStartQuat.copy(world.quaternion);
+                        state.gripStartPos.set(handX, handY);
+                        // Kill any momentum
+                        state.spinX = 0;
+                        state.spinY = 0;
+                        // Flash effect on grip
+                        state.gripFlashTime = performance.now();
+                    }
+                    // Arcball rotation: compute rotation from start to current
+                    const startVec = getArcballVector(state.gripStartPos.x, state.gripStartPos.y);
+                    const currVec = getArcballVector(handX, handY);
+                    
+                    // Rotation axis is cross product, angle from dot product
+                    const axis = new THREE.Vector3().crossVectors(startVec, currVec).normalize();
+                    const dot = THREE.MathUtils.clamp(startVec.dot(currVec), -1, 1);
+                    const angle = Math.acos(dot) * 2.5;  // Amplify for responsiveness
+                    
+                    if (axis.length() > 0.001) {
+                        const deltaQuat = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+                        state.gripQuat.copy(state.gripStartQuat).premultiply(deltaQuat);
+                    }
+                }
+                // OPEN MODE: Momentum-based spin
+                else if (g === 'open' && !state.panelOpen) {
+                    const dx = lm[9].x - state.lastX, dy = lm[9].y - state.lastY;
+                    state.spinY += dx * -0.12;
+                    state.spinX += dy * 0.12;
+                    state.spinY = THREE.MathUtils.clamp(state.spinY, -0.08, 0.08);
+                    state.spinX = THREE.MathUtils.clamp(state.spinX, -0.08, 0.08);
+                }
+
+                state.lastX = lm[9].x;
+                state.lastY = lm[9].y;
+            } else {
+                state.handOn = false;
+                hInd.classList.remove('visible');
+                state.gesture = 'none';
+                state.grip = false;
+                updateGesture('none');
+                state.scale = THREE.MathUtils.lerp(state.scale, 1.2, 0.02);
+            }
+        }
+
+        function updateGesture(g) {
+            gPanel.classList.remove('focus', 'fist');
+            switch (g) {
+                case 'point': gIcon.textContent = '☝️'; gLabel.textContent = 'Details'; gPanel.classList.add('focus'); break;
+                case 'fist': gIcon.textContent = '✊'; gLabel.textContent = 'Grip'; gPanel.classList.add('fist'); break;
+                case 'open': gIcon.textContent = '👋'; gLabel.textContent = 'Explore'; break;
+                default: gIcon.textContent = '👋'; gLabel.textContent = 'Ready';
+            }
+        }
+
+        // ============================================================
+        // ANIMATION
+        // ============================================================
+        const clk = new THREE.Clock();
+        let fc = 0, lt = performance.now();
+
+        function loop() {
+            requestAnimationFrame(loop);
+            const t = clk.getElapsedTime();
+
+            // Entry animation - bubbles pop out from center
+            if (!state.entryComplete) {
+                let allDone = true;
+                bubbles.forEach((b, i) => {
+                    const delay = b.userData.entryDelay || 0;
+                    const progress = Math.max(0, Math.min(1, (t - delay) / 0.6));
+                    if (progress < 1) allDone = false;
+                    const eased = 1 - Math.pow(1 - progress, 3);  // Ease out cubic
+                    const targetScale = 1 + (1 - eased) * 0.3;  // Slight overshoot
+                    b.scale.setScalar(eased * (progress > 0.8 ? 1 : targetScale));
+                    scores[i].material.opacity = eased;
+                    labels[i].material.opacity = eased * 0.95;
+                });
+                if (allDone && t > 1.5) state.entryComplete = true;
+            }
+
+            if (!state.panelOpen) {
+                if (state.grip) {
+                    // GRIP MODE: Arcball quaternion interpolation (natural rotation)
+                    world.quaternion.slerp(state.gripQuat, 0.3);
+                } else {
+                    // EXPLORE MODE: Euler-based momentum rotation
+                    world.rotation.y += state.spinY;
+                    world.rotation.x += state.spinX;
+                    state.spinY *= state.friction;
+                    state.spinX *= state.friction;
+                    // Gentle auto-spin when no hand detected
+                    if (Math.abs(state.spinY) < 0.0008 && !state.handOn) state.spinY = 0.0015;
+                    // Keep quaternion in sync for when we switch to grip
+                    state.gripQuat.copy(world.quaternion);
+                }
+            }
+
+            // Grip flash visual feedback
+            const flashAge = (performance.now() - state.gripFlashTime) / 1000;
+            const flashIntensity = state.grip && flashAge < 0.3 ? (1 - flashAge / 0.3) * 0.3 : 0;
+
+            stars.rotation.y = t * 0.002;
+
+            // Floating intensity: more in explore mode, less in grip mode
+            const floatIntensity = state.grip ? 0.02 : 0.08;
+
+            // Update bubbles with score breathing
+            bubbles.forEach((b, i) => {
+                if (b.material.uniforms) b.material.uniforms.t.value = t;
+                const fl = Math.sin(t * 0.5 + i * 0.9) * floatIntensity;
+                const sp = b.userData.base.clone().multiplyScalar(state.scale);
+                if (state.entryComplete) {
+                    b.position.lerp(sp.clone().setY(sp.y + fl), 0.08);
+                }
+                scores[i].position.copy(b.position);
+                
+                // Score number breathing animation (subtle scale pulse)
+                const breathe = 1 + Math.sin(t * 1.2 + i * 0.5) * 0.025;
+                scores[i].scale.set(1.3 * breathe, 1.3 * breathe, 1);
+                
+                labels[i].position.copy(b.position).y -= 1.4 * state.scale;
+                halos[i].position.copy(b.position);
+                
+                // Update ripple positions
+                ripples[i].forEach(r => r.position.copy(b.position));
+            });
+
+            // Focus tracking: CLOSEST to user (highest Z in camera space = closest)
+            let maxZ = -Infinity, minI = -1;
+            bubbles.forEach((b, i) => {
+                const wp = new THREE.Vector3();
+                b.getWorldPosition(wp);
+                // Transform to camera space - higher Z = closer to camera
+                const camSpace = wp.clone().applyMatrix4(cam.matrixWorldInverse);
+                // In camera space, -Z is forward, so the closest bubble has the HIGHEST (least negative) Z
+                if (camSpace.z > maxZ) { maxZ = camSpace.z; minI = i; }
+            });
+            focus = minI;
+
+            // Halos - highlight front-center bubble, stronger in grip mode + flash
+            halos.forEach((h, i) => {
+                const isFoc = i === focus;
+                const baseOpacity = isFoc ? (state.grip ? 0.5 : 0.3) : 0;
+                const haloOpacity = baseOpacity + (isFoc ? flashIntensity : 0);
+                h.material.opacity = THREE.MathUtils.lerp(h.material.opacity, haloOpacity, 0.1);
+                bubbles[i].scale.setScalar(THREE.MathUtils.lerp(bubbles[i].scale.x, isFoc ? 1.1 : 1, 0.08));
+                if (isFoc) h.scale.setScalar(3.2 + Math.sin(t * 2.5) * 0.15);
+            });
+
+            // Ripple rings - expand outward when focused
+            ripples.forEach((bubbleRipples, i) => {
+                const isFoc = i === focus;
+                bubbleRipples.forEach((r, ri) => {
+                    if (isFoc) {
+                        // Staggered expanding rings
+                        const ringPhase = (t * 1.5 + ri * 0.4) % 2;  // 2 second cycle per ring
+                        const expansion = ringPhase < 1 ? ringPhase : 0;  // Expand then reset
+                        const opacity = ringPhase < 1 ? (1 - ringPhase) * 0.4 : 0;  // Fade as it expands
+                        const scale = r.userData.baseScale + expansion * 2.5;
+                        r.scale.set(scale, scale, 1);
+                        r.material.opacity = THREE.MathUtils.lerp(r.material.opacity, opacity, 0.15);
+                    } else {
+                        // Fade out when not focused
+                        r.material.opacity = THREE.MathUtils.lerp(r.material.opacity, 0, 0.1);
+                        r.scale.set(r.userData.baseScale, r.userData.baseScale, 1);
+                    }
+                });
+            });
+
+            // Energy flow particles along connections
+            flowParticles.forEach(p => {
+                const fb = bubbles[p.userData.fi], tb = bubbles[p.userData.ti];
+                const progress = ((t * p.userData.speed + p.userData.offset) % 1);
+                const pts = bezier(fb.position, tb.position, 20);
+                const idx = Math.floor(progress * (pts.length - 1));
+                const nextIdx = Math.min(idx + 1, pts.length - 1);
+                const frac = progress * (pts.length - 1) - idx;
+                p.position.lerpVectors(pts[idx], pts[nextIdx], frac);
+                // Brighter when connection is focused
+                const rel = focus >= 0 && (p.userData.fi === focus || p.userData.ti === focus);
+                p.material.opacity = THREE.MathUtils.lerp(p.material.opacity, rel ? 0.8 : 0.3, 0.1);
+            });
+
+            // Lines (tubes) - update geometry and brightness for focused connections
+            lines.forEach(tube => {
+                const fb = bubbles[tube.userData.fi], tb = bubbles[tube.userData.ti];
+                const pts = bezier(fb.position, tb.position);
+                const curve = new THREE.CatmullRomCurve3(pts);
+                
+                // Recreate tube geometry with updated positions
+                const rel = focus >= 0 && (tube.userData.fi === focus || tube.userData.ti === focus);
+                const radiusMultiplier = rel ? 1.5 : 1;  // Thicken when focused
+                const newGeo = new THREE.TubeGeometry(curve, 40, tube.userData.baseRadius * radiusMultiplier, 6, false);
+                tube.geometry.dispose();
+                tube.geometry = newGeo;
+                
+                tube.material.opacity = THREE.MathUtils.lerp(tube.material.opacity, rel ? 0.35 : 0.12, 0.08);
+            });
+
+            comp.render();
+
+            fc++;
+            const now = performance.now();
+            if (now - lt >= 1000) { document.getElementById('fps').textContent = `${fc} fps`; fc = 0; lt = now; }
+        }
+
+        addEventListener('resize', () => {
+            cam.aspect = innerWidth / innerHeight;
+            cam.updateProjectionMatrix();
+            rend.setSize(innerWidth, innerHeight);
+            comp.setSize(innerWidth, innerHeight);
+        });
+
+        loop();
+        console.log('✨ Capital Sphere v1.0 - Ready');
+    </script>
+</body>
+</html>
