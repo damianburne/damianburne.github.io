@@ -184,114 +184,6 @@
             transition: transform 0.3s cubic-bezier(0.2, 1, 0.2, 1)
         }
 
-        /* Phase 2: Sound Toggle */
-        .sound-toggle {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1)
-        }
-
-        .sound-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(1.1);
-            border-color: var(--accent)
-        }
-
-        .sound-toggle svg {
-            width: 20px;
-            height: 20px;
-            stroke: rgba(255, 255, 255, 0.6);
-            fill: none;
-            transition: stroke 0.3s
-        }
-
-        .sound-toggle.active svg {
-            stroke: var(--accent)
-        }
-
-        .sound-toggle .sound-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
-            height: 16px
-        }
-
-        .sound-toggle .bar {
-            width: 3px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 2px;
-            transition: height 0.15s, background 0.3s
-        }
-
-        .sound-toggle.active .bar {
-            background: var(--accent);
-            animation: soundBar 0.8s ease-in-out infinite
-        }
-
-        .sound-toggle .bar:nth-child(1) {
-            height: 6px;
-            animation-delay: 0s
-        }
-
-        .sound-toggle .bar:nth-child(2) {
-            height: 10px;
-            animation-delay: 0.1s
-        }
-
-        .sound-toggle .bar:nth-child(3) {
-            height: 14px;
-            animation-delay: 0.2s
-        }
-
-        .sound-toggle .bar:nth-child(4) {
-            height: 8px;
-            animation-delay: 0.3s
-        }
-
-        @keyframes soundBar {
-
-            0%,
-            100% {
-                transform: scaleY(1)
-            }
-
-            50% {
-                transform: scaleY(0.5)
-            }
-        }
-
-        /* Audio Visualizer Orb */
-        .audio-orb {
-            position: fixed;
-            bottom: 5rem;
-            right: 2rem;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none;
-            z-index: 999
-        }
-
-        .audio-orb.active {
-            opacity: 0.6;
-            transform: scale(1)
-        }
 
         /* ============================================ */
         /* PHASE 3: 3D & WebGL Integration */
@@ -1773,28 +1665,66 @@
         /* Mobile */
         @media(max-width:768px) {
             nav {
-                padding: 1.5rem 2rem
+                padding: 1.5rem 1.5rem
             }
 
             .nav-links {
                 display: none
             }
 
+            .hero-content {
+                padding: 1.5rem 1rem;
+                max-width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center
+            }
+
             .hero-title {
-                font-size: 3rem
+                font-size: clamp(2.5rem, 12vw, 4rem);
+                line-height: 1;
+                text-align: center
+            }
+
+            .hero-subtitle {
+                font-size: 0.95rem;
+                padding: 0 0.5rem;
+                margin-bottom: 2rem;
+                max-width: 90%;
+                text-align: center
+            }
+
+            .hero-eyebrow {
+                font-size: 0.65rem;
+                letter-spacing: 0.2em
+            }
+
+            .hero-eyebrow::before,
+            .hero-eyebrow::after {
+                width: 20px
             }
 
             .stats-bar {
                 flex-direction: column;
-                gap: 3rem
+                gap: 2rem;
+                padding: 4rem 1.5rem
+            }
+
+            .stat-value {
+                font-size: 3rem
             }
 
             .bento-section {
-                padding: 5rem 1.5rem
+                padding: 4rem 1.5rem
+            }
+
+            .section-title {
+                font-size: clamp(1.75rem, 8vw, 3rem)
             }
 
             .bento-grid {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
+                gap: 1rem
             }
 
             .card-large,
@@ -1803,18 +1733,86 @@
                 grid-column: span 1
             }
 
+            .bento-card {
+                padding: 1.5rem
+            }
+
             .timeline-section {
-                padding: 5rem 1.5rem
+                padding: 4rem 1.5rem
+            }
+
+            .timeline {
+                margin-top: 2rem
+            }
+
+            .marquee-text {
+                font-size: clamp(2.5rem, 10vw, 6rem)
             }
 
             .cta-section {
-                padding: 8rem 2rem
+                padding: 6rem 1.5rem
+            }
+
+            .cta-title {
+                font-size: clamp(2rem, 8vw, 4rem)
+            }
+
+            .cta-btn {
+                padding: 1rem 2rem;
+                font-size: 0.9rem
             }
 
             footer {
                 flex-direction: column;
-                gap: 2rem;
-                text-align: center
+                gap: 1.5rem;
+                text-align: center;
+                padding: 3rem 1.5rem
+            }
+
+            .footer-links {
+                gap: 1.5rem
+            }
+
+            /* Hide custom cursor on mobile */
+            .cursor,
+            .cursor-dot,
+            .cursor-label,
+            .cursor-trail {
+                display: none !important
+            }
+
+            body {
+                cursor: auto
+            }
+
+            /* Reduce elastic indicator size on mobile */
+            .elastic-indicator {
+                display: none
+            }
+        }
+
+        /* Small mobile */
+        @media(max-width:480px) {
+            .hero-title {
+                font-size: clamp(2rem, 14vw, 3rem)
+            }
+
+            .stats-bar {
+                gap: 1.5rem;
+                padding: 3rem 1rem
+            }
+
+            .stat-value {
+                font-size: 2.5rem
+            }
+
+            .bento-section,
+            .timeline-section {
+                padding: 3rem 1rem
+            }
+
+            .cta-section {
+                padding: 4rem 1rem
             }
         }
     </style>
@@ -1843,10 +1841,6 @@
                 <span class="shortcut-key">T</span>
             </div>
             <div class="shortcut-item">
-                <span>Toggle sound</span>
-                <span class="shortcut-key">S</span>
-            </div>
-            <div class="shortcut-item">
                 <span>Next section</span>
                 <span class="shortcut-key">J</span>
             </div>
@@ -1865,16 +1859,7 @@
         </div>
     </div>
 
-    <!-- Phase 2: Sound Toggle -->
-    <button class="sound-toggle magnetic" id="soundToggle" data-cursor-label="Toggle Sound" aria-label="Toggle sound">
-        <div class="sound-bars">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
-    </button>
-    <div class="audio-orb" id="audioOrb"></div>
+
 
     <div class="aurora">
         <div class="aurora-gradient"></div>
@@ -2204,217 +2189,7 @@
             document.body.style.cursor = 'auto';
         }
 
-        // ============================================
-        // PHASE 2: Spatial Audio & Sound Design
-        // ============================================
 
-        const soundToggle = document.getElementById('soundToggle');
-        const audioOrb = document.getElementById('audioOrb');
-
-        // Audio context and state
-        let audioContext = null;
-        let masterGain = null;
-        let ambientOscillators = [];
-        let isAudioEnabled = localStorage.getItem('audioEnabled') === 'true';
-        let currentSection = 0;
-
-        // Section-based frequencies for ambient soundscape
-        const sectionTones = [
-            { base: 220, mod: 0.5 },   // Hero - Low A
-            { base: 261.63, mod: 0.6 }, // Stats - Middle C
-            { base: 329.63, mod: 0.4 }, // Work - E
-            { base: 392, mod: 0.5 },    // Statement - G
-            { base: 293.66, mod: 0.7 }, // About - D
-            { base: 349.23, mod: 0.8 }  // Contact - F
-        ];
-
-        // Initialize audio on first user interaction
-        function initAudio() {
-            if (audioContext) return;
-
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            masterGain = audioContext.createGain();
-            masterGain.gain.value = 0;
-            masterGain.connect(audioContext.destination);
-
-            // Create ambient oscillators (soft pad sound)
-            for (let i = 0; i < 3; i++) {
-                const osc = audioContext.createOscillator();
-                const oscGain = audioContext.createGain();
-                const filter = audioContext.createBiquadFilter();
-
-                osc.type = 'sine';
-                osc.frequency.value = sectionTones[0].base * (i === 0 ? 1 : i === 1 ? 1.5 : 2);
-
-                filter.type = 'lowpass';
-                filter.frequency.value = 800;
-                filter.Q.value = 1;
-
-                oscGain.gain.value = 0.15 / (i + 1);
-
-                osc.connect(filter);
-                filter.connect(oscGain);
-                oscGain.connect(masterGain);
-                osc.start();
-
-                ambientOscillators.push({ osc, gain: oscGain, filter });
-            }
-        }
-
-        // Task 2.1: Ambient Soundscape - responds to scroll position
-        function updateAmbientSound() {
-            if (!audioContext || !isAudioEnabled) return;
-
-            const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-            const sectionIndex = Math.min(Math.floor(scrollProgress * sectionTones.length), sectionTones.length - 1);
-            const tone = sectionTones[sectionIndex];
-
-            // Smoothly transition frequencies based on scroll
-            ambientOscillators.forEach((item, i) => {
-                const targetFreq = tone.base * (i === 0 ? 1 : i === 1 ? 1.5 : 2);
-                item.osc.frequency.setTargetAtTime(targetFreq, audioContext.currentTime, 0.5);
-
-                // Modulate filter with scroll for subtle variation
-                const filterMod = 600 + (scrollProgress * 400) + (Math.sin(Date.now() * 0.001) * 100);
-                item.filter.frequency.setTargetAtTime(filterMod, audioContext.currentTime, 0.3);
-            });
-
-            // Update audio orb size based on audio activity
-            const orbScale = 1 + (Math.sin(Date.now() * 0.003) * 0.3) + (scrollProgress * 0.5);
-            audioOrb.style.transform = `scale(${orbScale})`;
-        }
-
-        // Task 2.2: Interaction Sounds
-        function playHoverSound() {
-            if (!audioContext || !isAudioEnabled) return;
-
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.value = 800 + Math.random() * 200;
-            gain.gain.value = 0.03;
-            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-
-            osc.connect(gain);
-            gain.connect(masterGain);
-            osc.start();
-            osc.stop(audioContext.currentTime + 0.1);
-        }
-
-        function playClickSound() {
-            if (!audioContext || !isAudioEnabled) return;
-
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-
-            osc.type = 'triangle';
-            osc.frequency.value = 600;
-            osc.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.15);
-
-            gain.gain.value = 0.08;
-            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
-
-            osc.connect(gain);
-            gain.connect(masterGain);
-            osc.start();
-            osc.stop(audioContext.currentTime + 0.15);
-        }
-
-        function playScrollSound() {
-            if (!audioContext || !isAudioEnabled) return;
-
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.value = 300 + (Math.random() * 100);
-
-            gain.gain.value = 0.02;
-            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
-
-            osc.connect(gain);
-            gain.connect(masterGain);
-            osc.start();
-            osc.stop(audioContext.currentTime + 0.2);
-        }
-
-        // Task 2.4: Sound Toggle with smooth fade
-        function enableAudio() {
-            initAudio();
-            isAudioEnabled = true;
-            localStorage.setItem('audioEnabled', 'true');
-            soundToggle.classList.add('active');
-            audioOrb.classList.add('active');
-
-            // Smooth fade in
-            if (masterGain) {
-                masterGain.gain.setTargetAtTime(0.08, audioContext.currentTime, 0.5);
-            }
-        }
-
-        function disableAudio() {
-            isAudioEnabled = false;
-            localStorage.setItem('audioEnabled', 'false');
-            soundToggle.classList.remove('active');
-            audioOrb.classList.remove('active');
-
-            // Smooth fade out
-            if (masterGain) {
-                masterGain.gain.setTargetAtTime(0, audioContext.currentTime, 0.3);
-            }
-        }
-
-        soundToggle.addEventListener('click', () => {
-            if (isAudioEnabled) {
-                disableAudio();
-            } else {
-                enableAudio();
-            }
-        });
-
-        // Attach hover sounds to interactive elements
-        document.querySelectorAll('a, button, .magnetic, .bento-card').forEach(el => {
-            el.addEventListener('mouseenter', playHoverSound);
-        });
-
-        // Click sound (separate from ripple effect)
-        document.addEventListener('click', playClickSound);
-
-        // Throttled scroll handler for ambient updates
-        let scrollSoundTimeout = null;
-        let lastScrollY = 0;
-        window.addEventListener('scroll', () => {
-            updateAmbientSound();
-
-            // Play subtle scroll sound on significant scroll
-            if (!scrollSoundTimeout && Math.abs(window.scrollY - lastScrollY) > 100) {
-                playScrollSound();
-                lastScrollY = window.scrollY;
-                scrollSoundTimeout = setTimeout(() => {
-                    scrollSoundTimeout = null;
-                }, 300);
-            }
-        });
-
-        // Task 2.3: Audio Reactivity - animate orb with ambient
-        function animateAudioOrb() {
-            if (isAudioEnabled && audioOrb.classList.contains('active')) {
-                updateAmbientSound();
-            }
-            requestAnimationFrame(animateAudioOrb);
-        }
-        animateAudioOrb();
-
-        // Restore audio state on load (but don't auto-play - requires interaction)
-        if (isAudioEnabled) {
-            soundToggle.classList.add('active');
-            // Will enable on first click anywhere
-            document.addEventListener('click', function initOnClick() {
-                enableAudio();
-                document.removeEventListener('click', initOnClick);
-            }, { once: true });
-        }
 
         // ============================================
         // PHASE 3: 3D & WebGL Integration
