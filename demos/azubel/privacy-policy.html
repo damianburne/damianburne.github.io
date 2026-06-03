@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>azubel DENTAL · Family-friendly dentist in Camberwell</title>
+  <meta name="description"
+    content="azubel DENTAL is a warm, family-friendly dental practice in Camberwell. Book online or contact us for gentle, modern care." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="images/hero-family.jpg" imagesrcset="images/hero-family.jpg 956w"
+    imagesizes="(max-width: 900px) 100vw, 45vw">
+  <link rel="icon" href="images/azubel.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="images/azubel.ico" type="image/x-icon">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #101828;
+      --muted: #667085;
+      --brand: #2b77e7;
+      --brand-700: #1d5fc2;
+      --accent: #f0f6ff;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --success: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-padding-top: 80px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, .9);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav nav {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .brand span:first-child {
+      color: var(--brand);
+    }
+
+    /* Header nav buttons: subtle by default; primary stands out */
+    .nav a.btn {
+      background: transparent;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      border-color: var(--border);
+    }
+
+    .nav a.btn:hover {
+      background: var(--accent);
+      text-decoration: none;
+    }
+
+    .nav a.btn.primary {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 56px 0 24px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: clamp(28px, 3.5vw, 44px);
+      line-height: 1.15;
+      margin: 0 0 12px;
+    }
+
+    .sub {
+      font-size: clamp(16px, 2vw, 18px);
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-weight: 600;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    .btn.primary:hover {
+      background: var(--brand-700);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(43, 119, 231, 0.25);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--brand-700);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .media {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      aspect-ratio: 16 / 9;
+      background: #f8fafc;
+    }
+
+    .media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .map-embed {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    .map-embed iframe {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      min-height: 350px;
+      border: 0;
+      display: block;
+    }
+
+
+
+    /* Mobile menu toggle */
+    .menu-toggle {
+      display: none;
+      margin-left: auto;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-weight: 600;
+    }
+
+    .menu-toggle .bars {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-left: 6px;
+    }
+
+    .menu-toggle .bar {
+      width: 16px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+    }
+
+    /* Sections */
+    section {
+      padding: 40px 0;
+    }
+
+    h2 {
+      font-size: clamp(22px, 2.5vw, 28px);
+      margin: 0 0 16px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Info cards */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .kpi {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .kpi .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .kpi .value {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    /* Footer */
+    footer {
+      background: #0b1220;
+      color: #e5e7eb;
+      padding: 32px 0;
+      margin-top: 32px;
+    }
+
+    footer a {
+      color: #93c5fd;
+    }
+
+    /* Utilities */
+    .muted {
+      color: var(--muted);
+    }
+
+    .stack-8>*+* {
+      margin-top: 8px;
+    }
+
+    .stack-12>*+* {
+      margin-top: 12px;
+    }
+
+    .stack-16>*+* {
+      margin-top: 16px;
+    }
+
+    .stack-24>*+* {
+      margin-top: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .grid.cols-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .grid.cols-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .nav {
+        height: 64px;
+        padding: 0;
+      }
+
+      .nav nav {
+        position: absolute;
+        top: 64px;
+        right: 20px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 8px;
+        box-shadow: 0 10px 24px rgba(2, 6, 23, .12);
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 220px;
+      }
+
+      .nav nav.open {
+        display: flex;
+      }
+
+      .nav a.btn {
+        padding: 10px 12px;
+        font-size: 14px;
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav {
+        height: auto;
+        padding: 8px 0;
+      }
+
+      .nav nav {
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .nav nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav a.btn {
+        padding: 8px 10px;
+        font-size: 14px;
+      }
+
+      .nav a.btn.primary {
+        padding: 8px 10px;
+      }
+    }
+
+    .service-card {
+      position: relative;
+      overflow: hidden;
+      padding-top: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      isolation: isolate;
+      transform: translateZ(0);
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 260px;
+      background-size: cover;
+      background-position: center;
+      z-index: 0;
+    }
+    .service-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 120px, rgba(255,255,255,1) 190px);
+      z-index: 1;
+    }
+    .service-card > * {
+      position: relative;
+      z-index: 2;
+    }
+    .card-checkups::before { background-image: url('images/service_checkups.png?v=2'); }
+    .card-restorative::before { background-image: url('images/service_restorative.png?v=2'); }
+    .card-cosmetic::before { background-image: url('images/service_cosmetic.png?v=2'); }
+  </style>
+</head>
+
+<body>
+  <header aria-label="Primary">
+    <div class="container nav">
+      <div class="brand"><a href="/"><img src="images/azubel-logo.png" alt="azubel DENTAL"
+          style="height:32px; width:auto; display:block"></a></div>
+      <button class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav">Menu <span
+          class="bars" aria-hidden="true"><span class="bar"></span><span class="bar"></span><span
+            class="bar"></span></span></button>
+      <nav id="site-nav">
+        <a class="btn" href="/#contact">Contact</a>
+        <a class="btn primary"
+          href="tel:+61398091768">Call Us</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="policy" class="hero" style="padding-top: 120px; padding-bottom: 60px; min-height: auto; text-align: left;">
+      <div class="container">
+        <h1 style="margin-bottom: 20px; font-size: 2.5rem;">Privacy Policy</h1>
+        <p style="font-size: 1.2rem; color: var(--muted); max-width: 800px;">How we collect, use, and protect your personal information.</p>
+      </div>
+    </section>
+
+    <section class="content-section" style="padding: 40px 0;">
+      <div class="container" style="max-width: 800px; margin: 0 auto; color: var(--text); line-height: 1.6;">
+        
+        <p>This privacy policy applies to personal information collected in Australia by Azubel Dental. In this policy, ‘we’, ‘us’, and ‘our’ refer to Azubel Dental. ‘You’ and ‘your’ refers to our patients, clients, or website visitors. We are a privately owned dental practice committed to protecting your privacy and handling your sensitive health information in accordance with the <em>Privacy Act 1988 (Cth)</em> and the <em>Australian Privacy Principles</em>.</p>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">1. Introduction</h3>
+        <p>Your privacy and the confidentiality of your personal information are of paramount importance to us. We are committed to safeguarding your personal information in accordance with the <em>Privacy Act 1988 (Cth)</em> and the <em>Australian Privacy Principles</em>. This policy explains what information we collect, how it is used, when it may be disclosed, and your rights regarding access and corrections. By receiving services from Azubel Dental, you agree to the handling of your personal information as outlined in this policy.</p>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">2. Definitions</h3>
+        <ul style="list-style-type: disc; padding-left: 20px; margin-bottom: 20px;">
+          <li style="margin-bottom: 10px;"><strong>Consent</strong> means your permission, which may be express or implied. Express consent may be written (e.g., signing a form) or verbal. Implied consent is inferred when we can reasonably conclude from our relationship that you have agreed by taking action or deciding not to take action.</li>
+          <li style="margin-bottom: 10px;"><strong>Personal Information</strong> has the same meaning as under the <em>Privacy Act 1988 (Cth)</em>: information or an opinion about an identified individual, or an individual who is reasonably identifiable.</li>
+        </ul>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">3. Information We Collect</h3>
+        <p>We collect information that is necessary to provide our dental services and ensure your clinical safety. The type of personal information we collect depends on your interaction with the practice. This may include:</p>
+        <ul style="list-style-type: disc; padding-left: 20px; margin-bottom: 20px;">
+          <li style="margin-bottom: 10px;"><strong>Contact Details:</strong> Name, address, telephone, and email.</li>
+          <li style="margin-bottom: 10px;"><strong>Personal Details:</strong> Age and gender.</li>
+          <li style="margin-bottom: 10px;"><strong>Clinical History:</strong> Details of previous dental providers and referrals.</li>
+          <li style="margin-bottom: 10px;"><strong>Administrative Details:</strong> Medicare number (where required for government-funded schemes) and health insurance details.</li>
+          <li style="margin-bottom: 10px;"><strong>Correspondence:</strong> Records of interactions, including system notes and emails.</li>
+          <li style="margin-bottom: 10px;"><strong>Financial Administration:</strong> Records of services provided, dates of treatment, and payment processing information.</li>
+          <li style="margin-bottom: 10px;"><strong>Sensitive Health Information:</strong> Medical history, family medical history, and current clinical assessments.</li>
+        </ul>
+        <p>We collect this data primarily for clinical care, quality assurance, and internal administration.</p>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">4. How Information May Be Collected</h3>
+        <p>We collect information directly from you via website forms, in-person consultations, telephone conversations, or medical history forms. We may also collect information from third parties (such as your health fund or referring specialists) where you have provided consent for such disclosure.</p>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">5. Use & Disclosure of Your Personal Information</h3>
+        <p>We use your personal information primarily to provide, manage, and administer your dental care and to operate a professional health service. As part of these processes, we may use or disclose your information for the following purposes:</p>
+        <ul style="list-style-type: disc; padding-left: 20px; margin-bottom: 20px;">
+          <li style="margin-bottom: 10px;">To provide dental and related healthcare services to you.</li>
+          <li style="margin-bottom: 10px;">To maintain and administer your clinical patient files.</li>
+          <li style="margin-bottom: 10px;">To contact you regarding your treatment, appointments, or oral health needs.</li>
+          <li style="margin-bottom: 10px;">To carry out internal functions such as administration, quality assurance, clinical audits, and secure information technology storage.</li>
+          <li style="margin-bottom: 10px;">To process health insurance claims and manage account invoicing.</li>
+          <li style="margin-bottom: 10px;">To comply with relevant healthcare laws and regulations.</li>
+        </ul>
+        <p>If you submit enquiries via our website, we will use that information specifically to respond to your request. We may store your contact information for future clinical reference and continuity of care.</p>
+
+        <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--text);">5.1 Disclosure to Third Parties</h4>
+        <p>To provide comprehensive care and maintain practice operations, we may disclose your information to third parties on a strictly confidential basis, including:</p>
+        <ul style="list-style-type: disc; padding-left: 20px; margin-bottom: 20px;">
+          <li style="margin-bottom: 10px;">Your nominated relatives or emergency contacts in an emergency.</li>
+          <li style="margin-bottom: 10px;">Government and regulatory bodies (e.g., Medicare or the Department of Health) where required.</li>
+          <li style="margin-bottom: 10px;">Contracted dental practitioners, specialists, and other healthcare professionals for the purpose of seeking a second opinion or a referral.</li>
+          <li style="margin-bottom: 10px;">Third-party health benefit providers (Health Funds) to assist in the processing of your claims.</li>
+        </ul>
+        
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">6. Handling and storage of Personal Information</h3>
+        <p>We take all reasonable steps to ensure your personal information is stored securely and protected from misuse, loss, unauthorized access, or disclosure.</p>
+        <ul style="list-style-type: disc; padding-left: 20px; margin-bottom: 20px;">
+          <li style="margin-bottom: 10px;"><strong>Data Security:</strong> We maintain strict clinical data security standards. Your records are handled by authorised employees only.</li>
+          <li style="margin-bottom: 10px;"><strong>Retention:</strong> We retain your clinical records for as long as required by law (generally a minimum of 7 years for adults, or until a minor reaches age 25).</li>
+          <li style="margin-bottom: 10px;"><strong>Destruction:</strong> When information is no longer required for clinical or legal purposes, we take reasonable steps to securely destroy or de-identify that data.</li>
+        </ul>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">7. Accessing and Correcting Your Information</h3>
+        <p>You have the right to access personal information that is held about you. You can ask us for access to the information that we hold about you at any time. Simply contact us to make your request. We will always endeavour to meet your request for access within a reasonable time. We may charge you a reasonable fee for access to some types of information to recoup our costs for providing you with the information (e.g., document retrieval or photocopy costs). We will not charge you to simply make a request to access your information.</p>
+        <p>To enable us to provide you with the best possible service, it is important that the information we hold about you is accurate. We will take reasonable steps to ensure that your personal information is accurate, complete and up-to-date at the time of collecting, using or disclosing it. If you believe any information we hold about you is inaccurate, incomplete or out-of-date, you should contact us to let us know.</p>
+
+        <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--text);">Online Data Collection and Cookies</h4>
+        <p>When you access our website, we may collect certain anonymous technical information about user activities on the website. This may include information such as the type of browser used to access the website and the pages visited. This information is used solely to make decisions about maintaining and improving our website and online services.</p>
+        <p>We may use cookies to collect data to help us determine which pages are most popular, peak usage times, and other information that helps us make our website easier and more efficient for you to use. A “cookie” is a small text file placed on your computer by a web server when you access a website. Cookies in themselves do not identify the individual user, just the computer used. You can choose if and how a cookie will be accepted by configuring your preferences and options in your browser.</p>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">8. Website Security</h3>
+        <p>The protection of personal privacy is a priority for us. While we take reasonable steps to secure our digital environment, you should be aware that our website does not guarantee the absolute secure transmission of information over the internet. There are inherent risks in transmitting information across the internet, including online forms and emails. If you are concerned about conveying sensitive material to us digitally, please contact us by telephone.</p>
+
+        <h3 style="margin-top: 40px; margin-bottom: 15px; color: var(--brand);">9. Our Contact Information</h3>
+        <p>If you have any questions, concerns, or a complaint regarding this policy or how your personal information has been handled, please contact our Privacy Officer. We are committed to managing any concerns internally and directly with you.</p>
+        <div style="background: var(--accent); padding: 20px; border-radius: 8px; margin-top: 20px;">
+          <p style="margin: 0 0 10px;"><strong>Azubel Dental</strong></p>
+          <p style="margin: 0 0 10px;"><strong>Address:</strong> 1341 Toorak Road, Camberwell 3124</p>
+          <p style="margin: 0 0 10px;"><strong>Email:</strong> <a href="mailto:info@azubeldental.com.au">info@azubeldental.com.au</a></p>
+          <p style="margin: 0;"><strong>Phone:</strong> <a href="tel:+61398091768">03 9809 1768</a></p>
+        </div>
+        
+        <p style="margin-top: 20px;">If you are not satisfied with our response or how we have handled your complaint, you may contact the Office of the Australian Information Commissioner (OAIC) at www.oaic.gov.au.</p>
+      </div>
+    </section>
+</main>
+
+
+  <section id="contact">
+    <div class="container grid cols-2">
+      <div class="card stack-12">
+        <h2 style="margin:0">Contact</h2>
+        <div class="stack-8">
+          <div><strong>Phone</strong><br><a href="tel:+61398091768">03 9809 1768</a></div>
+          <div><strong>Email</strong><br><a href="mailto:info@azubeldental.com.au">info@azubeldental.com.au</a></div>
+          <div><strong>Address</strong><br>1341 Toorak Road, Camberwell 3124</div>
+          <div style="margin-top: 16px;"><a class="btn primary" href="https://appointments.praktika.net.au/online-booking/step1?Apikey=811c47cf-ba4e-4e5b-bac2-28a349050b31" target="_blank" rel="noopener noreferrer" style="width: 100%; text-align: center; justify-content: center;">Book Online</a></div>
+        </div>
+      </div>
+      <div class="card" style="padding: 0; overflow: hidden; border: none; background: transparent;">
+        <div class="map-embed">
+          <iframe title="Map to azubel DENTAL" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+            src="https://www.google.com/maps?q=Azubel+DENTAL,+1341+Toorak+Road,+Camberwell+3124&output=embed">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="text-align: center; font-size: 14px; padding: 24px 0;">
+      <a href="patient-information-risks.html" style="color: var(--brand); text-decoration: underline; margin-bottom: 12px; display: inline-block;">Clinical Risks & Patient Information</a> | 
+      <a href="privacy-policy.html" style="color: var(--brand); text-decoration: underline; margin-bottom: 12px; display: inline-block;">Privacy Policy</a><br>
+      Copyright &copy; <span id="current-year"></span> | Azubel Dental<br>
+      All rights reserved
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const header = document.querySelector('header');
+      const toggle = document.querySelector('.menu-toggle');
+      const nav = document.getElementById('site-nav');
+
+      // Mobile menu toggle
+      if (toggle && nav) {
+        toggle.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const open = nav.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', String(open));
+        });
+        // Close on link click
+        nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+          nav.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }));
+        // Close on outside click
+        document.addEventListener('click', function (e) {
+          if (!nav.classList.contains('open')) return;
+          if (!nav.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)) {
+            nav.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+        // Reset when resizing up
+        window.addEventListener('resize', function () {
+          if (window.innerWidth > 700) {
+            nav.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+
+      const yearSpan = document.getElementById('current-year');
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+    })();
+  </script>
+</body>
+
+</html>
