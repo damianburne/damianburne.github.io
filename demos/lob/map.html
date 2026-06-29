@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics World Map Mockup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- MapLibre GL JS -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        /* Custom scrollbar to match Proof */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: rgb(32 33 36 / 0.18); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: rgb(32 33 36 / 0.32); }
+
+        .leaflet-container { background: transparent; font-family: 'Google Sans', sans-serif; }
+        
+        /* Map glow effects */
+        .shipment-glow-marker {
+            width: 24px;
+            height: 24px;
+            background-color: hsl(165, 30%, 26%); /* brand primary */
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 15px 5px rgba(23, 86, 75, 0.4);
+            position: relative;
+        }
+        .shipment-glow-marker::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background-color: hsl(165, 30%, 26%);
+            border-radius: 50%;
+            animation: ping-large 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+            z-index: -1;
+        }
+        
+        .daily-dot-marker {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border: 2px solid hsl(165, 30%, 26%);
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .waypoint-marker {
+            width: 14px;
+            height: 14px;
+            background-color: white;
+            border: 3px solid hsl(220, 6%, 13%);
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Tooltip styling override */
+        .custom-tooltip {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            color: hsl(220, 6%, 13%);
+            font-family: 'Google Sans', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 6px 10px;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .custom-tooltip.primary-tooltip {
+            background: hsl(165, 30%, 26%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(23, 86, 75, 0.4);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Google Sans"', 'Arial', 'Helvetica', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            primary: 'hsl(165, 30%, 26%)', secondary: 'hsl(38, 100%, 61%)',
+                            tertiary: 'hsl(168, 22%, 43%)', light: 'hsl(247, 16%, 84%)',
+                            dark: 'hsl(220, 6%, 13%)', success: 'hsl(142, 76%, 36%)', error: 'hsl(0, 84%, 60%)',
+                        }
+                    },
+                    borderRadius: { 'panel': '32px', 'control': '8px' },
+                    keyframes: {
+                        'ping-large': {
+                            '75%, 100%': { transform: 'scale(2.5)', opacity: '0' }
+                        }
+                    },
+                    animation: {
+                        'ping-large': 'ping-large 2.5s cubic-bezier(0, 0, 0.2, 1) infinite'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-light flex items-start justify-center min-h-screen text-brand-dark antialiased relative overflow-hidden">
+    <!-- Error display overlay -->
+    <div id="error-log" class="absolute top-0 left-0 w-full z-50 bg-red-500 text-white font-mono text-xs p-2 hidden opacity-90 pointer-events-none"></div>
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            const errDiv = document.getElementById('error-log');
+            errDiv.style.display = 'block';
+            errDiv.innerHTML += `ERROR: ${msg} <br/>`;
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+            const errDiv = document.getElementById('error-log');
+            errDiv.style.display = 'block';
+            errDiv.innerHTML += `PROMISE REJECTION: ${event.reason} <br/>`;
+        });
+    </script>
+    
+    <!-- Map Container -->
+    <div id="map" class="absolute inset-0 z-0 w-full h-full"></div>
+
+    <!-- Map Controls (Top Center) -->
+    <div class="absolute top-6 left-1/2 -translate-x-1/2 z-20 pointer-events-auto flex gap-2 bg-white/60 backdrop-blur-xl p-2 rounded-full shadow-lg border border-white/70">
+        <button class="bg-white hover:bg-brand-light text-brand-dark text-xs font-bold py-2 px-5 rounded-full border border-brand-dark/10 transition-colors shadow-sm flex items-center gap-2" onclick="flyTo(toronto, 6)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            Focus Origin
+        </button>
+        <button class="bg-white hover:bg-brand-light text-brand-dark text-xs font-bold py-2 px-5 rounded-full border border-brand-dark/10 transition-colors shadow-sm" onclick="flyTo([-10, 10], 3)">View Entire Trail</button>
+        <button class="bg-brand-primary hover:bg-brand-primary/90 text-white text-xs font-bold py-2 px-5 rounded-full transition-colors shadow-sm" onclick="flyTo(currentShipmentLocation, 5)">Locate Shipment</button>
+    </div>
+
+    <!-- Main Panels Container -->
+    <div class="absolute inset-0 z-10 w-full h-full p-8 flex justify-between items-start pointer-events-none">
+        
+        <!-- Left Panel: Macro Lifecycle Steps -->
+        <div class="w-80 max-h-[calc(100vh-4rem)] overflow-y-auto bg-white/60 backdrop-blur-xl rounded-panel p-6 shadow-lg border border-white/70 pointer-events-auto flex flex-col gap-6" style="scrollbar-width: none;">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-bold uppercase tracking-wider border border-brand-primary/20">Status</span>
+                </div>
+                <h2 class="text-xl font-bold text-brand-dark tracking-tight">Macro Lifecycle</h2>
+                <p class="text-xs text-brand-dark/60 font-medium mt-1">High-level operational steps</p>
+            </div>
+            
+            <div class="space-y-5 relative ml-2">
+                <!-- connecting line -->
+                <div class="absolute left-[3px] top-2 bottom-2 w-0.5 bg-brand-dark/10 z-0"></div>
+                
+                <!-- Completed Steps -->
+                <div class="flex gap-4 items-start relative z-10 opacity-50">
+                    <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-bold text-brand-dark">Planning</p></div>
+                </div>
+                <div class="flex gap-4 items-start relative z-10 opacity-50">
+                    <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-bold text-brand-dark">Dispatch</p></div>
+                </div>
+                
+                <!-- Active Step -->
+                <div class="flex gap-4 items-start relative z-10 bg-white/50 -ml-4 p-3 rounded-lg border border-white shadow-sm">
+                    <div class="w-2 h-2 rounded-full bg-brand-primary mt-1.5 flex-shrink-0 relative">
+                        <div class="absolute inset-0 bg-brand-primary rounded-full animate-ping-large opacity-50"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-brand-primary">Ocean Transit</p>
+                        <p class="text-[10px] text-brand-primary/70 mt-1 font-medium leading-relaxed">Shipment is currently in transit</p>
+                    </div>
+                </div>
+
+                <!-- Pending Steps -->
+                <div class="flex gap-4 items-start relative z-10 opacity-30">
+                    <div class="w-2 h-2 rounded-full border-2 border-brand-dark bg-transparent mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-bold text-brand-dark">Customs Clearance</p></div>
+                </div>
+                <div class="flex gap-4 items-start relative z-10 opacity-30">
+                    <div class="w-2 h-2 rounded-full border-2 border-brand-dark bg-transparent mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-bold text-brand-dark">Partner DC Receipt</p></div>
+                </div>
+                <div class="flex gap-4 items-start relative z-10 opacity-30">
+                    <div class="w-2 h-2 rounded-full border-2 border-brand-dark bg-transparent mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-bold text-brand-dark">Inventory Confirmed</p></div>
+                </div>
+                <div class="flex gap-4 items-start relative z-10 opacity-30">
+                    <div class="w-2 h-2 rounded-full border-2 border-brand-dark bg-transparent mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-bold text-brand-dark">Last-Mile Distribution</p></div>
+                </div>
+                <div class="flex gap-4 items-start relative z-10 opacity-30">
+                    <div class="w-2 h-2 rounded-full border-2 border-brand-dark bg-transparent mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-bold text-brand-dark">Close-Out</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Detailed Tracking Info -->
+        <div class="w-[420px] max-h-[calc(100vh-4rem)] overflow-y-auto bg-white/60 backdrop-blur-xl rounded-panel p-6 shadow-lg border border-white/70 pointer-events-auto flex flex-col gap-6" style="scrollbar-width: none;">
+            
+            <!-- Header -->
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <span class="px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-bold uppercase tracking-wider border border-brand-primary/20">Departed</span>
+                    <span class="text-xs font-semibold text-brand-primary">ETA: 27-Jun-26</span>
+                </div>
+                <h1 class="text-2xl font-bold text-brand-dark tracking-tight">S00262912</h1>
+                <p class="text-xs text-brand-dark/60 uppercase tracking-widest font-semibold mt-1">OCEAN EXPORT - FCL • 8159 KG</p>
+            </div>
+
+            <!-- Quick Details Grid -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Origin Port</span>
+                    <span class="text-[14px] font-semibold text-brand-dark">CATOR (Toronto)</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Destination</span>
+                    <span class="text-[14px] font-semibold text-brand-dark">SZ7DS (Eswatini)</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Container</span>
+                    <span class="text-[14px] font-semibold text-brand-dark">MRSU7729222</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Seal Number</span>
+                    <span class="text-[14px] font-semibold text-brand-dark">3313145</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Packages</span>
+                    <span class="text-[14px] font-semibold text-brand-dark">62 (FCL)</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Estimated Pickup</span>
+                    <span class="text-[14px] font-semibold text-brand-dark">16-Apr-26 11:00</span>
+                </div>
+            </div>
+
+            <!-- Transport Routings -->
+            <div class="pt-4 border-t border-brand-dark/10">
+                <h3 class="text-xs font-bold text-brand-dark/70 uppercase tracking-wider mb-4">Transport Routings (3)</h3>
+                <div class="space-y-3">
+                    <!-- Leg 1 -->
+                    <div class="bg-white/50 rounded-lg p-3 border border-white shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-brand-dark">CATOR</span>
+                                <svg class="w-4 h-4 text-brand-dark/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                <span class="text-sm font-bold text-brand-dark">CAMTR</span>
+                            </div>
+                            <span class="px-2 py-0.5 bg-brand-success/10 text-brand-success rounded text-[10px] font-bold uppercase">Arrived</span>
+                        </div>
+                        <p class="text-[11px] text-brand-dark/70 font-medium">RAIL - CMACGMYUL</p>
+                        <p class="text-[10px] text-brand-dark/50 mt-1">ATD 28-Apr-26 - ATA 30-Apr-26</p>
+                    </div>
+                    
+                    <!-- Leg 2 -->
+                    <div class="bg-white/50 rounded-lg p-3 border border-white shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-brand-dark">CAMTR</span>
+                                <svg class="w-4 h-4 text-brand-dark/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                <span class="text-sm font-bold text-brand-dark">DEBRE</span>
+                            </div>
+                            <span class="px-2 py-0.5 bg-brand-success/10 text-brand-success rounded text-[10px] font-bold uppercase">Arrived</span>
+                        </div>
+                        <p class="text-[11px] text-brand-dark/70 font-medium">CMA CGM PARANAGUA (617E)</p>
+                        <p class="text-[10px] text-brand-dark/50 mt-1">ATD 02-May-26 - ATA 18-May-26</p>
+                    </div>
+
+                    <!-- Leg 3 -->
+                    <div class="bg-brand-primary/5 rounded-lg p-3 border border-brand-primary/20 shadow-sm relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-primary"></div>
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-brand-primary">DEBRE</span>
+                                <svg class="w-4 h-4 text-brand-primary/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                <span class="text-sm font-bold text-brand-primary">ZADUR</span>
+                            </div>
+                            <span class="px-2 py-0.5 bg-brand-secondary/20 text-yellow-700 rounded text-[10px] font-bold uppercase border border-brand-secondary/30">Pending</span>
+                        </div>
+                        <p class="text-[11px] text-brand-primary font-medium">SANTA ROSA (620S)</p>
+                        <p class="text-[10px] text-brand-primary/60 mt-1">ETD 30-May-26 - ETA 27-Jun-26</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tracking History -->
+            <div class="pt-4 border-t border-brand-dark/10">
+                <h3 class="text-xs font-bold text-brand-dark/70 uppercase tracking-wider mb-4">Tracking History</h3>
+                <div class="space-y-4 relative ml-1">
+                    <div class="absolute left-[3px] top-2 bottom-2 w-0.5 bg-brand-dark/10 z-0"></div>
+                    
+                    <div class="flex gap-3 items-start relative z-10">
+                        <div class="w-2 h-2 rounded-full bg-brand-primary mt-1 flex-shrink-0 relative">
+                            <div class="absolute inset-0 bg-brand-primary rounded-full animate-ping-large opacity-50"></div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-brand-primary">Master Bill of Lading Received</p>
+                            <p class="text-[10px] text-brand-primary/80">KNOWN SHIPPER VERIFICATION</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">May 13, 2026 11:11</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 items-start relative z-10 opacity-70">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold">Agent Alerted for Delivery</p>
+                            <p class="text-[10px] text-brand-dark/70">PRE ALERT SENT TO AGENT/CLIENT</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">May 6, 2026 15:48</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 items-start relative z-10 opacity-70">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold">Arrived at Destination CFS</p>
+                            <p class="text-[10px] text-brand-dark/70">RAI Arrival Terminal Montreal, QC, CA</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">Apr 30, 2026 12:25</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 items-start relative z-10 opacity-70">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold">IN TRANSIT TO DESTINATION</p>
+                            <p class="text-[10px] text-brand-dark/70">Documents Rcvd/Verification of licensability</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">Apr 28, 2026 15:43</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 items-start relative z-10 opacity-70">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold">Delivered to CFS</p>
+                            <p class="text-[10px] text-brand-dark/70">Gate In at Terminal Toronto, ON, CA</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">Apr 25, 2026 11:10</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 items-start relative z-10 opacity-70">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold">Pickup Dispatched</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">Apr 22, 2026 15:13</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 items-start relative z-10 opacity-70">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold">Booking Confirmation</p>
+                            <p class="text-[10px] text-brand-dark/70">BOOKING CONFIRMATION/ROUTING SENT TO CLIENT</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">Apr 9, 2026 11:11</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 items-start relative z-10 opacity-70">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold">Shipment Routed</p>
+                            <p class="text-[10px] text-brand-dark/70">C00186485 Attached to Consol</p>
+                            <p class="text-[10px] text-brand-dark/40 mt-0.5">Apr 7, 2026 23:34</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Note: MapLibre uses [lng, lat] coordinate format unlike Leaflet/Globe.gl [lat, lng]
+        // We will flip them here for the variables to avoid refactoring all data
+        const toronto = [-79.3832, 43.6532]; // CATOR
+        const montreal = [-73.5673, 45.5017]; // CAMTR
+        const bremerhaven = [8.5809, 53.5396]; // DEBRE
+        const durban = [31.0218, -29.8587]; // ZADUR
+        const eswatini = [31.1367, -26.3054]; // SZ7DS
+
+        // Interpolated "Daily" Coordinates
+        const leg1_MontrealToBremerhaven = [
+            [-60.0, 48.0],
+            [-40.0, 51.0],
+            [-20.0, 53.0],
+            [-5.0, 52.0], // English channel
+            bremerhaven
+        ];
+
+        const leg2_BremerhavenToDurban = [
+            [-10.0, 45.0], // Bay of Biscay
+            [-20.0, 20.0], // West Africa coast
+            [-10.0, 0.0],  // Equator crossing
+            [5.0, -20.0],  // Namibia coast
+            [18.0, -35.0]  // Cape of Good Hope (Current Location)
+        ];
+
+        const completedPath = [toronto, montreal, ...leg1_MontrealToBremerhaven, ...leg2_BremerhavenToDurban];
+        const pendingPath = [completedPath[completedPath.length-1], durban, eswatini];
+        const dailyCoordinates = completedPath.slice(2); 
+
+        const currentShipmentLocation = [18.0, -35.0]; 
+
+        // Initialize MapLibre
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+            center: [-20, 10], // Atlantic
+            zoom: 2.5,
+            pitch: 55, // 2.5D Cinematic Tilt
+            bearing: 15,
+            attributionControl: false
+        });
+
+        // Setup Native MapLibre Layers once map loads
+        map.on('load', () => {
+            
+            // 1. Add Completed Route Source
+            map.addSource('route-completed', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'properties': {},
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': completedPath
+                    }
+                }
+            });
+
+            // 2. Add Pending Route Source
+            map.addSource('route-pending', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'properties': {},
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': pendingPath
+                    }
+                }
+            });
+
+            // 3. Render Neon Glow Layer (Completed)
+            map.addLayer({
+                'id': 'route-completed-glow',
+                'type': 'line',
+                'source': 'route-completed',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': 'hsl(165, 30%, 26%)',
+                    'line-width': 8,
+                    'line-blur': 12,
+                    'line-opacity': 0.6
+                }
+            });
+
+            // 4. Render Core Solid Layer (Completed)
+            map.addLayer({
+                'id': 'route-completed-core',
+                'type': 'line',
+                'source': 'route-completed',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': 'hsl(165, 30%, 26%)',
+                    'line-width': 3
+                }
+            });
+
+            // 5. Render Dashed Layer (Pending)
+            map.addLayer({
+                'id': 'route-pending-core',
+                'type': 'line',
+                'source': 'route-pending',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': 'hsl(168, 22%, 43%)',
+                    'line-width': 3,
+                    'line-dasharray': [2, 3]
+                }
+            });
+        });
+
+        // Add HTML Markers using MapLibre standard (automatically tracks with map pitch)
+        function createMarkerElement(html, type) {
+            const el = document.createElement('div');
+            el.innerHTML = html;
+            return el;
+        }
+
+        const waypoints = [
+            { pos: toronto, label: 'CATOR (Toronto)' },
+            { pos: montreal, label: 'CAMTR (Montreal)' },
+            { pos: bremerhaven, label: 'DEBRE (Bremerhaven)' },
+            { pos: durban, label: 'ZADUR (Durban)' },
+            { pos: eswatini, label: 'SZ7DS (Eswatini)' }
+        ];
+
+        waypoints.forEach(wp => {
+            const el = createMarkerElement(`
+                <div class="waypoint-marker relative group cursor-pointer z-40">
+                    <div class="custom-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        ${wp.label}
+                    </div>
+                </div>
+            `);
+            new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat(wp.pos).addTo(map);
+        });
+
+        dailyCoordinates.forEach(coord => {
+            if(coord !== currentShipmentLocation && coord !== bremerhaven) {
+                const el = createMarkerElement(`<div class="daily-dot-marker"></div>`);
+                new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat(coord).addTo(map);
+            }
+        });
+
+        // Current Shipment Location Pulsing Marker
+        const shipmentEl = createMarkerElement(`
+            <div class="shipment-glow-marker relative group cursor-pointer z-50">
+                <div class="custom-tooltip primary-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Current Location (S00262912)
+                </div>
+            </div>
+        `);
+        new maplibregl.Marker({ element: shipmentEl, anchor: 'center' }).setLngLat(currentShipmentLocation).addTo(map);
+
+        // Map Control Functions
+        window.flyTo = function(point, zoom) {
+            map.flyTo({
+                center: point,
+                zoom: zoom,
+                pitch: 55,
+                duration: 2500,
+                essential: true
+            });
+        }
+        
+        // Initial Cinematic Fly-in
+        setTimeout(() => {
+            map.flyTo({
+                center: [-10, 10], // Atlantic overview
+                zoom: 2.8,
+                pitch: 55,
+                bearing: 0,
+                duration: 3500,
+                essential: true
+            });
+        }, 500);
+
+    </script>
+</body>
+</html>
