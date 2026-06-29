@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Tracking Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- MapLibre GL JS -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+
+    <!-- Globe.gl -->
+    <script src="https://unpkg.com/three@0.158.0"></script>
+    <script src="https://unpkg.com/globe.gl@2.30.0"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: rgb(32 33 36 / 0.18); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: rgb(32 33 36 / 0.32); }
+
+        body { font-family: 'Google Sans', sans-serif; overflow: hidden; margin: 0; }
+        
+        .map-container { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 0.5s ease; }
+        .hidden-viz { opacity: 0; pointer-events: none; }
+        
+        /* Glowing marker for active shipments */
+        .shipment-active {
+            width: 20px;
+            height: 20px;
+            background-color: hsl(165, 30%, 26%);
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 15px 5px rgba(23, 86, 75, 0.4);
+            position: relative;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: transform 0.2s;
+        }
+        .shipment-active:hover { transform: scale(1.2); }
+        .shipment-active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background-color: hsl(165, 30%, 26%);
+            border-radius: 50%;
+            animation: ping-large 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+            z-index: -1;
+        }
+
+        /* Static marker for arrived shipments */
+        .shipment-arrived {
+            width: 16px;
+            height: 16px;
+            background-color: hsl(220, 6%, 13%);
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: transform 0.2s;
+        }
+        .shipment-arrived:hover { transform: scale(1.2); }
+
+        /* Minimal Popup Panel */
+        .minimal-popup {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 40;
+        }
+        .minimal-popup.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Full Details overlay matching map.html */
+        .expanded-view {
+            position: absolute;
+            inset: 0;
+            background: rgba(244, 244, 247, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .expanded-view.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: 'hsl(165, 30%, 26%)', secondary: 'hsl(38, 100%, 61%)',
+                            tertiary: 'hsl(168, 22%, 43%)', light: 'hsl(247, 16%, 84%)',
+                            dark: 'hsl(220, 6%, 13%)', success: 'hsl(142, 76%, 36%)', error: 'hsl(0, 84%, 60%)',
+                        }
+                    },
+                    borderRadius: { 'panel': '32px', 'control': '8px' },
+                    keyframes: {
+                        'ping-large': { '75%, 100%': { transform: 'scale(2.5)', opacity: '0' } }
+                    },
+                    animation: {
+                        'ping-large': 'ping-large 2.5s cubic-bezier(0, 0, 0.2, 1) infinite'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#040d21] text-brand-dark antialiased relative h-screen">
+    
+    <!-- 2D Map Container -->
+    <div id="mapViz" class="map-container hidden-viz"></div>
+    
+    <!-- 3D Globe Container -->
+    <div id="globeViz" class="map-container cursor-grab active:cursor-grabbing"></div>
+
+    <!-- UI Overlays -->
+    <div class="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-6">
+        
+        <!-- Top Header & Controls -->
+        <div class="flex justify-between items-start pointer-events-auto">
+            <div class="bg-white/80 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-white flex items-center gap-4">
+                <h1 class="font-bold text-lg tracking-tight">Global Network</h1>
+                <div class="h-4 w-px bg-brand-dark/20"></div>
+                <div class="flex gap-2 text-sm font-semibold">
+                    <span class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></div> Active (<span id="active-count">3</span>)</span>
+                    <span class="flex items-center gap-1.5 ml-2"><div class="w-2 h-2 rounded-full bg-brand-dark"></div> Arrived (<span id="arrived-count">2</span>)</span>
+                </div>
+            </div>
+
+            <!-- View Toggles -->
+            <div class="bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-white flex gap-1 items-center">
+                <button id="toggle-3d" class="px-5 py-2 rounded-full bg-brand-dark text-white text-xs font-bold transition-colors">3D Globe</button>
+                <button id="toggle-2d" class="px-5 py-2 rounded-full hover:bg-brand-light text-brand-dark text-xs font-bold transition-colors">2D Map</button>
+                <div class="w-px h-5 bg-brand-dark/20 mx-1"></div>
+                <button id="toggle-filter" class="px-5 py-2 rounded-full hover:bg-brand-light text-brand-dark text-xs font-bold transition-colors">Show Active Only</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimal Popup -->
+    <div id="minimalPopup" class="minimal-popup w-[340px]">
+        <div class="bg-white/90 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-5 relative overflow-hidden">
+            <div id="popup-header-bg" class="absolute top-0 left-0 w-full h-1 bg-brand-primary"></div>
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <span id="popup-status" class="px-2 py-0.5 bg-brand-primary/10 text-brand-primary rounded text-[10px] font-bold uppercase tracking-wider">In Transit</span>
+                    <h3 id="popup-id" class="text-xl font-bold mt-1 tracking-tight">S00262912</h3>
+                </div>
+                <button onclick="closePopup()" class="text-brand-dark/40 hover:text-brand-dark transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="flex items-center justify-between text-sm font-semibold mb-6">
+                <div class="flex-1">
+                    <p id="popup-origin-code" class="text-brand-dark">CATOR</p>
+                    <p id="popup-origin-city" class="text-[10px] text-brand-dark/50 uppercase tracking-wider">Toronto</p>
+                </div>
+                <div class="flex-1 flex flex-col items-center">
+                    <p id="popup-eta" class="text-[10px] font-bold text-brand-primary">ETA 27-Jun</p>
+                    <div class="w-full flex items-center justify-center gap-1 my-1">
+                        <div class="w-1 h-1 rounded-full bg-brand-dark/20"></div>
+                        <div class="h-px bg-brand-dark/20 flex-1"></div>
+                        <svg class="w-4 h-4 text-brand-dark/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </div>
+                </div>
+                <div class="flex-1 text-right">
+                    <p id="popup-dest-code" class="text-brand-dark">SZ7DS</p>
+                    <p id="popup-dest-city" class="text-[10px] text-brand-dark/50 uppercase tracking-wider">Eswatini</p>
+                </div>
+            </div>
+
+            <button onclick="expandView()" class="w-full py-2.5 bg-brand-primary hover:bg-brand-primary/90 text-white text-xs font-bold rounded-xl transition-colors shadow-sm flex justify-center items-center gap-2">
+                View Full Details
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Expanded Details View (Replicating map.html UI) -->
+    <div id="expandedView" class="expanded-view flex items-center justify-center p-8">
+        <button onclick="collapseView()" class="absolute top-8 right-8 bg-white hover:bg-brand-light text-brand-dark px-5 py-2.5 rounded-full shadow-lg border border-white font-bold text-xs transition-colors z-50 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Global View
+        </button>
+        
+        <div class="w-full h-full max-w-7xl relative flex justify-between items-start pt-16">
+            <!-- Left Panel -->
+            <div class="w-80 max-h-[85vh] overflow-y-auto bg-white/80 backdrop-blur-2xl rounded-panel p-6 shadow-2xl border border-white pointer-events-auto flex flex-col gap-6" style="scrollbar-width: none;">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="exp-status" class="px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-bold uppercase tracking-wider">Status</span>
+                    </div>
+                    <h2 class="text-xl font-bold tracking-tight">Macro Lifecycle</h2>
+                    <p class="text-xs text-brand-dark/60 font-medium mt-1">High-level operational steps</p>
+                </div>
+                
+                <div id="exp-macro-container" class="space-y-5 relative ml-2">
+                    <!-- Dynamic Macro Steps Injected Here -->
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="w-[420px] max-h-[85vh] overflow-y-auto bg-white/80 backdrop-blur-2xl rounded-panel p-6 shadow-2xl border border-white pointer-events-auto flex flex-col gap-6" style="scrollbar-width: none;">
+                <div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span id="exp-status-tag" class="px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-bold uppercase tracking-wider">Departed</span>
+                        <span id="exp-eta" class="text-xs font-semibold text-brand-primary">ETA: 27-Jun-26</span>
+                    </div>
+                    <h1 id="exp-id" class="text-2xl font-bold tracking-tight">S00262912</h1>
+                    <p id="exp-type" class="text-xs text-brand-dark/60 uppercase tracking-widest font-semibold mt-1">OCEAN EXPORT - FCL</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Origin Port</span>
+                        <span id="exp-origin" class="text-[14px] font-semibold text-brand-dark">CATOR (Toronto)</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Destination</span>
+                        <span id="exp-dest" class="text-[14px] font-semibold text-brand-dark">SZ7DS (Eswatini)</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Packages</span>
+                        <span id="exp-packages" class="text-[14px] font-semibold text-brand-dark">1 (FCL)</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-brand-dark/40 uppercase tracking-widest mb-1">Estimated Pickup</span>
+                        <span id="exp-pickup" class="text-[14px] font-semibold text-brand-dark">16-Apr-26 11:00</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-brand-dark/10">
+                    <h3 class="text-xs font-bold text-brand-dark/70 uppercase tracking-wider mb-4">Transport Routings</h3>
+                    <div id="exp-routes-container" class="space-y-3">
+                        <!-- Dynamic Routings Injected Here -->
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-brand-dark/10">
+                    <h3 class="text-xs font-bold text-brand-dark/70 uppercase tracking-wider mb-4">Tracking History</h3>
+                    <div id="exp-history-container" class="space-y-4 relative ml-1">
+                        <div class="absolute left-[3px] top-2 bottom-2 w-0.5 bg-brand-dark/10 z-0"></div>
+                        <!-- Dynamic History Injected Here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Highly Detailed Mock Data matching live properties
+        const shipments = [
+            {
+                id: 'S00262911', status: 'active',
+                lat: 45.0, lng: -40.0,
+                origin: { code: 'CAVAN', city: 'Vancouver', lat: 49.2, lng: -123.1 },
+                dest: { code: 'GBLON', city: 'London', lat: 51.5, lng: -0.1 },
+                eta: '14-Jul-26',
+                type: 'OCEAN EXPORT - FCL',
+                packages: '3 (FCL)',
+                pickup: '10-Jun-26 09:00',
+                macro: [
+                    { name: 'Planning', status: 'completed' },
+                    { name: 'Dispatch', status: 'completed' },
+                    { name: 'Ocean Transit', status: 'active', desc: 'Shipment is currently in transit' },
+                    { name: 'Customs Clearance', status: 'pending' },
+                    { name: 'Last-Mile Distribution', status: 'pending' }
+                ],
+                routes: [
+                    { orig: 'CAVAN', dest: 'NYC', vessel: 'Vancouver Express 101E', status: 'completed' },
+                    { orig: 'NYC', dest: 'GBLON', vessel: 'Atlantic Star 202E', status: 'pending' }
+                ],
+                history: [
+                    { event: 'Departed Origin Port', desc: 'Vessel Departed', date: '15-Jun-26 14:00', status: 'active' },
+                    { event: 'Gate In', desc: 'Arrived at terminal', date: '12-Jun-26 10:00', status: 'completed' },
+                    { event: 'Booking Confirmed', desc: 'Booking sent to client', date: '01-Jun-26 09:11', status: 'completed' }
+                ]
+            },
+            {
+                id: 'S00262912', status: 'active',
+                lat: -35.0, lng: 18.0,
+                origin: { code: 'CATOR', city: 'Toronto', lat: 43.6, lng: -79.3 },
+                dest: { code: 'SZ7DS', city: 'Eswatini', lat: -26.3, lng: 31.1 },
+                eta: '27-Jun-26',
+                type: 'OCEAN EXPORT - FCL',
+                packages: '1 (FCL)',
+                pickup: '16-Apr-26 11:00',
+                macro: [
+                    { name: 'Planning', status: 'completed' },
+                    { name: 'Dispatch', status: 'completed' },
+                    { name: 'Ocean Transit', status: 'active', desc: 'Shipment is currently in transit' },
+                    { name: 'Customs Clearance', status: 'pending' },
+                    { name: 'Partner DC Receipt', status: 'pending' },
+                    { name: 'Close-Out', status: 'pending' }
+                ],
+                routes: [
+                    { orig: 'CATOR', dest: 'CAMTR', vessel: 'RAIL - CMACGMYUL', status: 'completed' },
+                    { orig: 'CAMTR', dest: 'DEBRE', vessel: 'CMA CGM PARANAGUA (617E)', status: 'completed' },
+                    { orig: 'DEBRE', dest: 'ZADUR', vessel: 'SANTA ROSA (620S)', status: 'pending' }
+                ],
+                history: [
+                    { event: 'Master Bill of Lading Received', desc: 'KNOWN SHIPPER VERIFICATION', date: 'May 13, 2026 11:11', status: 'active' },
+                    { event: 'Agent Alerted for Delivery', desc: 'PRE ALERT SENT TO AGENT/CLIENT', date: 'May 6, 2026 15:48', status: 'completed' },
+                    { event: 'Arrived at Destination CFS', desc: 'RAI Arrival Terminal Montreal, QC, CA', date: 'Apr 30, 2026 12:25', status: 'completed' },
+                    { event: 'IN TRANSIT TO DESTINATION', desc: 'Documents Rcvd/Verification of licensability', date: 'Apr 28, 2026 15:43', status: 'completed' },
+                    { event: 'Booking Confirmation', desc: 'BOOKING CONFIRMATION/ROUTING SENT TO CLIENT', date: 'Apr 9, 2026 11:11', status: 'completed' }
+                ]
+            },
+            {
+                id: 'S00262913', status: 'active',
+                lat: 20.0, lng: -160.0,
+                origin: { code: 'CNSHA', city: 'Shanghai', lat: 31.2, lng: 121.4 },
+                dest: { code: 'USLAX', city: 'Los Angeles', lat: 34.0, lng: -118.2 },
+                eta: '02-Aug-26',
+                type: 'OCEAN EXPORT - LCL',
+                packages: '45 (LCL)',
+                pickup: '20-Jul-26 08:30',
+                macro: [
+                    { name: 'Planning', status: 'completed' },
+                    { name: 'Dispatch', status: 'completed' },
+                    { name: 'Ocean Transit', status: 'active', desc: 'Shipment is currently in transit' },
+                    { name: 'Customs Clearance', status: 'pending' },
+                    { name: 'Last-Mile Distribution', status: 'pending' }
+                ],
+                routes: [
+                    { orig: 'CNSHA', dest: 'USLAX', vessel: 'Pacific Voyager 88E', status: 'pending' }
+                ],
+                history: [
+                    { event: 'Departed Origin Port', desc: 'Vessel Departed Shanghai', date: '25-Jul-26 18:00', status: 'active' },
+                    { event: 'Gate In', desc: 'Arrived at terminal Shanghai', date: '22-Jul-26 09:00', status: 'completed' },
+                    { event: 'Booking Confirmed', desc: 'Booking sent to client', date: '10-Jul-26 11:11', status: 'completed' }
+                ]
+            },
+            {
+                id: 'S00266198', status: 'arrived',
+                lat: 35.6, lng: 139.6,
+                origin: { code: 'DEBER', city: 'Berlin', lat: 52.5, lng: 13.4 },
+                dest: { code: 'JPTYO', city: 'Tokyo', lat: 35.6, lng: 139.6 },
+                eta: '10-Jun-26',
+                type: 'AIR FREIGHT',
+                packages: '2 Pallets',
+                pickup: '01-Jun-26 14:00',
+                macro: [
+                    { name: 'Planning', status: 'completed' },
+                    { name: 'Air Transit', status: 'completed' },
+                    { name: 'Customs Clearance', status: 'completed' },
+                    { name: 'Last-Mile Distribution', status: 'completed' },
+                    { name: 'Close-Out', status: 'completed' }
+                ],
+                routes: [
+                    { orig: 'DEBER', dest: 'JPTYO', vessel: 'LH8300', status: 'completed' }
+                ],
+                history: [
+                    { event: 'Proof of Delivery', desc: 'Delivered to Consignee Tokyo', date: '10-Jun-26 16:30', status: 'completed' },
+                    { event: 'Customs Cleared', desc: 'Released by Customs', date: '09-Jun-26 11:00', status: 'completed' },
+                    { event: 'Arrived Destination', desc: 'Flight Landed JPTYO', date: '08-Jun-26 22:00', status: 'completed' }
+                ]
+            },
+            {
+                id: 'S00266202', status: 'arrived',
+                lat: 25.2, lng: 55.2,
+                origin: { code: 'INBOM', city: 'Mumbai', lat: 19.0, lng: 72.8 },
+                dest: { code: 'AEDXB', city: 'Dubai', lat: 25.2, lng: 55.2 },
+                eta: '15-Jun-26',
+                type: 'OCEAN EXPORT - FCL',
+                packages: '2 (FCL)',
+                pickup: '05-Jun-26 10:00',
+                macro: [
+                    { name: 'Planning', status: 'completed' },
+                    { name: 'Ocean Transit', status: 'completed' },
+                    { name: 'Customs Clearance', status: 'completed' },
+                    { name: 'Last-Mile Distribution', status: 'completed' },
+                    { name: 'Close-Out', status: 'completed' }
+                ],
+                routes: [
+                    { orig: 'INBOM', dest: 'AEDXB', vessel: 'Gulf Express 55W', status: 'completed' }
+                ],
+                history: [
+                    { event: 'Proof of Delivery', desc: 'Delivered to Consignee Dubai', date: '15-Jun-26 10:30', status: 'completed' },
+                    { event: 'Customs Cleared', desc: 'Released by Customs', date: '14-Jun-26 09:00', status: 'completed' },
+                    { event: 'Arrived Destination', desc: 'Vessel Arrived AEDXB', date: '13-Jun-26 12:00', status: 'completed' }
+                ]
+            }
+        ];
+
+        let currentShipment = null;
+        let is3D = true;
+        let showActiveOnly = false;
+        
+        // Track previous camera states for restoring when popup is closed
+        let previousGlobePov = { lat: 20, lng: -40, altitude: 2 };
+        let previousMapState = { center: [-40, 20], zoom: 1.5 };
+
+        // UI Elements
+        const toggle3dBtn = document.getElementById('toggle-3d');
+        const toggle2dBtn = document.getElementById('toggle-2d');
+        const toggleFilterBtn = document.getElementById('toggle-filter');
+        const globeViz = document.getElementById('globeViz');
+        const mapViz = document.getElementById('mapViz');
+        const minimalPopup = document.getElementById('minimalPopup');
+        const expandedView = document.getElementById('expandedView');
+
+        // --- 3D GLOBE SETUP ---
+        const world = Globe()(globeViz)
+            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+            .backgroundColor('#040d21')
+            .pointOfView(previousGlobePov);
+            
+        // Make scroll/zoom much faster
+        world.controls().zoomSpeed = 2.5;
+
+        function createGlobeMarkers() {
+            const elData = shipments.filter(s => showActiveOnly ? s.status === 'active' : true).map(s => ({
+                lat: s.lat, lng: s.lng, data: s
+            }));
+
+            world.htmlElementsData(elData)
+                .htmlElement(d => {
+                    const el = document.createElement('div');
+                    el.className = d.data.status === 'active' ? 'shipment-active' : 'shipment-arrived';
+                    el.onpointerdown = (e) => e.stopPropagation();
+                    el.onclick = (e) => {
+                        e.stopPropagation();
+                        selectShipment(d.data);
+                    };
+                    return el;
+                });
+
+            const arcs = [];
+            shipments.forEach(s => {
+                if (showActiveOnly && s.status !== 'active') return;
+                
+                // Completed path (solid)
+                arcs.push({
+                    startLat: s.origin.lat, startLng: s.origin.lng,
+                    endLat: s.lat, endLng: s.lng,
+                    color: s.status === 'active' ? ['hsl(165, 30%, 26%)', 'hsl(165, 30%, 26%)'] : ['#555', '#555'],
+                    isDashed: false
+                });
+                // Pending path (dashed for active)
+                arcs.push({
+                    startLat: s.lat, startLng: s.lng,
+                    endLat: s.dest.lat, endLng: s.dest.lng,
+                    color: s.status === 'active' ? ['rgba(23, 86, 75, 0.5)', 'rgba(23, 86, 75, 0.5)'] : ['#555', '#555'],
+                    isDashed: s.status === 'active'
+                });
+            });
+            world.arcsData(arcs)
+                .arcColor('color')
+                .arcDashLength(d => d.isDashed ? 0.1 : 1)
+                .arcDashGap(d => d.isDashed ? 0.05 : 0)
+                .arcDashAnimateTime(2000)
+                .arcAltitudeAutoScale(0.2)
+                .arcStroke(0.6);
+        }
+        createGlobeMarkers();
+        world.controls().autoRotate = true;
+        world.controls().autoRotateSpeed = 0.5;
+
+        // --- 2D MAPLIBRE SETUP ---
+        const map = new maplibregl.Map({
+            container: 'mapViz',
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
+            center: previousMapState.center,
+            zoom: previousMapState.zoom,
+            pitch: 0,
+            renderWorldCopies: false,
+            attributionControl: false
+        });
+        
+        let mapMarkers = [];
+        
+        function updateMapMarkers() {
+            mapMarkers.forEach(m => m.remove());
+            mapMarkers = [];
+            const filtered = shipments.filter(s => showActiveOnly ? s.status === 'active' : true);
+            
+            const features = [];
+            
+            filtered.forEach(s => {
+                const el = document.createElement('div');
+                el.className = s.status === 'active' ? 'shipment-active' : 'shipment-arrived';
+                el.onclick = () => selectShipment(s);
+                const marker = new maplibregl.Marker({ element: el })
+                    .setLngLat([s.lng, s.lat])
+                    .addTo(map);
+                mapMarkers.push(marker);
+                
+                features.push({
+                    type: 'Feature',
+                    properties: { status: s.status, part: 'completed' },
+                    geometry: { type: 'LineString', coordinates: [[s.origin.lng, s.origin.lat], [s.lng, s.lat]] }
+                });
+                features.push({
+                    type: 'Feature',
+                    properties: { status: s.status, part: 'pending' },
+                    geometry: { type: 'LineString', coordinates: [[s.lng, s.lat], [s.dest.lng, s.dest.lat]] }
+                });
+            });
+
+            if (map.getSource('routes')) {
+                map.getSource('routes').setData({ type: 'FeatureCollection', features });
+            }
+        }
+        
+        map.on('load', () => {
+            map.addSource('routes', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+            map.addLayer({
+                id: 'route-completed',
+                type: 'line',
+                source: 'routes',
+                filter: ['==', ['get', 'part'], 'completed'],
+                paint: {
+                    'line-color': ['case', ['==', ['get', 'status'], 'active'], 'hsl(165, 30%, 26%)', '#555555'],
+                    'line-width': 2
+                }
+            });
+            map.addLayer({
+                id: 'route-pending',
+                type: 'line',
+                source: 'routes',
+                filter: ['==', ['get', 'part'], 'pending'],
+                paint: {
+                    'line-color': ['case', ['==', ['get', 'status'], 'active'], 'rgba(23, 86, 75, 0.5)', '#555555'],
+                    'line-width': 2,
+                    'line-dasharray': [2, 4]
+                }
+            });
+            updateMapMarkers();
+        });
+
+        // --- INTERACTION LOGIC ---
+        function selectShipment(shipment) {
+            currentShipment = shipment;
+            
+            // Update Popup Data
+            document.getElementById('popup-id').innerText = shipment.id;
+            document.getElementById('popup-status').innerText = shipment.status === 'active' ? 'In Transit' : 'Delivered';
+            document.getElementById('popup-status').className = shipment.status === 'active' 
+                ? 'px-2 py-0.5 bg-brand-primary/10 text-brand-primary rounded text-[10px] font-bold uppercase tracking-wider'
+                : 'px-2 py-0.5 bg-brand-dark/10 text-brand-dark rounded text-[10px] font-bold uppercase tracking-wider';
+            document.getElementById('popup-header-bg').className = shipment.status === 'active'
+                ? 'absolute top-0 left-0 w-full h-1 bg-brand-primary'
+                : 'absolute top-0 left-0 w-full h-1 bg-brand-dark';
+            
+            document.getElementById('popup-origin-code').innerText = shipment.origin.code;
+            document.getElementById('popup-origin-city').innerText = shipment.origin.city;
+            document.getElementById('popup-dest-code').innerText = shipment.dest.code;
+            document.getElementById('popup-dest-city').innerText = shipment.dest.city;
+            document.getElementById('popup-eta').innerText = shipment.status === 'active' ? `ETA ${shipment.eta}` : `Arr ${shipment.eta}`;
+
+            // Save camera state and Fly camera (FASTER: 500ms)
+            if (is3D) {
+                if (!minimalPopup.classList.contains('active')) previousGlobePov = world.pointOfView();
+                world.controls().autoRotate = false;
+                world.pointOfView({ lat: shipment.lat, lng: shipment.lng, altitude: 0.8 }, 500);
+            } else {
+                if (!minimalPopup.classList.contains('active')) previousMapState = { center: map.getCenter(), zoom: map.getZoom() };
+                map.flyTo({ center: [shipment.lng, shipment.lat], zoom: 4, essential: true, duration: 500 });
+            }
+
+            minimalPopup.classList.add('active');
+        }
+
+        function closePopup() {
+            minimalPopup.classList.remove('active');
+            
+            // Restore camera to previous state smoothly (500ms)
+            if(is3D) {
+                world.pointOfView(previousGlobePov, 500);
+                world.controls().autoRotate = true;
+            } else {
+                map.flyTo({ center: previousMapState.center, zoom: previousMapState.zoom, essential: true, duration: 500 });
+            }
+        }
+
+        function expandView() {
+            if(!currentShipment) return;
+            const s = currentShipment;
+            
+            // Populate expanded view headers
+            document.getElementById('exp-id').innerText = s.id;
+            document.getElementById('exp-status').innerText = s.status === 'active' ? 'Ocean Transit' : 'Delivered';
+            document.getElementById('exp-status-tag').innerText = s.status === 'active' ? 'Departed' : 'Arrived';
+            document.getElementById('exp-type').innerText = s.type;
+            document.getElementById('exp-eta').innerText = s.status === 'active' ? `ETA: ${s.eta}` : `ATA: ${s.eta}`;
+            document.getElementById('exp-origin').innerText = `${s.origin.code} (${s.origin.city})`;
+            document.getElementById('exp-dest').innerText = `${s.dest.code} (${s.dest.city})`;
+            document.getElementById('exp-packages').innerText = s.packages;
+            document.getElementById('exp-pickup').innerText = s.pickup;
+
+            // Generate Dynamic Macro Lifecycle HTML
+            const macroHtml = '<div class="absolute left-[3px] top-2 bottom-2 w-0.5 bg-brand-dark/10 z-0"></div>' + 
+            s.macro.map(step => {
+                if(step.status === 'completed') {
+                    return `
+                    <div class="flex gap-4 items-start relative z-10 opacity-50">
+                        <div class="w-2 h-2 rounded-full bg-brand-dark mt-1.5 flex-shrink-0"></div>
+                        <div><p class="text-xs font-bold text-brand-dark">${step.name}</p></div>
+                    </div>`;
+                } else if(step.status === 'active') {
+                    return `
+                    <div class="flex gap-4 items-start relative z-10 bg-white/50 -ml-4 p-3 rounded-lg border border-white shadow-sm">
+                        <div class="w-2 h-2 rounded-full bg-brand-primary mt-1.5 flex-shrink-0 relative">
+                            <div class="absolute inset-0 bg-brand-primary rounded-full animate-ping-large opacity-50"></div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-brand-primary">${step.name}</p>
+                            ${step.desc ? `<p class="text-[10px] text-brand-primary/70 mt-1 font-medium leading-relaxed">${step.desc}</p>` : ''}
+                        </div>
+                    </div>`;
+                } else {
+                    return `
+                    <div class="flex gap-4 items-start relative z-10 opacity-30">
+                        <div class="w-2 h-2 rounded-full border-2 border-brand-dark bg-transparent mt-1.5 flex-shrink-0"></div>
+                        <div><p class="text-xs font-bold text-brand-dark">${step.name}</p></div>
+                    </div>`;
+                }
+            }).join('');
+            document.getElementById('exp-macro-container').innerHTML = macroHtml;
+
+            // Generate Dynamic Routings HTML
+            const routesHtml = s.routes.map(r => {
+                const isActive = r.status === 'pending';
+                return `
+                <div class="${isActive ? 'bg-brand-primary/5 border-brand-primary/20' : 'bg-white/50 border-white'} rounded-lg p-3 border shadow-sm relative overflow-hidden">
+                    ${isActive ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-primary"></div>' : ''}
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold ${isActive ? 'text-brand-primary' : 'text-brand-dark'}">${r.orig}</span>
+                            <svg class="w-4 h-4 ${isActive ? 'text-brand-primary/50' : 'text-brand-dark/40'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            <span class="text-sm font-bold ${isActive ? 'text-brand-primary' : 'text-brand-dark'}">${r.dest}</span>
+                        </div>
+                        <span class="px-2 py-0.5 ${isActive ? 'bg-brand-secondary/20 text-yellow-700 border-brand-secondary/30' : 'bg-brand-success/10 text-brand-success'} border rounded text-[10px] font-bold uppercase">${isActive ? 'Pending' : 'Arrived'}</span>
+                    </div>
+                    <p class="text-[11px] ${isActive ? 'text-brand-primary' : 'text-brand-dark/70'} font-medium">${r.vessel}</p>
+                </div>`;
+            }).join('');
+            document.getElementById('exp-routes-container').innerHTML = routesHtml;
+
+            // Generate Dynamic Tracking History HTML
+            const historyHtml = '<div class="absolute left-[3px] top-2 bottom-2 w-0.5 bg-brand-dark/10 z-0"></div>' + 
+            s.history.map(h => {
+                const isActive = h.status === 'active';
+                return `
+                <div class="flex gap-3 items-start relative z-10 ${isActive ? '' : 'opacity-70'}">
+                    <div class="w-2 h-2 rounded-full ${isActive ? 'bg-brand-primary' : 'bg-brand-dark'} mt-1 flex-shrink-0 relative">
+                        ${isActive ? '<div class="absolute inset-0 bg-brand-primary rounded-full animate-ping-large opacity-50"></div>' : ''}
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold ${isActive ? 'text-brand-primary' : 'text-brand-dark'}">${h.event}</p>
+                        <p class="text-[10px] ${isActive ? 'text-brand-primary/80' : 'text-brand-dark/70'}">${h.desc}</p>
+                        <p class="text-[10px] text-brand-dark/40 mt-0.5">${h.date}</p>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('exp-history-container').innerHTML = historyHtml;
+
+            expandedView.classList.add('active');
+            minimalPopup.classList.remove('active');
+        }
+
+        function collapseView() {
+            expandedView.classList.remove('active');
+            closePopup(); // This will trigger the camera restore logic seamlessly
+        }
+
+        // --- TOGGLE HANDLERS ---
+        toggle3dBtn.onclick = () => {
+            if(is3D) return;
+            is3D = true;
+            mapViz.classList.add('hidden-viz');
+            globeViz.classList.remove('hidden-viz');
+            toggle3dBtn.className = "px-5 py-2 rounded-full bg-brand-dark text-white text-xs font-bold transition-colors";
+            toggle2dBtn.className = "px-5 py-2 rounded-full hover:bg-brand-light text-brand-dark text-xs font-bold transition-colors";
+            
+            // Sync camera roughly (Fast transition 500ms)
+            const center = map.getCenter();
+            world.pointOfView({ lat: center.lat, lng: center.lng, altitude: 2 }, 500);
+            if(!minimalPopup.classList.contains('active')) world.controls().autoRotate = true;
+        };
+
+        toggle2dBtn.onclick = () => {
+            if(!is3D) return;
+            is3D = false;
+            globeViz.classList.add('hidden-viz');
+            mapViz.classList.remove('hidden-viz');
+            toggle2dBtn.className = "px-5 py-2 rounded-full bg-brand-dark text-white text-xs font-bold transition-colors";
+            toggle3dBtn.className = "px-5 py-2 rounded-full hover:bg-brand-light text-brand-dark text-xs font-bold transition-colors";
+            
+            // Sync camera roughly
+            const pov = world.pointOfView();
+            map.jumpTo({ center: [pov.lng, pov.lat], zoom: 1 });
+        };
+
+        toggleFilterBtn.onclick = () => {
+            showActiveOnly = !showActiveOnly;
+            toggleFilterBtn.className = showActiveOnly 
+                ? "px-5 py-2 rounded-full bg-brand-primary text-white text-xs font-bold transition-colors shadow-inner"
+                : "px-5 py-2 rounded-full hover:bg-brand-light text-brand-dark text-xs font-bold transition-colors";
+            
+            createGlobeMarkers();
+            if(map.loaded()) updateMapMarkers();
+            closePopup();
+        };
+
+        // Window resize handling
+        window.addEventListener('resize', () => {
+            world.width(window.innerWidth).height(window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
